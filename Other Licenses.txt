@@ -1,0 +1,36 @@
+The MIT License (MIT)
+Copyright © 2014 Felix Jeyareuben Chandrakumar
+http://www.y-str.org
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the “Software”), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions: The above copyright
+notice and this permission notice shall be included in all copies or
+substantial portions of the Software. THE SOFTWARE IS PROVIDED “AS IS”,
+WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Other Licenses, References, Softwares, Libraries, Citations etc.
+
+HGDP Autosomal Reference Population: http://www.hagsc.org/hgdp/files.html
+ISOGG Y-Tree: http://isogg.org/tree/
+mtDNA Phylogeny: http://www.mtdnacommunity.org/downloads/mtDNAPhylogeny.xml
+Mitocondria Locations: http://www.mitomap.org/bin/view.pl/MITOMAP/GenomeLoci
+Application Icon: https://www.iconfinder.com/icons/171268/tree_icon#size=128
+Eraser icon: http://www.iconarchive.com/show/farm-fresh-icons-by-fatcow/draw-eraser-icon.html
+Paste icon: http://findicons.com/icon/67168/gnome_edit_paste?id=67897
+Delete icon: https://www.iconfinder.com/icons/100980/delete_trash_icon#size=16
+Disable icon: http://findicons.com/icon/116499/150?id=293646
+Enable icon: http://findicons.com/icon/2982/tick
+Girl: http://www.iconarchive.com/show/pretty-office-9-icons-by-custom-icon-design/baby-girl-icon.html
+Boy: http://www.iconarchive.com/show/pretty-office-9-icons-by-custom-icon-design/baby-boy-icon.html
+Woman: http://www.iconarchive.com/show/pretty-office-4-icons-by-custom-icon-design/woman-icon.html
+Man: http://www.iconarchive.com/show/pretty-office-2-icons-by-custom-icon-design/man-icon.html
+Refresh Icon: http://www.iconarchive.com/show/basic-2-icons-by-pixelmixer/reload-icon.html

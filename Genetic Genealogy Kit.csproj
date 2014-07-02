@@ -1,0 +1,295 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{918565A4-0748-4C0E-BC26-F725402DF66B}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Genetic_Genealogy_Kit</RootNamespace>
+    <AssemblyName>Genetic Genealogy Kit</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.92.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AboutGGKFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutGGKFrm.Designer.cs">
+      <DependentUpon>AboutGGKFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AdmixtureFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdmixtureFrm.Designer.cs">
+      <DependentUpon>AdmixtureFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DeveloperFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DeveloperFrm.Designer.cs">
+      <DependentUpon>DeveloperFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKitFrmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GGKitFrmMain.Designer.cs">
+      <DependentUpon>GGKitFrmMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKSettings.cs" />
+    <Compile Include="GGKUtilLib.cs" />
+    <Compile Include="LicenseFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LicenseFrm.Designer.cs">
+      <DependentUpon>LicenseFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LocationSelectFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LocationSelectFrm.Designer.cs">
+      <DependentUpon>LocationSelectFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IsoggYTreeFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IsoggYTreeFrm.designer.cs">
+      <DependentUpon>IsoggYTreeFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MitoMapFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MitoMapFrm.Designer.cs">
+      <DependentUpon>MitoMapFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MtPhylogenyFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MtPhylogenyFrm.designer.cs">
+      <DependentUpon>MtPhylogenyFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MatchingKitsFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MatchingKitsFrm.Designer.cs">
+      <DependentUpon>MatchingKitsFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewEditKitFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewEditKitFrm.Designer.cs">
+      <DependentUpon>NewEditKitFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OneToOneCmpFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OneToOneCmpFrm.Designer.cs">
+      <DependentUpon>OneToOneCmpFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PhasingFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PhasingFrm.Designer.cs">
+      <DependentUpon>PhasingFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ProcessKitsFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ProcessKitsFrm.Designer.cs">
+      <DependentUpon>ProcessKitsFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="QuickEditKit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QuickEditKit.Designer.cs">
+      <DependentUpon>QuickEditKit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ROHFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ROHFrm.Designer.cs">
+      <DependentUpon>ROHFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PhasedSegmentVisualizerFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PhasedSegmentVisualizerFrm.Designer.cs">
+      <DependentUpon>PhasedSegmentVisualizerFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SelectKitFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectKitFrm.Designer.cs">
+      <DependentUpon>SelectKitFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SelectTwoKitsFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectTwoKitsFrm.Designer.cs">
+      <DependentUpon>SelectTwoKitsFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SettingsFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SettingsFrm.Designer.cs">
+      <DependentUpon>SettingsFrm.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="AboutGGKFrm.resx">
+      <DependentUpon>AboutGGKFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AdmixtureFrm.resx">
+      <DependentUpon>AdmixtureFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DeveloperFrm.resx">
+      <DependentUpon>DeveloperFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GGKitFrmMain.resx">
+      <DependentUpon>GGKitFrmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LicenseFrm.resx">
+      <DependentUpon>LicenseFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LocationSelectFrm.resx">
+      <DependentUpon>LocationSelectFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IsoggYTreeFrm.resx">
+      <DependentUpon>IsoggYTreeFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MitoMapFrm.resx">
+      <DependentUpon>MitoMapFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MtPhylogenyFrm.resx">
+      <DependentUpon>MtPhylogenyFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MatchingKitsFrm.resx">
+      <DependentUpon>MatchingKitsFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewEditKitFrm.resx">
+      <DependentUpon>NewEditKitFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OneToOneCmpFrm.resx">
+      <DependentUpon>OneToOneCmpFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PhasingFrm.resx">
+      <DependentUpon>PhasingFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ProcessKitsFrm.resx">
+      <DependentUpon>ProcessKitsFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="QuickEditKit.resx">
+      <DependentUpon>QuickEditKit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ROHFrm.resx">
+      <DependentUpon>ROHFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PhasedSegmentVisualizerFrm.resx">
+      <DependentUpon>PhasedSegmentVisualizerFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectKitFrm.resx">
+      <DependentUpon>SelectKitFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="SelectTwoKitsFrm.resx">
+      <DependentUpon>SelectTwoKitsFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SettingsFrm.resx">
+      <DependentUpon>SettingsFrm.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="map.csv.gz" />
+    <None Include="mtdna_map.csv" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <None Include="RSRS.txt.gz" />
+    <None Include="ysnp_hg19.txt.gz" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="baby.png" />
+    <Content Include="snps_on_tree.txt" />
+    <Content Include="ytree.xml" />
+    <None Include="boy.png" />
+    <Content Include="db.sql" />
+    <Content Include="delete.png" />
+    <Content Include="diff.exe" />
+    <Content Include="disable.png" />
+    <Content Include="enable.png" />
+    <Content Include="eraser.png" />
+    <None Include="girl.png" />
+    <Content Include="icon.ico" />
+    <Content Include="LICENSE.txt" />
+    <Content Include="logo.png" />
+    <None Include="man-2-icon.png" />
+    <None Include="mtDNAPhylogeny.xml" />
+    <Content Include="paste.png" />
+    <None Include="refresh.png" />
+    <Content Include="System.Data.SQLite.dll" />
+    <Content Include="tree.ico" />
+    <None Include="woman-icon.png" />
+    <Content Include="world_map.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
