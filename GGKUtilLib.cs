@@ -75,34 +75,32 @@ namespace Genetic_Genealogy_Kit
 
         public static void FactoryReset()
         {
-            //if (File.Exists(SQLITE_DB))
-            //    File.Move(SQLITE_DB, SQLITE_DB + "-" + DateTime.Now.Ticks.ToString("X"));
-            //if (connection != null)
-            //    connection.Dispose();
-            //connection = new SQLiteConnection(@"Data Source=" + GGKUtilLib.SQLITE_DB + @";Version=3; Compress=True; New=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;");
-            //connection.Open();
-            //Dictionary<string, string> pragma = new Dictionary<string, string>();
+            if (File.Exists(SQLITE_DB))
+                File.Move(SQLITE_DB, SQLITE_DB + "-" + DateTime.Now.Ticks.ToString("X"));
+            SQLiteConnection connection = new SQLiteConnection(@"Data Source=" + GGKUtilLib.SQLITE_DB + @";Version=3; Compress=True; New=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;");
+            connection.Open();
+            Dictionary<string, string> pragma = new Dictionary<string, string>();
 
-            //pragma.Add("foreign_keys", "ON");
-            //pragma.Add("auto_vacuum", "FULL");
-            //using (SQLiteTransaction trans = connection.BeginTransaction())
-            //{
-            //    SQLiteCommand ss2 = null;
-            //    foreach (string key in pragma.Keys)
-            //    {
-            //        ss2 = new SQLiteCommand("PRAGMA " + key + " = " + pragma[key] + ";", connection);
-            //        ss2.ExecuteNonQuery();
-            //    }
-            //    // ---
-            //    for (int idx = 0; idx < CreateTableSQL.Length; idx += 2)
-            //    {
-            //        ss2 = new SQLiteCommand(CreateTableSQL[idx + 1], connection);
-            //        ss2.ExecuteNonQuery();
-            //    }
-            //    insertDefaultSettings(connection);
-            //    trans.Commit();
-            //}
-            //connection.Close();
+            pragma.Add("foreign_keys", "ON");
+            pragma.Add("auto_vacuum", "FULL");
+            using (SQLiteTransaction trans = connection.BeginTransaction())
+            {
+                SQLiteCommand ss2 = null;
+                foreach (string key in pragma.Keys)
+                {
+                    ss2 = new SQLiteCommand("PRAGMA " + key + " = " + pragma[key] + ";", connection);
+                    ss2.ExecuteNonQuery();
+                }
+                // ---
+                for (int idx = 0; idx < CreateTableSQL.Length; idx += 2)
+                {
+                    ss2 = new SQLiteCommand(CreateTableSQL[idx + 1], connection);
+                    ss2.ExecuteNonQuery();
+                }
+                insertDefaultSettings(connection);
+                trans.Commit();
+            }
+            connection.Close();
         }
 
         public static SQLiteConnection getDBConnection()
@@ -128,7 +126,11 @@ namespace Genetic_Genealogy_Kit
             {
                 //FactoryReset();
                 //return getDBConnection();
-                MessageBox.Show("Data file ggk.db doesn't exist.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if(MessageBox.Show("Data file ggk.db doesn't exist. If this is the first time you are opening the software, you can ignore this error. Do you wish to create one? ", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error)==DialogResult.Yes)
+                {
+                    FactoryReset();
+                    return getDBConnection();
+                }
                 Application.Exit();
             }
             return null;
@@ -1211,7 +1213,7 @@ namespace Genetic_Genealogy_Kit
                     string ysnps = null;
                     string ystr = null;
                     string mtdna = null;
-
+                    string fasta = null;
                     string autosomal_file = Path.GetTempFileName();
                     FileStream fs = new FileStream(autosomal_file, FileMode.Create);
                     dt_autosomal.WriteXml(fs);
@@ -1221,23 +1223,16 @@ namespace Genetic_Genealogy_Kit
                     autosomal_schema = Encoding.UTF8.GetString(ms.ToArray());
 
                     // kit - ysnp
-                    query = new SQLiteCommand(@"SELECT ysnp,derived from kit_ysnps where kit_no=@kit_no", cnn);
+                    query = new SQLiteCommand(@"SELECT ysnps from kit_ysnps where kit_no=@kit_no", cnn);
                     query.Parameters.AddWithValue("@kit_no", kit);
                     reader = query.ExecuteReader();
-                    StringBuilder sb = new StringBuilder();
-                    while (reader.Read())
+                    if (reader.Read())
                     {
-                        if (reader.GetInt16(1) == 1)
-                            sb.Append(reader.GetString(0) + "+, ");
-                        else
-                            sb.Append(reader.GetString(0) + "-, ");
+                        ysnps = reader.GetString(0);
                     }
                     reader.Close();
                     query.Dispose();
-                    ysnps = sb.ToString().Trim();
-                    if (ysnps.Length > 0)
-                        ysnps = ysnps.Substring(0, ysnps.Length - 1);
-
+                    
 
                     // kit - ystr
                     query = new SQLiteCommand(@"SELECT marker,value from kit_ystr where kit_no=@kit_no", cnn);
@@ -1257,19 +1252,17 @@ namespace Genetic_Genealogy_Kit
                     query.Dispose();
 
                     // kit - mtdna
-                    query = new SQLiteCommand(@"SELECT mutation from kit_mtdna where kit_no=@kit_no", cnn);
+                    query = new SQLiteCommand(@"SELECT mutations,fasta from kit_mtdna where kit_no=@kit_no", cnn);
                     query.Parameters.AddWithValue("@kit_no", kit);
                     reader = query.ExecuteReader();
-                    sb.Length = 0;
-                    while (reader.Read())
+                    
+                    if (reader.Read())
                     {
-                        sb.Append(reader.GetString(0) + ", ");
+                        mtdna = reader.GetString(0);
+                        fasta = reader.GetString(1);
                     }
                     reader.Close();
                     query.Dispose();
-                    mtdna = sb.ToString().Trim();
-                    if (mtdna.Length > 0)
-                        mtdna = mtdna.Substring(0, mtdna.Length - 1);
                     cnn.Close();
                     //out of memory... on several occations. (!?) - need some quality checks
                     string temp_file = Path.GetTempFileName();
@@ -1279,7 +1272,7 @@ namespace Genetic_Genealogy_Kit
                     StreamReader at_reader = File.OpenText(autosomal_file);
                     string line = null;
                     int count = 0;
-                    sb.Length = 0;
+                    StringBuilder sb = new StringBuilder();
                     while ((line = at_reader.ReadLine()) != null)
                     {
                         sb.Append(line);
@@ -1295,7 +1288,7 @@ namespace Genetic_Genealogy_Kit
                     File.AppendAllText(temp_file, sb.ToString());
 
                     File.AppendAllText(temp_file, "\r\n@AUTOSOMAL-SCHEMA@\r\n" + autosomal_schema.Replace("\r\n", "").Replace("\r", "").Replace("\n", "").Trim());
-                    File.AppendAllText(temp_file, "\r\n@YSNPS@\r\n" + ysnps + "\r\n@YSTR@\r\n" + ystr + "\r\n@MTDNA@\r\n" + mtdna);
+                    File.AppendAllText(temp_file, "\r\n@YSNPS@\r\n" + ysnps + "\r\n@YSTR@\r\n" + ystr + "\r\n@MTDNA@\r\n" + mtdna+"\r\n@FASTA@\r\n"+Convert.ToBase64String(Encoding.UTF8.GetBytes(fasta))+"\r\n");
                     GZipFile(temp_file, filename);
                     File.Delete(autosomal_file);
                     File.Delete(temp_file);
@@ -1339,7 +1332,7 @@ namespace Genetic_Genealogy_Kit
             string ysnps=null;
             string ystr=null;
             string mtdna=null;
-
+            string fasta = null;
             StringBuilder sb = new StringBuilder();
             int count=0;
             GUnzipFile(filename, temp_file);
@@ -1382,6 +1375,10 @@ namespace Genetic_Genealogy_Kit
                 else if (line.Trim() == "@MTDNA@")
                 {
                     mtdna = reader.ReadLine();
+                }
+                else if (line.Trim() == "@FASTA@")
+                {
+                    fasta = Encoding.UTF8.GetString(Convert.FromBase64String(reader.ReadLine()));
                 }
             }
             reader.Close();
@@ -1427,34 +1424,10 @@ namespace Genetic_Genealogy_Kit
                 //kit ysnps
                 if (ysnps.Trim() != "")
                 {
-                    upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_ysnps(kit_no, ysnp,derived)values(@kit_no,@ysnp,@derived)", cnn);
-                    using (var transaction = cnn.BeginTransaction())
-                    {
-                        string ysnptrim = null;
-                        int derived = 0;
-                        foreach (string ysnp in ysnps.Split(new char[] { ',' }))
-                        {
-                            ysnptrim = ysnp.Trim();
-                            if (ysnptrim == "")
-                                continue;
-                            if (ysnptrim.EndsWith("+"))
-                                derived = 1;
-                            else if (ysnptrim.EndsWith("-"))
-                                derived = 0;
-                            else
-                            {
-                                // something wrong..
-                                continue;
-                            }
-                            if (ysnptrim.Length > 0)
-                                ysnptrim = ysnptrim.Substring(0, ysnptrim.Length - 1);
-                            upCmd.Parameters.AddWithValue("@kit_no", kit_no);
-                            upCmd.Parameters.AddWithValue("@ysnp", ysnptrim);
-                            upCmd.Parameters.AddWithValue("@derived", derived);
-                            upCmd.ExecuteNonQuery();
-                        }
-                        transaction.Commit();
-                    }
+                    upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_ysnps(kit_no, ysnps)values(@kit_no,@ysnps)", cnn);
+                    upCmd.Parameters.AddWithValue("@kit_no", kit_no);
+                    upCmd.Parameters.AddWithValue("@ysnps", ysnps);
+                    upCmd.ExecuteNonQuery();                        
                     upCmd.Dispose();
                 }
                 Program.GGKitFrmMainInst.Invoke(new MethodInvoker(delegate
@@ -1488,21 +1461,11 @@ namespace Genetic_Genealogy_Kit
                 //kit mtdna
                 if (mtdna.Trim() != "")
                 {
-                    upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_mtdna(kit_no, mutation)values(@kit_no,@mutation)", cnn);
-                    using (var transaction = cnn.BeginTransaction())
-                    {
-                        string mtrim = null;
-                        foreach (string m in mtdna.Split(new char[] { ',' }))
-                        {
-                            mtrim = m.Trim();
-                            if (mtrim == "")
-                                continue;
-                            upCmd.Parameters.AddWithValue("@kit_no", kit_no);
-                            upCmd.Parameters.AddWithValue("@mutation", mtrim);
-                            upCmd.ExecuteNonQuery();
-                        }
-                        transaction.Commit();
-                    }
+                    upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_mtdna(kit_no, mutations,fasta)values(@kit_no,@mutations,@fasta)", cnn);
+                    upCmd.Parameters.AddWithValue("@kit_no", kit_no);
+                    upCmd.Parameters.AddWithValue("@mutations", mtdna);
+                    upCmd.Parameters.AddWithValue("@fasta", fasta);
+                    upCmd.ExecuteNonQuery();                        
                     upCmd.Dispose();
                 }
             }

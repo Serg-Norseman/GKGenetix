@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Genetic Genealogy Kit")]
-[assembly: AssemblyDescription("GGK is a kit management, analysis and matching tool for Y-DNA, Autosomal DNA and X-DNA. This product is free and open source.")]
+[assembly: AssemblyDescription("GGK is a kit management, analysis and matching tool for Y-DNA, Autosomal DNA, X-DNA and Mitocondrial DNA. This product is free and open source.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Genetic Genealogy Tools")]
 [assembly: AssemblyProduct("Genetic Genealogy Kit (GGK)")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0")]
-[assembly: AssemblyFileVersion("1.0")]
+[assembly: AssemblyVersion("1.1")]
+[assembly: AssemblyFileVersion("1.1")]

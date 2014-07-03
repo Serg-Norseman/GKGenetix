@@ -265,7 +265,6 @@
     <Content Include="snps_on_tree.txt" />
     <Content Include="ytree.xml" />
     <None Include="boy.png" />
-    <Content Include="db.sql" />
     <Content Include="delete.png" />
     <Content Include="diff.exe" />
     <Content Include="disable.png" />

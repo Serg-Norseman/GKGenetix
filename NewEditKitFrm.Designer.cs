@@ -79,7 +79,11 @@
             this.btnClear = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.tabMtDNA = new System.Windows.Forms.TabPage();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabMutations = new System.Windows.Forms.TabPage();
             this.textBoxMtDNA = new System.Windows.Forms.TextBox();
+            this.tabFasta = new System.Windows.Forms.TabPage();
+            this.tbFASTA = new System.Windows.Forms.TextBox();
             this.txtName = new System.Windows.Forms.TextBox();
             this.txtKit = new System.Windows.Forms.TextBox();
             this.bwNewKitAutosomalJob = new System.ComponentModel.BackgroundWorker();
@@ -91,10 +95,6 @@
             this.bwDelete = new System.ComponentModel.BackgroundWorker();
             this.label9 = new System.Windows.Forms.Label();
             this.cbSex = new System.Windows.Forms.ComboBox();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabMutations = new System.Windows.Forms.TabPage();
-            this.tabFasta = new System.Windows.Forms.TabPage();
-            this.tbFASTA = new System.Windows.Forms.TextBox();
             this.tabControlNewKit.SuspendLayout();
             this.tabAutosomal.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewAutosomal)).BeginInit();
@@ -113,10 +113,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvy12)).BeginInit();
             this.tableLayoutPanel2.SuspendLayout();
             this.tabMtDNA.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabMutations.SuspendLayout();
             this.tabFasta.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -639,6 +639,30 @@
             this.tabMtDNA.Text = "MT DNA";
             this.tabMtDNA.UseVisualStyleBackColor = true;
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Alignment = System.Windows.Forms.TabAlignment.Left;
+            this.tabControl1.Controls.Add(this.tabMutations);
+            this.tabControl1.Controls.Add(this.tabFasta);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControl1.Location = new System.Drawing.Point(0, 0);
+            this.tabControl1.Multiline = true;
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(748, 443);
+            this.tabControl1.TabIndex = 2;
+            // 
+            // tabMutations
+            // 
+            this.tabMutations.Controls.Add(this.textBoxMtDNA);
+            this.tabMutations.Location = new System.Drawing.Point(23, 4);
+            this.tabMutations.Name = "tabMutations";
+            this.tabMutations.Padding = new System.Windows.Forms.Padding(3);
+            this.tabMutations.Size = new System.Drawing.Size(721, 435);
+            this.tabMutations.TabIndex = 0;
+            this.tabMutations.Text = "Mutations";
+            this.tabMutations.UseVisualStyleBackColor = true;
+            // 
             // textBoxMtDNA
             // 
             this.textBoxMtDNA.AllowDrop = true;
@@ -652,6 +676,31 @@
             this.textBoxMtDNA.TabIndex = 1;
             this.textBoxMtDNA.DragDrop += new System.Windows.Forms.DragEventHandler(this.textBoxMtDNA_DragDrop);
             this.textBoxMtDNA.DragEnter += new System.Windows.Forms.DragEventHandler(this.textBoxMtDNA_DragEnter);
+            // 
+            // tabFasta
+            // 
+            this.tabFasta.Controls.Add(this.tbFASTA);
+            this.tabFasta.Location = new System.Drawing.Point(23, 4);
+            this.tabFasta.Name = "tabFasta";
+            this.tabFasta.Padding = new System.Windows.Forms.Padding(3);
+            this.tabFasta.Size = new System.Drawing.Size(721, 435);
+            this.tabFasta.TabIndex = 1;
+            this.tabFasta.Text = "FASTA";
+            this.tabFasta.UseVisualStyleBackColor = true;
+            // 
+            // tbFASTA
+            // 
+            this.tbFASTA.AllowDrop = true;
+            this.tbFASTA.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tbFASTA.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.tbFASTA.Location = new System.Drawing.Point(3, 3);
+            this.tbFASTA.Multiline = true;
+            this.tbFASTA.Name = "tbFASTA";
+            this.tbFASTA.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.tbFASTA.Size = new System.Drawing.Size(715, 429);
+            this.tbFASTA.TabIndex = 2;
+            this.tbFASTA.DragDrop += new System.Windows.Forms.DragEventHandler(this.tbFASTA_DragDrop);
+            this.tbFASTA.DragEnter += new System.Windows.Forms.DragEventHandler(this.tbFASTA_DragEnter);
             // 
             // txtName
             // 
@@ -690,7 +739,8 @@
             this.tipLbl.Name = "tipLbl";
             this.tipLbl.Size = new System.Drawing.Size(244, 49);
             this.tipLbl.TabIndex = 5;
-            this.tipLbl.Text = "Tip: Drag and drop any autosomal raw file into the grid below.";
+            this.tipLbl.Text = "Tip: Drag and drop any autosomal raw file into the grid below. You can select mul" +
+    "tiple files. e.g, Autosomal and X.";
             // 
             // bwSave
             // 
@@ -738,55 +788,6 @@
             this.cbSex.Size = new System.Drawing.Size(121, 21);
             this.cbSex.TabIndex = 7;
             // 
-            // tabControl1
-            // 
-            this.tabControl1.Alignment = System.Windows.Forms.TabAlignment.Left;
-            this.tabControl1.Controls.Add(this.tabMutations);
-            this.tabControl1.Controls.Add(this.tabFasta);
-            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Multiline = true;
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(748, 443);
-            this.tabControl1.TabIndex = 2;
-            // 
-            // tabMutations
-            // 
-            this.tabMutations.Controls.Add(this.textBoxMtDNA);
-            this.tabMutations.Location = new System.Drawing.Point(23, 4);
-            this.tabMutations.Name = "tabMutations";
-            this.tabMutations.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMutations.Size = new System.Drawing.Size(721, 435);
-            this.tabMutations.TabIndex = 0;
-            this.tabMutations.Text = "Mutations";
-            this.tabMutations.UseVisualStyleBackColor = true;
-            // 
-            // tabFasta
-            // 
-            this.tabFasta.Controls.Add(this.tbFASTA);
-            this.tabFasta.Location = new System.Drawing.Point(23, 4);
-            this.tabFasta.Name = "tabFasta";
-            this.tabFasta.Padding = new System.Windows.Forms.Padding(3);
-            this.tabFasta.Size = new System.Drawing.Size(721, 435);
-            this.tabFasta.TabIndex = 1;
-            this.tabFasta.Text = "FASTA";
-            this.tabFasta.UseVisualStyleBackColor = true;
-            // 
-            // tbFASTA
-            // 
-            this.tbFASTA.AllowDrop = true;
-            this.tbFASTA.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tbFASTA.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tbFASTA.Location = new System.Drawing.Point(3, 3);
-            this.tbFASTA.Multiline = true;
-            this.tbFASTA.Name = "tbFASTA";
-            this.tbFASTA.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbFASTA.Size = new System.Drawing.Size(715, 429);
-            this.tbFASTA.TabIndex = 2;
-            this.tbFASTA.DragDrop += new System.Windows.Forms.DragEventHandler(this.tbFASTA_DragDrop);
-            this.tbFASTA.DragEnter += new System.Windows.Forms.DragEventHandler(this.tbFASTA_DragEnter);
-            // 
             // NewEditKitFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -830,12 +831,12 @@
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
             this.tabMtDNA.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.tabMutations.ResumeLayout(false);
             this.tabMutations.PerformLayout();
             this.tabFasta.ResumeLayout(false);
             this.tabFasta.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
