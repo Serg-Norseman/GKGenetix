@@ -271,6 +271,15 @@ namespace Genetic_Genealogy_Kit
         private void bwIChkAndFix_DoWork(object sender, DoWorkEventArgs e)
         {
             GGKUtilLib.integrityCheckAndFix();
+            DataTable dt = GGKUtilLib.QueryDB("select * from kit_master where reference=1");
+            if (dt.Rows.Count == 0)
+            {
+                this.Invoke(new MethodInvoker(delegate
+                {
+                    admixtureToolStripMenuItem.Enabled = false;
+                }));
+            }
+
         }
 
         private void bwIChkAndFix_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

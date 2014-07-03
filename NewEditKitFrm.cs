@@ -163,8 +163,10 @@ namespace Genetic_Genealogy_Kit
 
         private void bwNewKitAutosomalJob_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            textBoxYDNA.Text = ysnps;
-            textBoxMtDNA.Text = mtdna;  
+            if (ysnps!=null)
+                textBoxYDNA.Text = ysnps;
+            if (mtdna!=null)
+                textBoxMtDNA.Text = mtdna;  
 
             GGKUtilLib.setProgress(-1);
             GGKUtilLib.setStatus("Done.");
@@ -313,7 +315,7 @@ namespace Genetic_Genealogy_Kit
             switch (tabControlNewKit.SelectedIndex)
             {
                 case 0:
-                    tipLbl.Text = "Tip: Drag and drop any autosomal raw file into the grid below.";
+                    tipLbl.Text = "Tip: Drag and drop any autosomal raw file into the grid below. You can select multiple files. e.g, Autosomal and X.";
                     break;
                 case 1:
                     tipLbl.Text = "Tip: Drag and drop Big-Y Export CSV file into the textbox below or you can type the Y-SNPs.";
@@ -759,13 +761,17 @@ namespace Genetic_Genealogy_Kit
             query = new SQLiteCommand(@"SELECT mutations,fasta from kit_mtdna where kit_no=@kit_no", cnn);
             query.Parameters.AddWithValue("@kit_no", kit);
             reader = query.ExecuteReader();
-            
+            string fasta=null;
             if (reader.Read())
             {
                 this.Invoke(new MethodInvoker(delegate
                 {
                     textBoxMtDNA.Text = reader.GetString(0);
-                    tbFASTA.Text = reader.GetString(1);
+                    fasta = reader.GetString(1);
+                    if (fasta != null)
+                        tbFASTA.Text = fasta;
+                    else
+                        tbFASTA.Text = "";
                 }));
             }
             reader.Close();
