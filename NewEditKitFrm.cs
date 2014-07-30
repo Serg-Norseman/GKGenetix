@@ -521,18 +521,24 @@ namespace Genetic_Genealogy_Kit
                 bwSave.ReportProgress(75,"Saving Y-SNPs ...");
 
 
-                //kit ysnps
-                upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_ysnps(kit_no, ysnps) values (@kit_no,@ysnps)", cnn);
-                upCmd.Parameters.AddWithValue("@kit_no", kit_no);
-                upCmd.Parameters.AddWithValue("@ysnps", ysnps_list);
-                upCmd.ExecuteNonQuery();
-                upCmd.Dispose();
-                bwSave.ReportProgress(80,"Saving Y-STR Values ...");
+                if (ysnps_list.Trim() != "")
+                {
+                    //kit ysnps
+                    upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_ysnps(kit_no, ysnps) values (@kit_no,@ysnps)", cnn);
+                    upCmd.Parameters.AddWithValue("@kit_no", kit_no);
+                    upCmd.Parameters.AddWithValue("@ysnps", ysnps_list);
+                    upCmd.ExecuteNonQuery();
+                    upCmd.Dispose();
+                }
+
+
+                //kit ystr
+                bwSave.ReportProgress(80, "Saving Y-STR Values ...");
 
                 upCmd = new SQLiteCommand(@"DELETE from kit_ystr where kit_no=@kit_no", cnn);
                 upCmd.Parameters.AddWithValue("@kit_no", kit_no);
                 upCmd.ExecuteNonQuery();
-                //kit ystr
+                
                 upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_ystr(kit_no, marker, value)values(@kit_no,@marker,@value)", cnn);
                 using (var transaction = cnn.BeginTransaction())
                 {
@@ -554,18 +560,16 @@ namespace Genetic_Genealogy_Kit
                 }
                 upCmd.Dispose();
 
-                bwSave.ReportProgress(90,"Saving mtDNA mutations ...");
-
-                upCmd = new SQLiteCommand(@"DELETE from kit_mtdna where kit_no=@kit_no", cnn);
-                upCmd.Parameters.AddWithValue("@kit_no", kit_no);
-                upCmd.ExecuteNonQuery();
                 //kit mtdna
-                upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_mtdna(kit_no, mutations,fasta)values(@kit_no,@mutations,@fasta)", cnn);
-                upCmd.Parameters.AddWithValue("@kit_no", kit_no);
-                upCmd.Parameters.AddWithValue("@mutations", mutations);
-                upCmd.Parameters.AddWithValue("@fasta", fasta);
-                upCmd.ExecuteNonQuery();
-
+                if (mutations.Trim() != "" || fasta.Trim() != "")
+                {
+                    bwSave.ReportProgress(90, "Saving mtDNA mutations ...");
+                    upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_mtdna(kit_no, mutations,fasta)values(@kit_no,@mutations,@fasta)", cnn);
+                    upCmd.Parameters.AddWithValue("@kit_no", kit_no);
+                    upCmd.Parameters.AddWithValue("@mutations", mutations);
+                    upCmd.Parameters.AddWithValue("@fasta", fasta);
+                    upCmd.ExecuteNonQuery();
+                }
                 bwSave.ReportProgress(100,"Saved");
                 save_success = true;
             }

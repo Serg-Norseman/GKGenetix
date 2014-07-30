@@ -98,6 +98,7 @@ namespace Genetic_Genealogy_Kit
                 lblSegLabel.Text = "List of matching segments for kit " + o[0] + " (" + o[1] + ")";                
                 dgvSegments.Columns.Clear();         
                 dgvSegments.DataSource = segment_dt;
+                segment_dt = null;
                 DataGridViewCellStyle style = new DataGridViewCellStyle();
                 style.Format = "N2";
 
@@ -109,7 +110,8 @@ namespace Genetic_Genealogy_Kit
                 dgvSegments.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 dgvSegments.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
-                dgvSegments.Columns[5].Visible = false;                
+                dgvSegments.Columns[5].Visible = false;
+                
             }
             
         }

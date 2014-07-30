@@ -272,7 +272,6 @@
     <Content Include="eraser.png" />
     <None Include="girl.png" />
     <Content Include="icon.ico" />
-    <Content Include="LICENSE.txt" />
     <Content Include="logo.png" />
     <None Include="man-2-icon.png" />
     <None Include="mtDNAPhylogeny.xml" />
