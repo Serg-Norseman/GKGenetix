@@ -1230,6 +1230,8 @@ namespace Genetic_Genealogy_Kit
                     {
                         ysnps = reader.GetString(0);
                     }
+                    if (ysnps == null)
+                        ysnps = "";
                     reader.Close();
                     query.Dispose();
                     
@@ -1261,6 +1263,11 @@ namespace Genetic_Genealogy_Kit
                         mtdna = reader.GetString(0);
                         fasta = reader.GetString(1);
                     }
+                    if (mtdna == null)
+                        mtdna = "";
+                    if (fasta == null)
+                        fasta = "";
+
                     reader.Close();
                     query.Dispose();
                     cnn.Close();
@@ -1646,37 +1653,37 @@ namespace Genetic_Genealogy_Kit
                                     dontMatchProc(start_pos, end_pos, prev_chr, chromosome, ref segments_idx, ref segments, ref tmp, reference);
                                     start_pos = position;
                                 }
-                                else if (gt1 == "--" || gt1 == "??")
+                                else if (gt1 == "--" || gt1 == "??" || gt1 == "00")
                                 {
                                     tmp.Rows.Add(new object[] { rsid, chromosome, position.ToString(), gt1, gt2, "-" });
                                     if (start_pos == 0)
                                         start_pos = position;
                                 }
-                                else if (gt2 == "--" || gt2 == "??")
+                                else if (gt2 == "--" || gt2 == "??" || gt2 == "00")
                                 {
                                     tmp.Rows.Add(new object[] { rsid, chromosome, position.ToString(), gt1, gt2, "-" });
                                     if (start_pos == 0)
                                         start_pos = position;
                                 }
-                                else if (gt1[0] == '-' || gt1[0] == '?')
+                                else if (gt1[0] == '-' || gt1[0] == '?' || gt1[0] == '0')
                                 {
                                     tmp.Rows.Add(new object[] { rsid, chromosome, position.ToString(), gt1, gt2, "-" });
                                     if (start_pos == 0)
                                         start_pos = position;
                                 }
-                                else if (gt1[1] == '-' || gt1[1] == '?')
+                                else if (gt1[1] == '-' || gt1[1] == '?' || gt1[1] == '0')
                                 {
                                     tmp.Rows.Add(new object[] { rsid, chromosome, position.ToString(), gt1, gt2, "-" });
                                     if (start_pos == 0)
                                         start_pos = position;
                                 }
-                                else if (gt2[0] == '-' || gt2[0] == '?')
+                                else if (gt2[0] == '-' || gt2[0] == '?' || gt2[0] == '0')
                                 {
                                     tmp.Rows.Add(new object[] { rsid, chromosome, position.ToString(), gt1, gt2, "-" });
                                     if (start_pos == 0)
                                         start_pos = position;
                                 }
-                                else if (gt2[1] == '-' || gt2[1] == '?')
+                                else if (gt2[1] == '-' || gt2[1] == '?' || gt2[1] == '0')
                                 {
                                     tmp.Rows.Add(new object[] { rsid, chromosome, position.ToString(), gt1, gt2, "-" });
                                     if (start_pos == 0)

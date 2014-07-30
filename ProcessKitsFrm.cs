@@ -123,7 +123,8 @@ namespace Genetic_Genealogy_Kit
 
                     segment_idx = (DataTable)cmp_results[0];
                     segments = (List<DataTable>)cmp_results[1];
-                    if (segment_idx.Rows.Count>0)
+                    //if (segment_idx.Rows.Count>0)
+                    if (segment_idx.Rows.Count>0 || redo_again)
                     {
                         if (!this.IsHandleCreated)
                             break;
