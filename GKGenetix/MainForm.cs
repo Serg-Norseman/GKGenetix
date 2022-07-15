@@ -18,19 +18,29 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
 using System.Windows.Forms;
 
 namespace GKGenetix
 {
-    internal static class Program
+    public partial class MainForm : Form
     {
-        [STAThread]
-        static void Main()
+        public MainForm()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            InitializeComponent();
+        }
+
+        private void btnDNAAnalysis_Click(object sender, System.EventArgs e)
+        {
+            using (var dlg = new DNAAnalysis()) {
+                dlg.ShowDialog();
+            }
+        }
+
+        private void btnDNAInheritanceTest_Click(object sender, System.EventArgs e)
+        {
+            using (var dlg = new DNAInheritanceTest()) {
+                dlg.ShowDialog();
+            }
         }
     }
 }

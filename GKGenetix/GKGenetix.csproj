@@ -37,11 +37,23 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DNAAnalysis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DNAAnalysis.designer.cs">
+      <DependentUpon>DNAAnalysis.cs</DependentUpon>
+    </Compile>
     <Compile Include="DNAInheritanceTest.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="DNAInheritanceTest.Designer.cs">
       <DependentUpon>DNAInheritanceTest.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
