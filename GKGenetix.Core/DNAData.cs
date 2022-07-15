@@ -22,56 +22,10 @@ using System.Collections.Generic;
 
 namespace GKGenetix.Core
 {
-    /// <summary>
-    /// Single-nucleotide polymorphism (SNP).
-    /// Substitution of a single nucleotide at a specific position in the genome.
-    /// </summary>
-    public struct SNP
-    {
-        /// <summary>
-        /// The rsID number ("rs#"; "refSNP cluster") is a unique label ("rs" followed by a number) used by researchers and databases to identify a specific SNP.
-        /// It stands for Reference SNP cluster ID and is the naming convention used for most SNPs.
-        /// </summary>
-        public string rsID;
-
-        /// <summary>
-        /// Chromosome.
-        /// </summary>
-        public byte Chr;
-
-        /// <summary>
-        /// Basepair position.
-        /// </summary>
-        public uint Pos;
-
-        /// <summary>
-        /// Allele1.
-        /// </summary>
-        public char A1;
-
-        /// <summary>
-        /// Allele2.
-        /// </summary>
-        public char A2;
-
-        public char this[int index]
-        {
-            get {
-                switch (index) {
-                    case 1:
-                        return A1;
-                    case 2:
-                        return A2;
-                    default:
-                        return '0';
-                }
-            }
-        }
-    }
-
-
     public sealed class DNAData
     {
+        public string PersonalName { get; set; }
+
         public IList<SNP> SNP { get; private set; }
 
         /// <summary>
@@ -79,29 +33,40 @@ namespace GKGenetix.Core
         /// </summary>
         public int[] ChromoPointers { get; private set; }
 
+        public GeneticSex Sex { get; private set; }
+
+        public bool IsFemale
+        {
+            get {
+                return (Sex == GeneticSex.Female);
+            }
+        }
+
         public DNAData()
         {
             SNP = new List<SNP>(702000);
             ChromoPointers = new int[26];
+            Sex = GeneticSex.Unknown;
         }
-    }
-
-
-    public struct Haplotype
-    {
-        public string Group;
 
         /// <summary>
-        /// The rsID number ("rs#"; "refSNP cluster") is a unique label ("rs" followed by a number) used by researchers and databases to identify a specific SNP.
-        /// It stands for Reference SNP cluster ID and is the naming convention used for most SNPs.
+        /// Determines whether the given DNA is female.
         /// </summary>
-        public string rsID;
+        public void DetermineSex()
+        {
+            int count = 0;
+            int total = 0;
 
-        /// <summary>
-        /// Basepair position.
-        /// </summary>
-        public uint Pos;
+            for (int i = ChromoPointers[23]; i < ChromoPointers[24]; i++) {
+                // chromosome 24 is male Y
+                if (SNP[i].A1 == '0') {
+                    count++;
+                }
+                total++;
+            }
 
-        public char Mutation;
+            // if the majority of Y were 0
+            Sex = (count / (double)total > 0.9d) ? GeneticSex.Female : GeneticSex.Male;
+        }
     }
 }

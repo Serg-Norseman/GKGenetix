@@ -38,8 +38,12 @@
     <Compile Include="DNAData.cs" />
     <Compile Include="FileFormats.cs" />
     <Compile Include="GeneLab.cs" />
+    <Compile Include="Haplotype.cs" />
     <Compile Include="IDisplay.cs" />
+    <Compile Include="Nucleotide.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="GeneticSex.cs" />
+    <Compile Include="SNP.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
