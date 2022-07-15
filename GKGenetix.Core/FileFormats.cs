@@ -63,12 +63,13 @@ namespace GKGenetix.Core
 
 
         /// <summary>
-        /// Reads the AncestryDNA file (and 23AndMe?) file. Comments begin line with #.
+        /// Reads the AncestryDNA file. Comments begin line with #.
         /// </summary>
         /// <param name="filePath">The file path of DNA.</param>
         public static DNAData ReadAncestryDNAFile(string filePath)
         {
             var result = new DNAData();
+            result.PersonalName = Path.GetFileNameWithoutExtension(filePath);
 
             try {
                 int snpIdx = 0, chrPtr = 0;
@@ -85,6 +86,53 @@ namespace GKGenetix.Core
                             snp.Pos = uint.Parse(fields[2]); // oldout: [3]
                             snp.A1 = fields[3][0];           // oldout: [1]
                             snp.A2 = fields[4][0];           // oldout: [2]
+                            result.SNP.Add(snp);
+
+                            // This if statement saves a pointer to the beginning of every chromosome.
+                            // Allows comparison of chromosome lengths.
+                            if (snpIdx == 0) {
+                                result.ChromoPointers[0] = snpIdx;
+                            } else if (result.SNP[snpIdx].Chr != result.SNP[snpIdx - 1].Chr) {
+                                result.ChromoPointers[++chrPtr] = snpIdx;
+                            }
+                            snpIdx++;
+                        }
+                    }
+                    result.ChromoPointers[result.ChromoPointers.Length - 1] = snpIdx;
+                }
+            } catch (IOException e) {
+                Console.WriteLine("The file could not be read: " + e.Message);
+            }
+
+            return result;
+        }
+
+
+        /// <summary>
+        /// Reads the 23AndMe file. Comments begin line with #.
+        /// </summary>
+        /// <param name="filePath">The file path of DNA.</param>
+        public static DNAData Read23AndMeFile(string filePath)
+        {
+            var result = new DNAData();
+            result.PersonalName = Path.GetFileNameWithoutExtension(filePath);
+
+            try {
+                int snpIdx = 0, chrPtr = 0;
+                using (StreamReader reader = new StreamReader(filePath)) {
+                    while (reader.Peek() != -1) {
+                        string line = reader.ReadLine();
+                        // Data validation: if line begins with 'r' then is most likely a SNP
+                        if (!string.IsNullOrEmpty(line) && line[0] != '#' && line[2] != 'i') {
+                            var fields = line.Split(fSeparator);
+
+                            var snp = new SNP();
+                            snp.rsID = fields[0];
+                            snp.Chr = byte.Parse(fields[1]);
+                            snp.Pos = uint.Parse(fields[2]);
+                            var genotype = fields[3];
+                            snp.A1 = genotype[0];
+                            snp.A2 = genotype[1];
                             result.SNP.Add(snp);
 
                             // This if statement saves a pointer to the beginning of every chromosome.
