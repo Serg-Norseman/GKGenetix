@@ -38,16 +38,27 @@ namespace GKGenetix
         private void btnLoadFile_Click(object sender, EventArgs e)
         {
             using (var dlg = new OpenFileDialog()) {
-                dlg.Multiselect = false;
+                dlg.Multiselect = true;
                 if (dlg.ShowDialog() == DialogResult.OK) {
-                    var file = dlg.FileNames[0];
+                    var files = dlg.FileNames;
 
-                    fFileName = file;
-                    fDNA = FileFormats.ReadAncestryDNAFile(fFileName);
-                    fDNA.DetermineSex();
+                    foreach (var file in files) {
+                        fFileName = file;
+                        fDNA = FileFormats.ReadAncestryDNAFile(fFileName);
+                        fDNA.DetermineSex();
 
-                    WriteLine("File name: " + Path.GetFileName(fFileName));
-                    WriteLine("Sex: " + fDNA.Sex.ToString());
+                        WriteLine("File name: " + Path.GetFileName(fFileName));
+                        WriteLine("Sex: " + fDNA.Sex.ToString());
+
+                        var haplogroups = Analytics.DetermineHaplogroup(fDNA);
+                        WriteLine("Haplogroups: ");
+                        foreach (var h in haplogroups) {
+                            string moreSpecific = h.Specific ? "*" : " ";
+                            WriteLine("    > " + moreSpecific + "\t" + h.Name);
+                        }
+                        WriteLine("\r\n");
+                        Application.DoEvents();
+                    }
                 }
             }
         }

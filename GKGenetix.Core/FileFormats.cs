@@ -42,12 +42,16 @@ namespace GKGenetix.Core
                         if (!string.IsNullOrEmpty(line) && line[0] != '#' && line[2] != 'i') {
                             var fields = line.Split(fSeparator);
 
-                            var ht = new Haplotype();
-                            ht.Group = fields[0];
-                            ht.rsID = fields[1];
-                            ht.Pos = uint.Parse(fields[2]);
-                            ht.Mutation = fields[3][0];
-                            result.Add(ht);
+                            var poses = fields[2].Split(';');
+
+                            foreach (var po in poses) {
+                                var ht = new Haplotype();
+                                ht.Group = fields[0];
+                                ht.rsID = fields[1];
+                                ht.Pos = uint.Parse(po.Trim());
+                                ht.Mutation = fields[3][0];
+                                result.Add(ht);
+                            }
                         }
                     }
                 }

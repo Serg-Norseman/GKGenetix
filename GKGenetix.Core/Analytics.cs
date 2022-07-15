@@ -23,6 +23,12 @@ using System.Collections.Generic;
 
 namespace GKGenetix.Core
 {
+    public class PersonalHaplogroup
+    {
+        public string Name { get; set; }
+        public bool Specific { get; set; }
+    }
+
     /// <summary>
     /// Methods for data analysis.
     /// 
@@ -30,84 +36,86 @@ namespace GKGenetix.Core
     /// </summary>
     public static class Analytics
     {
+        // haplogroups to search for
+        public static readonly IList<Haplotype> dbHaplogroups = FileFormats.ReadHaplotypeFile(@"../../../temp/haplogroups.txt");
+
         /// <summary>
         /// Determines the Y haplogroup.
         /// </summary>
         /// <param name="dna">The dna.</param>
         /// <returns></returns>
-        public static List<string> DetermineHaplogroup(DNAData dna)
+        public static List<PersonalHaplogroup> DetermineHaplogroup(DNAData dna)
         {
-            // haplogroups to search for
-            var dbHaplogroups = FileFormats.ReadHaplotypeFile(@"../../../temp/haplogroups.txt");
-
             // list of haplogroups that were expressed in Y chromosome
-            List<string> foundHaplogroups = new List<string>();
+            List<string> hgs = new List<string>();
 
             // look at Y chromosome
             for (int i = dna.ChromoPointers[23]; i < dna.ChromoPointers[24]; i++) {
+                var snp = dna.SNP[i];
+
                 // iterate through the haplogroups
                 for (int j = 0; j < dbHaplogroups.Count; j++) {
                     var hGroup = dbHaplogroups[j];
                     // position matches known haplogroup
-                    if (dna.SNP[i].Pos == hGroup.Pos) {
+                    if (snp.Pos == hGroup.Pos) {
                         // mutation matches haplogroup
-                        if (dna.SNP[i].A1 == hGroup.Mutation && !foundHaplogroups.Contains(hGroup.Group)) {
-                            foundHaplogroups.Add(hGroup.Group);
+                        if (snp.A1 == hGroup.Mutation && !hgs.Contains(hGroup.Group)) {
+                            hgs.Add(hGroup.Group);
                         }
                     }
                 }
             }
 
-            // put haplogroups into array to maintain an index
-            // list of most specific haplogroups
-            var h = foundHaplogroups.ToArray();
-
-            // corresponds to found haplogroups that may be ignored
-            var ignore = new bool[h.Length];
+            var result = new List<PersonalHaplogroup>(hgs.Count);
+            for (int x = 0; x < hgs.Count; x++) {
+                result.Add(new PersonalHaplogroup() { Name = hgs[x], Specific = true });
+            }
 
             // compare each pair of haplogroups once
-            for (int x = 0; x < h.Length; x++) {
-                for (int y = x + 1; y < h.Length; y++) {
+            for (int x = 0; x < hgs.Count; x++) {
+                for (int y = x + 1; y < hgs.Count; y++) {
                     // if haplogroup is less specific, or haplogroups have same number of characters
-                    if (h[x] == null || h[y] == null || h[x].Length == h[y].Length) {
+                    if (hgs[x] == null || hgs[y] == null || hgs[x].Length == hgs[y].Length) {
                         // then cannot determine specificity
                         continue;
                     }
 
                     // if lengths differ, begin looking at characters to see if they belong to same branch
-                    if (h[x].Length < h[y].Length) {
+                    if (hgs[x].Length < hgs[y].Length) {
                         // set to false when a character doesn't match, indicating two different branches
                         bool morespecific = true;
                         // iterate the chars, looking for a mismatch
-                        for (int i = 0; i < h[x].Length; i++) {
+                        for (int i = 0; i < hgs[x].Length; i++) {
                             // if mismatch is found, then the longer haplogroup is not more specific
-                            if (h[x][i] != h[y][i]) {
+                            if (hgs[x][i] != hgs[y][i]) {
                                 morespecific = false;
                             }
                         }
 
                         // if mismatch is not found, then the longer haplogroup is more specific
+                        // specify the shorter haplogroup
                         if (morespecific == true) {
-                            // ignore the shorter haplogroup
-                            h[x] = null;
+                            hgs[x] = null;
+                            result[x].Specific = false;
                         }
                     } else {
                         // the second haplogroup is longer, compare chars and look for a mismatch
                         bool morespecific = true;
-                        for (int i = 0; i < h[y].Length; i++) {
-                            if (h[x][i] != h[y][i]) {
+                        for (int i = 0; i < hgs[y].Length; i++) {
+                            if (hgs[x][i] != hgs[y][i]) {
                                 morespecific = false;
                             }
-
                         }
+
                         if (morespecific == true) {
-                            h[y] = null;
+                            hgs[y] = null;
+                            result[y].Specific = false;
                         }
                     }
                 }
             }
 
-            return foundHaplogroups;
+            return result;
         }
 
         public static void Compare(DNAData d1, DNAData d2, IDisplay display)
