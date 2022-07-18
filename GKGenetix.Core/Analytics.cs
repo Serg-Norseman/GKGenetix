@@ -147,24 +147,29 @@ namespace GKGenetix.Core
                             int snpIdx = i + d1.ChromoPointers[c];
                             var snp1 = d1snp[snpIdx];
                             var snp2 = d2snp[snpIdx];
+                            char ps; // person strand
                             switch (comparisonIndex) {
                                 case 0: // person 1 strand 1
-                                    if (snp1.A1 == snp2.A1 || snp1.A1 == snp2.A2)
+                                    ps = snp1.A1;
+                                    if (ps == snp2.A1 || ps == snp2.A2)
                                         match++;
                                     total++;
                                     break;
                                 case 1: // person 1 strand 2
-                                    if (snp1.A2 == snp2.A1 || snp1.A2 == snp2.A2)
+                                    ps = snp1.A2;
+                                    if (ps == snp2.A1 || ps == snp2.A2)
                                         match++;
                                     total++;
                                     break;
                                 case 2: // person 2 strand 1
-                                    if (snp2.A1 == snp1.A1 || snp2.A1 == snp1.A2)
+                                    ps = snp2.A1;
+                                    if (ps == snp1.A1 || ps == snp1.A2)
                                         match++;
                                     total++;
                                     break;
                                 case 3: // person 2 strand 2
-                                    if (snp2.A2 == snp1.A1 || snp2.A2 == snp1.A2)
+                                    ps = snp2.A2;
+                                    if (ps == snp1.A1 || ps == snp1.A2)
                                         match++;
                                     total++;
                                     break;

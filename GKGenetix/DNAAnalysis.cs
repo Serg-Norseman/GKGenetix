@@ -44,11 +44,12 @@ namespace GKGenetix
 
                     foreach (var file in files) {
                         fFileName = file;
-                        fDNA = FileFormats.ReadAncestryDNAFile(fFileName);
+                        fDNA = FileFormats.ReadFile(fFileName);
                         fDNA.DetermineSex();
 
                         WriteLine("File name: " + Path.GetFileName(fFileName));
                         WriteLine("Sex: " + fDNA.Sex.ToString());
+                        WriteLine("SNPs: " + fDNA.SNP.Count.ToString());
 
                         var haplogroups = Analytics.DetermineHaplogroup(fDNA);
                         WriteLine("Haplogroups: ");
@@ -59,6 +60,8 @@ namespace GKGenetix
                         WriteLine("\r\n");
                         Application.DoEvents();
                     }
+
+                    WriteLine("Analysis finished.");
                 }
             }
         }

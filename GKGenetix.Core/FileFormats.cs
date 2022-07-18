@@ -26,6 +26,16 @@ namespace GKGenetix.Core
 {
     public static class FileFormats
     {
+        private static readonly char[] TabSeparator = new char[] { '\t' };
+        private static readonly char[] CommaSeparator = new char[] { ',' };
+
+
+        public static string FileFilter_All = "All files (*.*)|*.*";
+        public static string FileFilter_23AndMe = "23AndMe data files|*.txt";
+        public static string FileFilter_AncestryDNA = "AncestryDNA data files|*.txt";
+        public static string FileFilter_deCODEme = "deCODEme data files|*.csv";
+
+
         /// <summary>
         /// Reads a reference file with haplogroups.
         /// </summary>
@@ -40,7 +50,7 @@ namespace GKGenetix.Core
                     while (reader.Peek() != -1) {
                         string line = reader.ReadLine();
                         if (!string.IsNullOrEmpty(line) && line[0] != '#' && line[2] != 'i') {
-                            var fields = line.Split(fSeparator);
+                            var fields = line.Split(TabSeparator);
 
                             var poses = fields[2].Split(';');
 
@@ -62,41 +72,80 @@ namespace GKGenetix.Core
             return result;
         }
 
-
-        private static readonly char[] fSeparator = new char[] { '\t' };
-
-
         /// <summary>
-        /// Reads the AncestryDNA file. Comments begin line with #.
+        /// Reads the file.
         /// </summary>
         /// <param name="filePath">The file path of DNA.</param>
-        public static DNAData ReadAncestryDNAFile(string filePath)
+        public static DNAData ReadFile(string filePath)
+        {
+            string ext = Path.GetExtension(filePath);
+            switch (ext) {
+                case ".txt":
+                    return ReadTabbedTextFile(filePath);
+                case ".csv":
+                    return ReadCommaSeparatedTextFile(filePath);
+                default:
+                    throw new Exception("Unknown file format");
+            }
+        }
+
+        /// <summary>
+        /// Reads the AncestryDNA or 23AndMe file. Comments begin line with #.
+        /// </summary>
+        /// <param name="filePath">The file path of DNA.</param>
+        public static DNAData ReadTabbedTextFile(string filePath)
         {
             var result = new DNAData();
             result.PersonalName = Path.GetFileNameWithoutExtension(filePath);
 
             try {
+                var fileFormat = RawDataFormat.rdfUnknown;
                 int snpIdx = 0, chrPtr = 0;
                 using (StreamReader reader = new StreamReader(filePath)) {
                     while (reader.Peek() != -1) {
                         string line = reader.ReadLine();
+                        if (string.IsNullOrEmpty(line))
+                            continue;
+
+                        // header line
+                        if (line[0] == '#') {
+                            if (fileFormat == RawDataFormat.rdfUnknown) {
+                                if (line.Contains("AncestryDNA")) {
+                                    fileFormat = RawDataFormat.rdfAncestryDNA;
+                                } else if (line.Contains("23andMe")) {
+                                    fileFormat = RawDataFormat.rdf23AndMe;
+                                }
+                            }
+                            continue;
+                        }
+
                         // Data validation: if line begins with 'r' then is most likely a SNP
-                        if (!string.IsNullOrEmpty(line) && line[0] != '#' && line[2] != 'i') {
-                            var fields = line.Split(fSeparator);
+                        // AncestryDNA column headers line; starts with "rsid"
+                        if (line[2] == 'i') {
+                            continue;
+                        }
 
-                            var snp = new SNP();
-                            snp.rsID = fields[0];            // oldout: []
-                            snp.Chr = byte.Parse(fields[1]); // oldout: [0]
-                            snp.Pos = uint.Parse(fields[2]); // oldout: [3]
-                            snp.A1 = fields[3][0];           // oldout: [1]
-                            snp.A2 = fields[4][0];           // oldout: [2]
+                        var fields = line.Split(TabSeparator);
+
+                        SNP snp = null;
+                        switch (fileFormat) {
+                            case RawDataFormat.rdfUnknown:
+                                break;
+                            case RawDataFormat.rdfAncestryDNA:
+                                snp = ParseAncestryDNALine(fields);
+                                break;
+                            case RawDataFormat.rdf23AndMe:
+                                snp = Parse23AndMeLine(fields);
+                                break;
+                        }
+
+                        if (snp != null) {
                             result.SNP.Add(snp);
-
                             // This if statement saves a pointer to the beginning of every chromosome.
                             // Allows comparison of chromosome lengths.
                             if (snpIdx == 0) {
                                 result.ChromoPointers[0] = snpIdx;
-                            } else if (result.SNP[snpIdx].Chr != result.SNP[snpIdx - 1].Chr) {
+                            } else if (snp.Chr != result.SNP[snpIdx - 1].Chr) {
                                 result.ChromoPointers[++chrPtr] = snpIdx;
                             }
                             snpIdx++;
@@ -111,39 +160,83 @@ namespace GKGenetix.Core
             return result;
         }
 
+        private static SNP ParseAncestryDNALine(string[] fields)
+        {
+            // AncestryDNA: chromosome numbers from 1 to 25!
+
+            var snp = new SNP();
+            snp.rsID = fields[0];
+            snp.Chr = (byte)fields[1].ParseChromosome();
+            snp.Pos = uint.Parse(fields[2]);
+            snp.Orientation = Orientation.Plus;
+            snp.A1 = fields[3][0];
+            snp.A2 = fields[4][0];
+            return snp;
+        }
+
+        private static SNP Parse23AndMeLine(string[] fields)
+        {
+            // 23AndMe: chromosome numbers from 1..22 to X, Y, MT
+
+            var snp = new SNP();
+            snp.rsID = fields[0];
+            snp.Chr = (byte)fields[1].ParseChromosome();
+            snp.Pos = uint.Parse(fields[2]);
+            snp.Orientation = Orientation.Plus;
+            var genotype = fields[3]; // 23AndMe: CC...--
+            if (!string.IsNullOrEmpty(genotype)) {
+                snp.A1 = genotype[0];
+                if (genotype.Length > 1) {
+                    snp.A2 = genotype[1];
+                }
+            }
+            return snp;
+        }
 
         /// <summary>
-        /// Reads the 23AndMe file. Comments begin line with #.
+        /// Reads the deCODEme file. Comments begin line with #.
         /// </summary>
         /// <param name="filePath">The file path of DNA.</param>
-        public static DNAData Read23AndMeFile(string filePath)
+        public static DNAData ReadCommaSeparatedTextFile(string filePath)
         {
             var result = new DNAData();
             result.PersonalName = Path.GetFileNameWithoutExtension(filePath);
 
             try {
+                var fileFormat = RawDataFormat.rdfUnknown;
                 int snpIdx = 0, chrPtr = 0;
                 using (StreamReader reader = new StreamReader(filePath)) {
                     while (reader.Peek() != -1) {
                         string line = reader.ReadLine();
-                        // Data validation: if line begins with 'r' then is most likely a SNP
-                        if (!string.IsNullOrEmpty(line) && line[0] != '#' && line[2] != 'i') {
-                            var fields = line.Split(fSeparator);
+                        if (string.IsNullOrEmpty(line))
+                            continue;
 
-                            var snp = new SNP();
-                            snp.rsID = fields[0];
-                            snp.Chr = byte.Parse(fields[1]);
-                            snp.Pos = uint.Parse(fields[2]);
-                            var genotype = fields[3];
-                            snp.A1 = genotype[0];
-                            snp.A2 = genotype[1];
+                        // header line
+                        if (line.StartsWith("Name")) {
+                            if (fileFormat == RawDataFormat.rdfUnknown) {
+                                fileFormat = RawDataFormat.rdfdeCODEme;
+                            }
+                            continue;
+                        }
+
+                        var fields = line.Split(CommaSeparator);
+
+                        SNP snp = null;
+                        switch (fileFormat) {
+                            case RawDataFormat.rdfUnknown:
+                                break;
+                            case RawDataFormat.rdfdeCODEme:
+                                snp = ParsedeCODEmeLine(fields);
+                                break;
+                        }
+
+                        if (snp != null) {
                             result.SNP.Add(snp);
-
                             // This if statement saves a pointer to the beginning of every chromosome.
                             // Allows comparison of chromosome lengths.
                             if (snpIdx == 0) {
                                 result.ChromoPointers[0] = snpIdx;
-                            } else if (result.SNP[snpIdx].Chr != result.SNP[snpIdx - 1].Chr) {
+                            } else if (snp.Chr != result.SNP[snpIdx - 1].Chr) {
                                 result.ChromoPointers[++chrPtr] = snpIdx;
                             }
                             snpIdx++;
@@ -156,6 +249,24 @@ namespace GKGenetix.Core
             }
 
             return result;
+        }
+
+        private static SNP ParsedeCODEmeLine(string[] fields)
+        {
+            var snp = new SNP();
+            snp.rsID = fields[0];
+            // Variation = fields[1];
+            snp.Chr = (byte)fields[2].ParseChromosome();
+            snp.Pos = uint.Parse(fields[3]);
+            snp.Orientation = fields[4].ParseOrientation();
+            var genotype = fields[5];
+            if (!string.IsNullOrEmpty(genotype)) {
+                snp.A1 = genotype[0];
+                if (genotype.Length > 1) {
+                    snp.A2 = genotype[1];
+                }
+            }
+            return snp;
         }
     }
 }

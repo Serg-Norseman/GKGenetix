@@ -100,7 +100,7 @@ namespace GKGenetix
                     }
 
                     foreach (var dfi in fFiles) {
-                        dfi.DNA = FileFormats.ReadAncestryDNAFile(dfi.FileName);
+                        dfi.DNA = FileFormats.ReadFile(dfi.FileName);
                         dfi.Stage = ProcessStage.DNALoading;
                         UpdateFiles();
                     }

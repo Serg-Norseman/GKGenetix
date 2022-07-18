@@ -18,26 +18,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using System.Diagnostics;
+
 namespace GKGenetix.Core
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public struct Haplotype
+    public class Utilities
     {
-        public string Group;
-
         /// <summary>
-        /// The rsID number ("rs#"; "refSNP cluster") is a unique label ("rs" followed by a number) used by researchers and databases to identify a specific SNP.
-        /// It stands for Reference SNP cluster ID and is the naming convention used for most SNPs.
+        /// Opens a browser window at SNPedia for this SNP.
         /// </summary>
-        public string rsID;
-
-        /// <summary>
-        /// Basepair position.
-        /// </summary>
-        public uint Pos;
-
-        public char Mutation;
+        public static void OpenSNPedia(string rsID)
+        {
+            Process.Start("http://www.snpedia.com/index.php/" + rsID);
+        }
     }
 }
