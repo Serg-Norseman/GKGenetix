@@ -20,24 +20,10 @@
 
 namespace GKGenetix.Core
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public struct Haplotype
+    public enum Orientation
     {
-        public string Group;
-
-        /// <summary>
-        /// The rsID number ("rs#"; "refSNP cluster") is a unique label ("rs" followed by a number) used by researchers and databases to identify a specific SNP.
-        /// It stands for Reference SNP cluster ID and is the naming convention used for most SNPs.
-        /// </summary>
-        public string rsID;
-
-        /// <summary>
-        /// Basepair position.
-        /// </summary>
-        public uint Pos;
-
-        public char Mutation;
+        Unknown,
+        Plus,
+        Minus
     }
 }
