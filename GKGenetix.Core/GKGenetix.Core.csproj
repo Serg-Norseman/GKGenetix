@@ -40,6 +40,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="FileFormats.cs" />
     <Compile Include="GeneLab.cs" />
+    <Compile Include="Genotype.cs" />
     <Compile Include="Haplotype.cs" />
     <Compile Include="IDisplay.cs" />
     <Compile Include="Nucleotide.cs" />
@@ -48,6 +49,8 @@
     <Compile Include="GeneticSex.cs" />
     <Compile Include="RawDataFormat.cs" />
     <Compile Include="SNP.cs" />
+    <Compile Include="SNPGenotype.cs" />
+    <Compile Include="SNPGenotypeInfo.cs" />
     <Compile Include="Utilities.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

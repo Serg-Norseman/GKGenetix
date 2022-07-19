@@ -47,33 +47,14 @@ namespace GKGenetix.Core
         public uint Pos;
 
         /// <summary>
-        /// Strand orientation.
+        /// Genotype. Allele1 and Allele2.
         /// </summary>
-        public Orientation Orientation;
+        public SNPGenotype Genotype;
 
         /// <summary>
-        /// Genotype. Allele1.
+        /// Logical centiMorgan location of SNP in the chromosome.
         /// </summary>
-        public char A1;
-
-        /// <summary>
-        /// Genotype. Allele2.
-        /// </summary>
-        public char A2;
-
-        public char this[int index]
-        {
-            get {
-                switch (index) {
-                    case 1:
-                        return A1;
-                    case 2:
-                        return A2;
-                    default:
-                        return '0';
-                }
-            }
-        }
+        public float cM;
 
         public override string ToString()
         {
@@ -84,7 +65,7 @@ namespace GKGenetix.Core
             sb.Append("@");
             sb.Append(Pos);
             sb.Append(" ");
-            sb.Append(A1 + A2);
+            sb.Append(Genotype.ToString());
             return sb.ToString();
         }
     }

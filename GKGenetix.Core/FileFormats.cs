@@ -168,9 +168,7 @@ namespace GKGenetix.Core
             snp.rsID = fields[0];
             snp.Chr = (byte)fields[1].ParseChromosome();
             snp.Pos = uint.Parse(fields[2]);
-            snp.Orientation = Orientation.Plus;
-            snp.A1 = fields[3][0];
-            snp.A2 = fields[4][0];
+            snp.Genotype = new SNPGenotype(fields[3][0], fields[4][0], Orientation.Plus);
             return snp;
         }
 
@@ -182,14 +180,7 @@ namespace GKGenetix.Core
             snp.rsID = fields[0];
             snp.Chr = (byte)fields[1].ParseChromosome();
             snp.Pos = uint.Parse(fields[2]);
-            snp.Orientation = Orientation.Plus;
-            var genotype = fields[3]; // 23AndMe: CC...--
-            if (!string.IsNullOrEmpty(genotype)) {
-                snp.A1 = genotype[0];
-                if (genotype.Length > 1) {
-                    snp.A2 = genotype[1];
-                }
-            }
+            snp.Genotype = new SNPGenotype(fields[3], Orientation.Plus); // 23AndMe: CC...--
             return snp;
         }
 
@@ -258,14 +249,8 @@ namespace GKGenetix.Core
             // Variation = fields[1];
             snp.Chr = (byte)fields[2].ParseChromosome();
             snp.Pos = uint.Parse(fields[3]);
-            snp.Orientation = fields[4].ParseOrientation();
-            var genotype = fields[5];
-            if (!string.IsNullOrEmpty(genotype)) {
-                snp.A1 = genotype[0];
-                if (genotype.Length > 1) {
-                    snp.A2 = genotype[1];
-                }
-            }
+            var orientation = fields[4].ParseOrientation();
+            snp.Genotype = new SNPGenotype(fields[5], orientation);
             return snp;
         }
     }

@@ -59,7 +59,7 @@ namespace GKGenetix.Core
                     // position matches known haplogroup
                     if (snp.Pos == hGroup.Pos) {
                         // mutation matches haplogroup
-                        if (snp.A1 == hGroup.Mutation && !hgs.Contains(hGroup.Group)) {
+                        if (snp.Genotype.A1 == hGroup.Mutation && !hgs.Contains(hGroup.Group)) {
                             hgs.Add(hGroup.Group);
                         }
                     }
@@ -145,32 +145,27 @@ namespace GKGenetix.Core
 
                         for (int i = 0; i < d1.ChromoPointers[c + 1] - d1.ChromoPointers[c]; i++) {
                             int snpIdx = i + d1.ChromoPointers[c];
-                            var snp1 = d1snp[snpIdx];
-                            var snp2 = d2snp[snpIdx];
-                            char ps; // person strand
+                            var snp1gt = d1snp[snpIdx].Genotype;
+                            var snp2gt = d2snp[snpIdx].Genotype;
                             switch (comparisonIndex) {
-                                case 0: // person 1 strand 1
-                                    ps = snp1.A1;
-                                    if (ps == snp2.A1 || ps == snp2.A2)
-                                        match++;
+                                case 0:
+                                    // person 1 strand 1
+                                    match += snp1gt.CompareStrand(snp2gt, 1);
                                     total++;
                                     break;
-                                case 1: // person 1 strand 2
-                                    ps = snp1.A2;
-                                    if (ps == snp2.A1 || ps == snp2.A2)
-                                        match++;
+                                case 1:
+                                    // person 1 strand 2
+                                    match += snp1gt.CompareStrand(snp2gt, 2);
                                     total++;
                                     break;
-                                case 2: // person 2 strand 1
-                                    ps = snp2.A1;
-                                    if (ps == snp1.A1 || ps == snp1.A2)
-                                        match++;
+                                case 2:
+                                    // person 2 strand 1
+                                    match += snp2gt.CompareStrand(snp1gt, 1);
                                     total++;
                                     break;
-                                case 3: // person 2 strand 2
-                                    ps = snp2.A2;
-                                    if (ps == snp1.A1 || ps == snp1.A2)
-                                        match++;
+                                case 3:
+                                    // person 2 strand 2
+                                    match += snp2gt.CompareStrand(snp1gt, 2);
                                     total++;
                                     break;
                             }
@@ -237,7 +232,6 @@ namespace GKGenetix.Core
                     diagTextOut += "\r\nChromosome" + (i + 1).ToString("00") + ":";
                     for (int j = 0; j < 4; j++) {
                         diagTextOut += Math.Round(strandScores[i, j], 4).ToString("0.000").PadLeft(7, ' ');
-
                     }
                 }
 
@@ -287,13 +281,15 @@ namespace GKGenetix.Core
                     // person 2 is parent
                     for (int i = 0; i < 23; i++) {
                         for (int j = 0; j < d1.ChromoPointers[i + 1] - d1.ChromoPointers[i]; j++) {
-                            missingParent[j + d1.ChromoPointers[i]] = d1snp[j + d1.ChromoPointers[i]][pMissingParentChromo[i]];
+                            int snpIdx = j + d1.ChromoPointers[i];
+                            missingParent[snpIdx] = d1snp[snpIdx].Genotype[pMissingParentChromo[i]];
                         }
                     }
                 } else {
                     for (int i = 0; i < 23; i++) {
                         for (int j = 0; j < d1.ChromoPointers[i + 1] - d1.ChromoPointers[i]; j++) {
-                            missingParent[j + d1.ChromoPointers[i]] = d2snp[j + d1.ChromoPointers[i]][pMissingParentChromo[i]];
+                            int snpIdx = j + d1.ChromoPointers[i];
+                            missingParent[snpIdx] = d2snp[snpIdx].Genotype[pMissingParentChromo[i]];
                         }
                     }
                 }
@@ -313,7 +309,7 @@ namespace GKGenetix.Core
                             // person 2 is female parent, but Y exists in P1
                             // copy child's Y to missing parent
                             for (int i = d1.ChromoPointers[23]; i < d1.ChromoPointers[24]; i++) {
-                                missingParent[i] = d1snp[i][pMissingParentChromo[i]];
+                                missingParent[i] = d1snp[i].Genotype[pMissingParentChromo[i]];
                             }
                         }
                     } else {
@@ -321,7 +317,7 @@ namespace GKGenetix.Core
                         if (d1.IsFemale) {
                             // child is female; give child's chromosome 24
                             for (int i = d1.ChromoPointers[23]; i < d1.ChromoPointers[24]; i++) {
-                                missingParent[i] = d1snp[i][pMissingParentChromo[i]];
+                                missingParent[i] = d1snp[i].Genotype[pMissingParentChromo[i]];
                             }
                         } else {
                             // both parent and child are male, NO KNOWN !Y chromosome
@@ -346,7 +342,7 @@ namespace GKGenetix.Core
                             // person 1 is female parent, but Y exists in P2
                             // copy child's Y to missing parent
                             for (int i = d1.ChromoPointers[23]; i < d1.ChromoPointers[24]; i++) {
-                                missingParent[i] = d2snp[i][pMissingParentChromo[23]];
+                                missingParent[i] = d2snp[i].Genotype[pMissingParentChromo[23]];
                             }
                         }
                     } else {
@@ -354,7 +350,7 @@ namespace GKGenetix.Core
                         if (d2.IsFemale) {
                             // child is female; give child's chromosome 24
                             for (int i = d1.ChromoPointers[23]; i < d1.ChromoPointers[24]; i++) {
-                                missingParent[i] = d2snp[i][pMissingParentChromo[23]];
+                                missingParent[i] = d2snp[i].Genotype[pMissingParentChromo[23]];
                             }
                         } else {
                             // both parent and child are male, NO KNOWN !Y chromosome
@@ -372,12 +368,12 @@ namespace GKGenetix.Core
                 if (pPointerToParent == 1) {
                     // person 2 is parent
                     for (int i = d1.ChromoPointers[24]; i < d1.ChromoPointers[25]; i++) {
-                        missingParent[i] = d1snp[i][pMissingParentChromo[24]];
+                        missingParent[i] = d1snp[i].Genotype[pMissingParentChromo[24]];
                     }
                 } else {
                     // person 1 is parent
                     for (int i = d1.ChromoPointers[24]; i < d1.ChromoPointers[25]; i++) {
-                        missingParent[i] = d2snp[i][pMissingParentChromo[25]];
+                        missingParent[i] = d2snp[i].Genotype[pMissingParentChromo[25]];
                     }
                 }
 

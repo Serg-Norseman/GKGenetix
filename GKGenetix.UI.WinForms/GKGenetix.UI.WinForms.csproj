@@ -4,16 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DDBB40FA-52F2-4719-8FB9-D8F774AC8BE4}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
-    <RootNamespace>GKGenetix</RootNamespace>
-    <AssemblyName>GKGenetix</AssemblyName>
+    <ProjectGuid>{B9225DE4-BE79-43F8-B84B-BECF360E329A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GKGenetix.UI.WinForms</RootNamespace>
+    <AssemblyName>GKGenetix.UI.WinForms</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,36 +30,33 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>GKGenetix.ico</ApplicationIcon>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainForm.cs">
+    <Compile Include="DNAAnalysis.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MainForm.Designer.cs">
-      <DependentUpon>MainForm.cs</DependentUpon>
+    <Compile Include="DNAAnalysis.Designer.cs">
+      <DependentUpon>DNAAnalysis.cs</DependentUpon>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="DNAInheritanceTest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DNAInheritanceTest.Designer.cs">
+      <DependentUpon>DNAInheritanceTest.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GKGenetix.Core\GKGenetix.Core.csproj">
-      <Project>{78659756-B505-403B-9173-0965DF601030}</Project>
+      <Project>{78659756-b505-403b-9173-0965df601030}</Project>
       <Name>GKGenetix.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GKGenetix.UI.WinForms\GKGenetix.UI.WinForms.csproj">
-      <Project>{B9225DE4-BE79-43F8-B84B-BECF360E329A}</Project>
-      <Name>GKGenetix.UI.WinForms</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="GKGenetix.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

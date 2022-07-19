@@ -59,7 +59,7 @@ namespace GKGenetix.Core
 
             for (int i = ChromoPointers[23]; i < ChromoPointers[24]; i++) {
                 // chromosome 24 is male Y
-                if (SNP[i].A1 == '0') {
+                if (SNP[i].Genotype.A1 == '0') {
                     count++;
                 }
                 total++;
