@@ -23,7 +23,7 @@ using System.IO;
 using System.Windows.Forms;
 using GKGenetix.Core;
 
-namespace GKGenetix
+namespace GKGenetix.UI.WinForms
 {
     public partial class DNAAnalysis : Form, IDisplay
     {

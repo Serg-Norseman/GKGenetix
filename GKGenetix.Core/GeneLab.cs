@@ -22,16 +22,16 @@ namespace GKGenetix.Core
 {
     public static class GeneLab
     {
-        public static string FlipNucleotide(string n)
+        public static char GetComplementaryNucleotide(char n)
         {
-            if (n == "A") {
-                n = "T"; // A -> T
-            } else if (n == "T") {
-                n = "A"; // T -> A
-            } else if (n == "C") {
-                n = "G"; // C -> G
-            } else if (n == "G") {
-                n = "C"; // G -> C
+            if (n == 'A') {
+                n = 'T'; // A -> T
+            } else if (n == 'T') {
+                n = 'A'; // T -> A
+            } else if (n == 'C') {
+                n = 'G'; // C -> G
+            } else if (n == 'G') {
+                n = 'C'; // G -> C
             }
             return n;
         }

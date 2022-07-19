@@ -18,30 +18,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System.Windows.Forms;
-using GKGenetix.UI.WinForms;
+using System.Collections.Generic;
 
-namespace GKGenetix
+namespace GKGenetix.Core
 {
-    public partial class MainForm : Form
+    public struct SNPGenotypeInfo
     {
-        public MainForm()
-        {
-            InitializeComponent();
-        }
-
-        private void btnDNAAnalysis_Click(object sender, System.EventArgs e)
-        {
-            using (var dlg = new DNAAnalysis()) {
-                dlg.ShowDialog();
-            }
-        }
-
-        private void btnDNAInheritanceTest_Click(object sender, System.EventArgs e)
-        {
-            using (var dlg = new DNAInheritanceTest()) {
-                dlg.ShowDialog();
-            }
-        }
+        public Genotype Genotype;
+        public string Trait;
+        public Dictionary<string, float> PopulationFrequencies;
     }
 }
