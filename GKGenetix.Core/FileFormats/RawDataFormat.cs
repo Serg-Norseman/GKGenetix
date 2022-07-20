@@ -18,7 +18,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace GKGenetix.Core
+namespace GKGenetix.Core.FileFormats
 {
     public enum RawDataFormat
     {

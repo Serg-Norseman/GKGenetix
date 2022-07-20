@@ -22,6 +22,7 @@ using System;
 using System.IO;
 using System.Windows.Forms;
 using GKGenetix.Core;
+using GKGenetix.Core.FileFormats;
 
 namespace GKGenetix.UI.WinForms
 {
@@ -44,12 +45,13 @@ namespace GKGenetix.UI.WinForms
 
                     foreach (var file in files) {
                         fFileName = file;
-                        fDNA = FileFormats.ReadFile(fFileName);
+                        fDNA = FileFormatsHelper.ReadFile(fFileName);
                         fDNA.DetermineSex();
 
                         WriteLine("File name: " + Path.GetFileName(fFileName));
                         WriteLine("Sex: " + fDNA.Sex.ToString());
                         WriteLine("SNPs: " + fDNA.SNP.Count.ToString());
+                        WriteLine("Chromosomes: " + fDNA.Chromosomes.Count.ToString());
 
                         var haplogroups = Analytics.DetermineHaplogroup(fDNA);
                         WriteLine("Haplogroups: ");

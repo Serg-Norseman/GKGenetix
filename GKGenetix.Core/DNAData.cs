@@ -31,7 +31,7 @@ namespace GKGenetix.Core
         /// <summary>
         /// Pointers to beginning of each chromosome.
         /// </summary>
-        public int[] ChromoPointers { get; private set; }
+        public IList<Region> Chromosomes { get; private set; }
 
         public GeneticSex Sex { get; private set; }
 
@@ -45,7 +45,7 @@ namespace GKGenetix.Core
         public DNAData()
         {
             SNP = new List<SNP>(702000);
-            ChromoPointers = new int[26];
+            Chromosomes = new List<Region>(26);
             Sex = GeneticSex.Unknown;
         }
 
@@ -57,8 +57,9 @@ namespace GKGenetix.Core
             int count = 0;
             int total = 0;
 
-            for (int i = ChromoPointers[23]; i < ChromoPointers[24]; i++) {
-                // chromosome 24 is male Y
+            // chromosome 24 is male Y
+            var chrY = Chromosomes[23];
+            for (int i = chrY.StartPosition; i <= chrY.EndPosition; i++) {
                 if (SNP[i].Genotype.A1 == '0') {
                     count++;
                 }
