@@ -8,3 +8,6 @@ rmdir .\GKGenetix.UI.WinForms\obj /s /q 2>NUL
 
 rmdir .\GKGenetix\bin /s /q 2>NUL
 rmdir .\GKGenetix\obj /s /q 2>NUL
+
+rmdir .\GKGenetixPlugin\bin /s /q 2>NUL
+rmdir .\GKGenetixPlugin\obj /s /q 2>NUL

@@ -90,11 +90,11 @@ namespace GKGenetix.Core
                     return (Chromosome)chrNum;
 
                 case "23":
-                case "X": // [23AndMe, deCODEme]
+                case "X": // [23AndMe, deCODEme, VCF]
                     return Chromosome.CHR_X;
 
                 case "24": // Non-pseudoautosomal portion of the Y chromosome [AncestryDNA]
-                case "Y": // [23AndMe, deCODEme]
+                case "Y": // [23AndMe, deCODEme, VCF]
                     return Chromosome.CHR_Y;
 
                 case "25": // Pseudoautosomal portion of the Y chromosome [AncestryDNA]
