@@ -18,26 +18,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace GKGenetix.Core
+using System.Collections.Generic;
+using System.Linq;
+
+namespace GKGenetix.Core.Reference
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public struct Haplotype
+    public sealed class Haplogroup
     {
-        public string Group;
+        public string Name { get; set; }
 
-        /// <summary>
-        /// The rsID number ("rs#"; "refSNP cluster") is a unique label ("rs" followed by a number) used by researchers and databases to identify a specific SNP.
-        /// It stands for Reference SNP cluster ID and is the naming convention used for most SNPs.
-        /// </summary>
-        public string rsID;
+        public List<Haplogroup> Children { get; set; }
 
-        /// <summary>
-        /// Basepair position.
-        /// </summary>
-        public uint Pos;
+        public List<HaplogroupMutation> Mutations { get; set; }
 
-        public char Mutation;
+        public Haplogroup()
+        {
+            Children = new List<Haplogroup>();
+            Mutations = new List<HaplogroupMutation>();
+        }
+
+        public override string ToString()
+        {
+            return Children.Any() ? string.Format("{0} -> {1}", Name, string.Join(", ", Children.Select(x => x.Name))) : Name;
+        }
     }
 }

@@ -69,7 +69,7 @@ namespace GKGenetix.Core.FileFormats
             fFieldSeparator = fieldSeparator;
         }
 
-        protected virtual void ProcessHeaderLine(string line)
+        protected virtual void ProcessHeaderLine(string line, DNAData data)
         {
         }
 
@@ -83,7 +83,7 @@ namespace GKGenetix.Core.FileFormats
             var result = new DNAData();
 
             try {
-                int snpIdx = 0, chrPtr = 0;
+                int snpIdx = 0;
                 SNP prev_snp = null;
                 Region curr_chr = null;
 
@@ -94,7 +94,7 @@ namespace GKGenetix.Core.FileFormats
 
                     // header line
                     if (line[0] == fHeaderMark) {
-                        ProcessHeaderLine(line);
+                        ProcessHeaderLine(line, result);
                         continue;
                     }
 
@@ -115,12 +115,6 @@ namespace GKGenetix.Core.FileFormats
                             result.Chromosomes.Add(curr_chr);
                         }
 
-                        /*if (snpIdx == 0) {
-                            result.ChromoPointers[0] = snpIdx;
-                        } else if (snp.Chr != result.SNP[snpIdx - 1].Chr) {
-                            result.ChromoPointers[++chrPtr] = snpIdx;
-                        }*/
-
                         snpIdx++;
                         prev_snp = snp;
                     }
@@ -129,7 +123,6 @@ namespace GKGenetix.Core.FileFormats
                 if (curr_chr != null) {
                     curr_chr.EndPosition = snpIdx - 1;
                 }
-                //result.ChromoPointers[result.ChromoPointers.Length - 1] = snpIdx;
             } catch (Exception e) {
                 Console.WriteLine("The file could not be read: " + e.Message);
             }

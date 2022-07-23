@@ -20,7 +20,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using BSLib;
 using GKGenetix.Core.FileFormats;
+using GKGenetix.Core.Reference;
 
 namespace GKGenetix.Core
 {
@@ -37,15 +40,15 @@ namespace GKGenetix.Core
     /// </summary>
     public static class Analytics
     {
-        // haplogroups to search for
-        public static readonly IList<Haplotype> dbHaplogroups = FileFormatsHelper.ReadHaplotypeFile(@"../../../temp/haplogroups.txt");
+        // haplogroups to search for (2016, build 37)
+        public static readonly IList<HaplogroupMutation> dbHaplogroupMutationsY = FileFormatsHelper.ReadHaplogroupMutations("ydna_snp_index_2016.txt.gz");
 
         /// <summary>
         /// Determines the Y haplogroup.
         /// </summary>
         /// <param name="dna">The dna.</param>
         /// <returns></returns>
-        public static List<PersonalHaplogroup> DetermineHaplogroup(DNAData dna)
+        public static List<PersonalHaplogroup> DetermineHaplogroupsY(DNAData dna)
         {
             // list of haplogroups that were expressed in Y chromosome
             List<string> hgs = new List<string>();
@@ -56,13 +59,13 @@ namespace GKGenetix.Core
                 var snp = dna.SNP[i];
 
                 // iterate through the haplogroups
-                for (int j = 0; j < dbHaplogroups.Count; j++) {
-                    var hGroup = dbHaplogroups[j];
+                for (int j = 0; j < dbHaplogroupMutationsY.Count; j++) {
+                    var hGroup = dbHaplogroupMutationsY[j];
                     // position matches known haplogroup
-                    if (snp.Pos == hGroup.Pos) {
+                    if (snp.Pos == hGroup.Position) {
                         // mutation matches haplogroup
-                        if (snp.Genotype.A1 == hGroup.Mutation && !hgs.Contains(hGroup.Group)) {
-                            hgs.Add(hGroup.Group);
+                        if (snp.Genotype.A1 == hGroup.NewNucleotide && !hgs.Contains(hGroup.Haplogroup)) {
+                            hgs.Add(hGroup.Haplogroup);
                         }
                     }
                 }
@@ -397,6 +400,106 @@ namespace GKGenetix.Core
 
                 display.WriteLine("\r\n\r\n");
             } catch (Exception ex) {
+                display.WriteLine(ex.StackTrace.ToString());
+            }
+        }
+
+
+        private const float HaplogroupMatchThreshold = 0.5F;
+
+        private class HGMatch
+        {
+            public int Total;
+            public int Exact;
+            public float Ratio;
+        }
+
+        private static StringNode CreateNode(Haplogroup hg, Dictionary<string, HGMatch> haplogroupMatches)
+        {
+            StringNode result = null;
+
+            foreach (var child in hg.Children) {
+                var node = CreateNode(child, haplogroupMatches);
+                if (node != null) {
+                    if (result == null) {
+                        result = new StringNode();
+                    }
+                    result.Children.Add(node);
+                }
+            }
+
+            // if result is not null, then there are significant child nodes
+
+            HGMatch match;
+            if (!haplogroupMatches.TryGetValue(hg.Name, out match)) {
+                if (result != null) {
+                    result.Value = hg.Name;
+                    return result;
+                }
+            }
+
+            if ((match == null || match.Exact == 0) && result == null) {
+                return result;
+            } else {
+                if (result == null) {
+                    result = new StringNode();
+                }
+
+                if (match.Total == 0) {
+                    result.Value = hg.Name;
+                } else {
+                    match.Ratio = match.Exact / (float)match.Total;
+                    result.Value = string.Format("{0}: {1:n0}% ({2:n0}/{3:n0})", hg.Name, match.Ratio * 100, match.Exact, match.Total);
+                }
+
+                return result;
+            }
+        }
+
+        public static void DetermineHaplogroupsTree(DNAData dna, IDisplay display)
+        {
+            try {
+                // TODO: dna.Sex -> ydna_tree.json | mtdna_tree.json ?
+                var hpTreeRoot = FileFormatsHelper.ReadHaplogroupTree("ydna_tree.json.gz");
+
+                var mutationMatches = new Dictionary<string, HGMatch>();
+                for (int i = 0; i < dna.SNP.Count; i++) {
+                    var snp = dna.SNP[i];
+                    for (int j = 0; j < dbHaplogroupMutationsY.Count; j++) {
+                        var hGroup = dbHaplogroupMutationsY[j];
+                        if (snp.Pos == hGroup.Position) {
+                            HGMatch tuple;
+                            if (!mutationMatches.TryGetValue(hGroup.Haplogroup, out tuple)) {
+                                tuple = new HGMatch();
+                                mutationMatches.Add(hGroup.Haplogroup, tuple);
+                            }
+
+                            tuple.Total += 1;
+                            if (snp.Genotype.A1 == hGroup.NewNucleotide) {
+                                tuple.Exact += 1;
+                            }
+                        }
+                    }
+                }
+
+                var stringTreeRoot = CreateNode(hpTreeRoot, mutationMatches);
+
+                display.WriteLine("Haplogroup Matches");
+                display.WriteLine("\r\n");
+                display.WriteLine(StringTree.Create(stringTreeRoot, x => x.Value, x => x.Children));
+
+                var haplogroup = mutationMatches
+                    .Where(x => x.Value.Ratio >= HaplogroupMatchThreshold)
+                    .OrderByDescending(x => x.Value.Ratio)
+                    .ThenByDescending(x => x.Key)
+                    .Select(x => x.Key)
+                    .FirstOrDefault();
+
+                if (haplogroup != null) {
+                    display.WriteLine(string.Format("Best match: {0}\r\n", haplogroup));
+                }
+            } catch (Exception ex) {
+                display.WriteLine(ex.Message);
                 display.WriteLine(ex.StackTrace.ToString());
             }
         }

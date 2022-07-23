@@ -26,6 +26,11 @@ namespace GKGenetix.Core
     {
         public string PersonalName { get; set; }
 
+        /// <summary>
+        /// Reference human assembly.
+        /// </summary>
+        public int RHABuild { get; set; }
+
         public IList<SNP> SNP { get; private set; }
 
         /// <summary>

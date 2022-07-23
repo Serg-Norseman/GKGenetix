@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using GKGenetix.Core.Reference;
 
 namespace GKGenetix.Core.FileFormats
 {
@@ -37,36 +38,53 @@ namespace GKGenetix.Core.FileFormats
         public static string FileFilter_VCF = "VCF variations files|*.vcf;*.vcf.gz";
 
 
+        public static Haplogroup ReadHaplogroupTree(string gzName)
+        {
+            var gzStream = Utilities.LoadResourceGZipStream(gzName);
+            return JsonHelper.DeserializeFromStream<Haplogroup>(gzStream);
+        }
+
         /// <summary>
         /// Reads a reference file with haplogroups.
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public static IList<Haplotype> ReadHaplotypeFile(string filePath)
+        public static IList<HaplogroupMutation> ReadHaplogroupMutations(string gzName)
         {
-            var result = new List<Haplotype>(1200);
+            var result = new List<HaplogroupMutation>(12000);
 
             try {
-                using (StreamReader reader = new StreamReader(filePath)) {
+                var gzStream = Utilities.LoadResourceGZipStream(gzName);
+                using (StreamReader reader = new StreamReader(gzStream)) {
                     while (reader.Peek() != -1) {
                         string line = reader.ReadLine();
-                        if (!string.IsNullOrEmpty(line) && line[0] != '#' && line[2] != 'i') {
+                        if (!string.IsNullOrEmpty(line) && !line.StartsWith("Haplogroup")) {
                             var fields = line.Split(TabSeparator);
 
-                            var poses = fields[2].Split(';');
+                            char oldNuc, newNuc;
+                            if (fields[3].Contains("->")) {
+                                var mutations = Extensions.ParseMutation(fields[3]);
+                                oldNuc = mutations[0];
+                                newNuc = mutations[1];
+                            } else {
+                                oldNuc = '0';
+                                newNuc = fields[3][0];
+                            }
 
+                            var poses = fields[2].Split(';');
                             foreach (var po in poses) {
-                                var ht = new Haplotype();
-                                ht.Group = fields[0];
+                                var ht = new HaplogroupMutation();
+                                ht.Haplogroup = fields[0];
                                 ht.rsID = fields[1];
-                                ht.Pos = uint.Parse(po.Trim());
-                                ht.Mutation = fields[3][0];
+                                ht.Position = po.ParsePosition();
+                                ht.OldNucleotide = oldNuc;
+                                ht.NewNucleotide = newNuc;
                                 result.Add(ht);
                             }
                         }
                     }
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Console.WriteLine("The file could not be read: " + e.Message);
             }
 

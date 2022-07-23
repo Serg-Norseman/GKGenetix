@@ -43,22 +43,20 @@ namespace GKGenetix.Core.FileFormats
             SetParsingParameters('#', ',');
         }
 
-        protected override void ProcessHeaderLine(string line)
+        protected override void ProcessHeaderLine(string line, DNAData data)
         {
         }
 
         protected override SNP ProcessDataLine(string[] fields)
         {
             // deCODEme column headers line; starts with "Name"
-            if (fields[0] == "Name") {
+            if (fields[0] == "Name")
                 return null;
-            }
 
             string positionText = fields[3];
-            uint position;
-            if (!uint.TryParse(positionText, out position)) {
+            int position = positionText.ParsePosition();
+            if (position == -1)
                 throw new Exception($"Error in deCODEme raw file. Invalid position '{positionText}'.");
-            }
 
             var snp = new SNP();
             snp.rsID = fields[0];
