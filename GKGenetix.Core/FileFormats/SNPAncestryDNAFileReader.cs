@@ -42,25 +42,26 @@ namespace GKGenetix.Core.FileFormats
             SetParsingParameters('#', '\t');
         }
 
-        protected override void ProcessHeaderLine(string line)
+        protected override void ProcessHeaderLine(string line, DNAData data)
         {
+            if (line.Contains("build 37")) {
+                data.RHABuild = 37;
+            }
         }
 
         protected override SNP ProcessDataLine(string[] fields)
         {
             // Data validation: if line begins with 'r' then is most likely a SNP
             // AncestryDNA column headers line; starts with "rsid"
-            if (fields[0] == "rsid") {
+            if (fields[0] == "rsid")
                 return null;
-            }
 
             // AncestryDNA: chromosome numbers from 1 to 25!
 
             string positionText = fields[2];
-            uint position;
-            if (!uint.TryParse(positionText, out position)) {
+            int position = positionText.ParsePosition();
+            if (position == -1)
                 throw new Exception($"Error in AncestryDNA raw file. Invalid position '{positionText}'.");
-            }
 
             var snp = new SNP();
             snp.rsID = fields[0];

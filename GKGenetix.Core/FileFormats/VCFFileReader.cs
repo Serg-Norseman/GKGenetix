@@ -45,7 +45,7 @@ namespace GKGenetix.Core.FileFormats
             SetParsingParameters('#', '\t');
         }
 
-        protected override void ProcessHeaderLine(string line)
+        protected override void ProcessHeaderLine(string line, DNAData data)
         {
         }
 
@@ -55,8 +55,8 @@ namespace GKGenetix.Core.FileFormats
             // optional columns: FORMAT [8] and other
 
             string positionText = fields[1];
-            uint position;
-            if (!uint.TryParse(positionText, out position)) {
+            int position;
+            if (!int.TryParse(positionText, out position)) {
                 throw new Exception($"Error in VCF raw file. Invalid position '{positionText}'.");
             }
 

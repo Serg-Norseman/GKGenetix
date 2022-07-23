@@ -42,8 +42,11 @@ namespace GKGenetix.Core.FileFormats
             SetParsingParameters('#', '\t');
         }
 
-        protected override void ProcessHeaderLine(string line)
+        protected override void ProcessHeaderLine(string line, DNAData data)
         {
+            if (line.Contains("build 37")) {
+                data.RHABuild = 37;
+            }
         }
 
         protected override SNP ProcessDataLine(string[] fields)
@@ -51,10 +54,9 @@ namespace GKGenetix.Core.FileFormats
             // 23andMe: chromosome numbers from 1..22 to X, Y, MT
 
             string positionText = fields[2];
-            uint position;
-            if (!uint.TryParse(positionText, out position)) {
+            int position = positionText.ParsePosition();
+            if (position == -1)
                 throw new Exception($"Error in 23andMe raw file. Invalid position '{positionText}'.");
-            }
 
             string genotypeText = fields[3];
             if (genotypeText.Length > 2)

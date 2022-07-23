@@ -53,14 +53,16 @@ namespace GKGenetix.UI.WinForms
                         WriteLine("SNPs: " + fDNA.SNP.Count.ToString());
                         WriteLine("Chromosomes: " + fDNA.Chromosomes.Count.ToString());
 
-                        var haplogroups = Analytics.DetermineHaplogroup(fDNA);
-                        WriteLine("Haplogroups: ");
+                        var haplogroups = Analytics.DetermineHaplogroupsY(fDNA);
+                        WriteLine("Y Haplogroups: ");
                         foreach (var h in haplogroups) {
                             string moreSpecific = h.Specific ? "*" : " ";
                             WriteLine("    > " + moreSpecific + "\t" + h.Name);
                         }
                         WriteLine("\r\n");
                         Application.DoEvents();
+
+                        Analytics.DetermineHaplogroupsTree(fDNA, this);
                     }
 
                     WriteLine("Analysis finished.");
