@@ -20,6 +20,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using BSLib;
+using GKGenetix.Core.FileFormats;
+using GKGenetix.Core.Reference;
 
 namespace GKGenetix.Core
 {
@@ -36,31 +40,32 @@ namespace GKGenetix.Core
     /// </summary>
     public static class Analytics
     {
-        // haplogroups to search for
-        public static readonly IList<Haplotype> dbHaplogroups = FileFormats.ReadHaplotypeFile(@"../../../temp/haplogroups.txt");
+        // haplogroups to search for (2016, build 37)
+        public static readonly IList<HaplogroupMutation> dbHaplogroupMutationsY = FileFormatsHelper.ReadHaplogroupMutations("ydna_snp_index_2016.txt.gz");
 
         /// <summary>
         /// Determines the Y haplogroup.
         /// </summary>
         /// <param name="dna">The dna.</param>
         /// <returns></returns>
-        public static List<PersonalHaplogroup> DetermineHaplogroup(DNAData dna)
+        public static List<PersonalHaplogroup> DetermineHaplogroupsY(DNAData dna)
         {
             // list of haplogroups that were expressed in Y chromosome
             List<string> hgs = new List<string>();
 
             // look at Y chromosome
-            for (int i = dna.ChromoPointers[23]; i < dna.ChromoPointers[24]; i++) {
+            var chrY = dna.Chromosomes[23];
+            for (int i = chrY.StartPosition; i <= chrY.EndPosition; i++) {
                 var snp = dna.SNP[i];
 
                 // iterate through the haplogroups
-                for (int j = 0; j < dbHaplogroups.Count; j++) {
-                    var hGroup = dbHaplogroups[j];
+                for (int j = 0; j < dbHaplogroupMutationsY.Count; j++) {
+                    var hGroup = dbHaplogroupMutationsY[j];
                     // position matches known haplogroup
-                    if (snp.Pos == hGroup.Pos) {
+                    if (snp.Pos == hGroup.Position) {
                         // mutation matches haplogroup
-                        if (snp.Genotype.A1 == hGroup.Mutation && !hgs.Contains(hGroup.Group)) {
-                            hgs.Add(hGroup.Group);
+                        if (snp.Genotype.A1 == hGroup.NewNucleotide && !hgs.Contains(hGroup.Haplogroup)) {
+                            hgs.Add(hGroup.Haplogroup);
                         }
                     }
                 }
@@ -127,9 +132,16 @@ namespace GKGenetix.Core
                 // alorithm counts chromosome length during file parsing and ensures there are the same number of compares
                 // USED TO guarantee that chromosomes are of same length prior to comparison,
 
+                display.WriteLine("Chromosomes 1: " + d1.Chromosomes.Count.ToString());
+                display.WriteLine("Chromosomes 2: " + d2.Chromosomes.Count.ToString());
+
                 // check that chromosomes are equilength
-                for (int i = 0; i < 26; i++) {
-                    if (d1.ChromoPointers[i] != d2.ChromoPointers[i]) {
+                if (d1.Chromosomes.Count != d2.Chromosomes.Count) {
+                    throw new Exception("The number of chromosomes does not match");
+                }
+
+                for (int i = 0; i < d1.Chromosomes.Count; i++) {
+                    if (d1.Chromosomes[i].EndPosition != d2.Chromosomes[i].EndPosition) {
                         throw new Exception("Chromosomes not aligned at chromo " + (i + 1));
                     }
                 }
@@ -139,12 +151,13 @@ namespace GKGenetix.Core
 
                 // compare one strand to the other persons strands, looking for possibility of inheritance
                 for (int c = 0; c < 25; c++) {
+                    var chReg = d1.Chromosomes[c];
+
                     // do 4 comparisions for each chromosome
                     for (int comparisonIndex = 0; comparisonIndex < 4; comparisonIndex++) {
                         int match = 0, total = 0;
 
-                        for (int i = 0; i < d1.ChromoPointers[c + 1] - d1.ChromoPointers[c]; i++) {
-                            int snpIdx = i + d1.ChromoPointers[c];
+                        for (int snpIdx = chReg.StartPosition; snpIdx <= chReg.EndPosition; snpIdx++) {
                             var snp1gt = d1snp[snpIdx].Genotype;
                             var snp2gt = d2snp[snpIdx].Genotype;
                             switch (comparisonIndex) {
@@ -273,27 +286,28 @@ namespace GKGenetix.Core
                 // Begin output of missing parent
                 // initialize the missing parent
                 // holds the array of chromoNumber and Allele of the extrapolated parent
-                char[] missingParent;
-                missingParent = new char[d1.ChromoPointers[d1.ChromoPointers.GetUpperBound(0)]];
+                var missingParent = new char[d1.SNP.Count];
 
                 // copy child's non-matched strand to missing parent
                 if (pPointerToParent == 1) {
                     // person 2 is parent
                     for (int i = 0; i < 23; i++) {
-                        for (int j = 0; j < d1.ChromoPointers[i + 1] - d1.ChromoPointers[i]; j++) {
-                            int snpIdx = j + d1.ChromoPointers[i];
+                        var chReg = d1.Chromosomes[i];
+                        for (int snpIdx = chReg.StartPosition; snpIdx <= chReg.EndPosition; snpIdx++) {
                             missingParent[snpIdx] = d1snp[snpIdx].Genotype[pMissingParentChromo[i]];
                         }
                     }
                 } else {
                     for (int i = 0; i < 23; i++) {
-                        for (int j = 0; j < d1.ChromoPointers[i + 1] - d1.ChromoPointers[i]; j++) {
-                            int snpIdx = j + d1.ChromoPointers[i];
+                        var chReg = d1.Chromosomes[i];
+                        for (int snpIdx = chReg.StartPosition; snpIdx <= chReg.EndPosition; snpIdx++) {
                             missingParent[snpIdx] = d2snp[snpIdx].Genotype[pMissingParentChromo[i]];
                         }
                     }
                 }
 
+                var chrY = d1.Chromosomes[23];
+                int x = pMissingParentChromo[23];
                 if (pPointerToParent == 1) {
                     // person 2 is parent
                     if (d2.IsFemale) {
@@ -302,27 +316,27 @@ namespace GKGenetix.Core
                             // both parent and child are female, NO KNOWN Y chromosome
                             diagTextOut = "Exporting Missing Parent: No known Y chromosome exists. Defaulting to '0'.";
                             // copy child's Y to missing parent
-                            for (int i = d1.ChromoPointers[23]; i < d1.ChromoPointers[24]; i++) {
+                            for (int i = chrY.StartPosition; i <= chrY.EndPosition; i++) {
                                 missingParent[i] = '0';
                             }
                         } else {
                             // person 2 is female parent, but Y exists in P1
                             // copy child's Y to missing parent
-                            for (int i = d1.ChromoPointers[23]; i < d1.ChromoPointers[24]; i++) {
-                                missingParent[i] = d1snp[i].Genotype[pMissingParentChromo[i]];
+                            for (int i = chrY.StartPosition; i <= chrY.EndPosition; i++) {
+                                missingParent[i] = d1snp[i].Genotype[x];
                             }
                         }
                     } else {
                         // person 2 is male parent; give missing parent X & no Y
                         if (d1.IsFemale) {
                             // child is female; give child's chromosome 24
-                            for (int i = d1.ChromoPointers[23]; i < d1.ChromoPointers[24]; i++) {
-                                missingParent[i] = d1snp[i].Genotype[pMissingParentChromo[i]];
+                            for (int i = chrY.StartPosition; i <= chrY.EndPosition; i++) {
+                                missingParent[i] = d1snp[i].Genotype[x];
                             }
                         } else {
                             // both parent and child are male, NO KNOWN !Y chromosome
                             diagTextOut = "Exporting Missing Parent: No known !Y chromosome exists. Defaulting to '0'.";
-                            for (int i = d1.ChromoPointers[23]; i < d1.ChromoPointers[24]; i++) {
+                            for (int i = chrY.StartPosition; i <= chrY.EndPosition; i++) {
                                 missingParent[i] = '0';
                             }
                         }
@@ -335,27 +349,27 @@ namespace GKGenetix.Core
                         if (d2.IsFemale) {
                             diagTextOut = "Exporting Missing Parent: No known Y chromosome exists. Defaulting to '0'.";
                             // copy child's Y to missing parent
-                            for (int i = d1.ChromoPointers[23]; i < d1.ChromoPointers[24]; i++) {
+                            for (int i = chrY.StartPosition; i <= chrY.EndPosition; i++) {
                                 missingParent[i] = '0';
                             }
                         } else {
                             // person 1 is female parent, but Y exists in P2
                             // copy child's Y to missing parent
-                            for (int i = d1.ChromoPointers[23]; i < d1.ChromoPointers[24]; i++) {
-                                missingParent[i] = d2snp[i].Genotype[pMissingParentChromo[23]];
+                            for (int i = chrY.StartPosition; i <= chrY.EndPosition; i++) {
+                                missingParent[i] = d2snp[i].Genotype[x];
                             }
                         }
                     } else {
                         // person 2 is male parent; give missing parent X & no Y
                         if (d2.IsFemale) {
                             // child is female; give child's chromosome 24
-                            for (int i = d1.ChromoPointers[23]; i < d1.ChromoPointers[24]; i++) {
-                                missingParent[i] = d2snp[i].Genotype[pMissingParentChromo[23]];
+                            for (int i = chrY.StartPosition; i <= chrY.EndPosition; i++) {
+                                missingParent[i] = d2snp[i].Genotype[x];
                             }
                         } else {
                             // both parent and child are male, NO KNOWN !Y chromosome
                             diagTextOut = "Exporting Missing Parent: No known !Y chromosome exists. Defaulting to '0'.";
-                            for (int i = d1.ChromoPointers[23]; i < d1.ChromoPointers[24]; i++) {
+                            for (int i = chrY.StartPosition; i <= chrY.EndPosition; i++) {
                                 missingParent[i] = '0';
                             }
                         }
@@ -365,26 +379,128 @@ namespace GKGenetix.Core
                 display.WriteLine(diagTextOut);
 
                 // copy mitochondrial dna
+                var chrMt = d1.Chromosomes[24];
+                int m = pMissingParentChromo[24];
+                IList<SNP> source;
                 if (pPointerToParent == 1) {
                     // person 2 is parent
-                    for (int i = d1.ChromoPointers[24]; i < d1.ChromoPointers[25]; i++) {
-                        missingParent[i] = d1snp[i].Genotype[pMissingParentChromo[24]];
-                    }
+                    source = d1snp;
                 } else {
                     // person 1 is parent
-                    for (int i = d1.ChromoPointers[24]; i < d1.ChromoPointers[25]; i++) {
-                        missingParent[i] = d2snp[i].Genotype[pMissingParentChromo[25]];
-                    }
+                    source = d2snp;
+                }
+                for (int i = chrMt.StartPosition; i <= chrMt.EndPosition; i++) {
+                    missingParent[i] = source[i].Genotype[m];
                 }
 
                 /*display.WriteLine("Output the best guess for missing parent:");
-                for (int i = 0; i <= missingParent.GetUpperBound(0); i++) {
+                for (int i = 0; i < missingParent.Length; i++) {
                     display.WriteLine(missingParent[i].ToString());
                 }*/
 
                 display.WriteLine("\r\n\r\n");
             } catch (Exception ex) {
+                display.WriteLine(ex.StackTrace.ToString());
+            }
+        }
 
+
+        private const float HaplogroupMatchThreshold = 0.5F;
+
+        private class HGMatch
+        {
+            public int Total;
+            public int Exact;
+            public float Ratio;
+        }
+
+        private static StringNode CreateNode(Haplogroup hg, Dictionary<string, HGMatch> haplogroupMatches)
+        {
+            StringNode result = null;
+
+            foreach (var child in hg.Children) {
+                var node = CreateNode(child, haplogroupMatches);
+                if (node != null) {
+                    if (result == null) {
+                        result = new StringNode();
+                    }
+                    result.Children.Add(node);
+                }
+            }
+
+            // if result is not null, then there are significant child nodes
+
+            HGMatch match;
+            if (!haplogroupMatches.TryGetValue(hg.Name, out match)) {
+                if (result != null) {
+                    result.Value = hg.Name;
+                    return result;
+                }
+            }
+
+            if ((match == null || match.Exact == 0) && result == null) {
+                return result;
+            } else {
+                if (result == null) {
+                    result = new StringNode();
+                }
+
+                if (match.Total == 0) {
+                    result.Value = hg.Name;
+                } else {
+                    match.Ratio = match.Exact / (float)match.Total;
+                    result.Value = string.Format("{0}: {1:n0}% ({2:n0}/{3:n0})", hg.Name, match.Ratio * 100, match.Exact, match.Total);
+                }
+
+                return result;
+            }
+        }
+
+        public static void DetermineHaplogroupsTree(DNAData dna, IDisplay display)
+        {
+            try {
+                // TODO: dna.Sex -> ydna_tree.json | mtdna_tree.json ?
+                var hpTreeRoot = FileFormatsHelper.ReadHaplogroupTree("ydna_tree.json.gz");
+
+                var mutationMatches = new Dictionary<string, HGMatch>();
+                for (int i = 0; i < dna.SNP.Count; i++) {
+                    var snp = dna.SNP[i];
+                    for (int j = 0; j < dbHaplogroupMutationsY.Count; j++) {
+                        var hGroup = dbHaplogroupMutationsY[j];
+                        if (snp.Pos == hGroup.Position) {
+                            HGMatch tuple;
+                            if (!mutationMatches.TryGetValue(hGroup.Haplogroup, out tuple)) {
+                                tuple = new HGMatch();
+                                mutationMatches.Add(hGroup.Haplogroup, tuple);
+                            }
+
+                            tuple.Total += 1;
+                            if (snp.Genotype.A1 == hGroup.NewNucleotide) {
+                                tuple.Exact += 1;
+                            }
+                        }
+                    }
+                }
+
+                var stringTreeRoot = CreateNode(hpTreeRoot, mutationMatches);
+
+                display.WriteLine("Haplogroup Matches");
+                display.WriteLine("\r\n");
+                display.WriteLine(StringTree.Create(stringTreeRoot, x => x.Value, x => x.Children));
+
+                var haplogroup = mutationMatches
+                    .Where(x => x.Value.Ratio >= HaplogroupMatchThreshold)
+                    .OrderByDescending(x => x.Value.Ratio)
+                    .ThenByDescending(x => x.Key)
+                    .Select(x => x.Key)
+                    .FirstOrDefault();
+
+                if (haplogroup != null) {
+                    display.WriteLine(string.Format("Best match: {0}\r\n", haplogroup));
+                }
+            } catch (Exception ex) {
+                display.WriteLine(ex.Message);
+                display.WriteLine(ex.StackTrace.ToString());
             }
         }
     }

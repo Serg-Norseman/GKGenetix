@@ -18,34 +18,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System.Diagnostics;
-using System.IO;
-using System.IO.Compression;
-using System.Reflection;
-
-namespace GKGenetix.Core
+namespace GKGenetix.Core.Reference
 {
-    public class Utilities
+    /// <summary>
+    /// 
+    /// </summary>
+    public sealed class HaplogroupMutation
     {
-        public static Stream LoadResourceGZipStream(string gzName)
-        {
-            var resStream = LoadResourceStream(gzName);
-            return new GZipStream(resStream, CompressionMode.Decompress);
-        }
+        public string Haplogroup { get; set; }
 
-        public static Stream LoadResourceStream(string resName)
-        {
-            Assembly assembly = typeof(Utilities).Assembly;
-            Stream resStream = assembly.GetManifestResourceStream("GKGenetix.Core.Resources." + resName);
-            return resStream;
-        }
+        public string SNP { get; set; }
 
         /// <summary>
-        /// Opens a browser window at SNPedia for this SNP.
+        /// The rsID number ("rs#"; "refSNP cluster") is a unique label ("rs" followed by a number) used by researchers and databases to identify a specific SNP.
+        /// It stands for Reference SNP cluster ID and is the naming convention used for most SNPs.
         /// </summary>
-        public static void OpenSNPedia(string rsID)
+        public string rsID { get; set; }
+
+        /// <summary>
+        /// Basepair position.
+        /// </summary>
+        public int Position { get; set; }
+
+        public char OldNucleotide { get; set; }
+
+        public char NewNucleotide { get; set; }
+
+        public override string ToString()
         {
-            Process.Start("http://www.snpedia.com/index.php/" + rsID);
+            return string.Format("{0}: '{1}', {2}, {3}->{4}", Haplogroup, SNP, Position, OldNucleotide, NewNucleotide);
         }
     }
 }

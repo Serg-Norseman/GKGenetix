@@ -19,6 +19,7 @@
  */
 
 using System;
+using System.Linq;
 
 namespace GKGenetix.Core
 {
@@ -89,12 +90,39 @@ namespace GKGenetix.Core
                     int chrNum = int.Parse(s);
                     return (Chromosome)chrNum;
 
+                case "chr1": // [VCF]
+                case "chr2": // [VCF]
+                case "chr3": // [VCF]
+                case "chr4": // [VCF]
+                case "chr5": // [VCF]
+                case "chr6": // [VCF]
+                case "chr7": // [VCF]
+                case "chr8": // [VCF]
+                case "chr9": // [VCF]
+                case "chr10": // [VCF]
+                case "chr11": // [VCF]
+                case "chr12": // [VCF]
+                case "chr13": // [VCF]
+                case "chr14": // [VCF]
+                case "chr15": // [VCF]
+                case "chr16": // [VCF]
+                case "chr17": // [VCF]
+                case "chr18": // [VCF]
+                case "chr19": // [VCF]
+                case "chr20": // [VCF]
+                case "chr21": // [VCF]
+                case "chr22": // [VCF]
+                    int chrNumVCF = int.Parse(s.Substring(3));
+                    return (Chromosome)chrNumVCF;
+
                 case "23":
-                case "X": // [23AndMe, deCODEme]
+                case "X": // [23AndMe, deCODEme, VCF]
+                case "chrX": // [VCF]
                     return Chromosome.CHR_X;
 
                 case "24": // Non-pseudoautosomal portion of the Y chromosome [AncestryDNA]
-                case "Y": // [23AndMe, deCODEme]
+                case "Y": // [23AndMe, deCODEme, VCF]
+                case "chrY": // [VCF]
                     return Chromosome.CHR_Y;
 
                 case "25": // Pseudoautosomal portion of the Y chromosome [AncestryDNA]
@@ -103,6 +131,7 @@ namespace GKGenetix.Core
                 case "26": // Mitochondrial DNA [AncestryDNA]
                 case "MT": // [23AndMe]
                 case "M": // [deCODEme]
+                case "chrM": // [VCF]
                     return Chromosome.MT;
 
                 default:
@@ -121,6 +150,25 @@ namespace GKGenetix.Core
             } else {
                 return Orientation.Unknown;
             }
+        }
+
+        public static int ParsePosition(this string s)
+        {
+            int x;
+            return !int.TryParse(s.Trim(), out x) ? -1 : x;
+        }
+
+        public static char[] ParseMutation(string mutation)
+        {
+            var parts = mutation.Split(new[] { "->" }, StringSplitOptions.RemoveEmptyEntries);
+
+            var nucleotides = new char[parts.Length];
+            for (int i = 0; i < parts.Length; i++) {
+                string part = parts[i].Trim();
+                nucleotides[i] = (part.Length == 1) ? part[0] : '\0';
+            }
+
+            return (nucleotides.Length == 2) ? nucleotides : new char[] { '\0', '\0' };
         }
     }
 }

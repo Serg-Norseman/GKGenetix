@@ -44,7 +44,7 @@ namespace GKGenetix.Core
         /// <summary>
         /// Basepair position.
         /// </summary>
-        public uint Pos;
+        public int Pos;
 
         /// <summary>
         /// Genotype. Allele1 and Allele2.
