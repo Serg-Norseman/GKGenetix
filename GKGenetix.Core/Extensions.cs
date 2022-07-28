@@ -23,6 +23,9 @@ using System.Linq;
 
 namespace GKGenetix.Core
 {
+    
+
+
     public static class Extensions
     {
         public static string ToString(this Chromosome chromosome)
@@ -135,7 +138,7 @@ namespace GKGenetix.Core
                     return Chromosome.MT;
 
                 default:
-                    throw new Exception(string.Format("Unknown chromosome '{0}'.", s));
+                    throw new ParseException("Unknown chromosome '{0}'.", s);
             }
         }
 

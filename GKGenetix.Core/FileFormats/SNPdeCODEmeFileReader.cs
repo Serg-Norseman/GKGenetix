@@ -56,7 +56,7 @@ namespace GKGenetix.Core.FileFormats
             string positionText = fields[3];
             int position = positionText.ParsePosition();
             if (position == -1)
-                throw new Exception($"Error in deCODEme raw file. Invalid position '{positionText}'.");
+                throw new ParseException("Error in deCODEme raw file. Invalid position '{0}'.", positionText);
 
             var snp = new SNP();
             snp.rsID = fields[0];
