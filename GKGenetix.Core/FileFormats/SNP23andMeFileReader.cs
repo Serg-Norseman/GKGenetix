@@ -56,11 +56,11 @@ namespace GKGenetix.Core.FileFormats
             string positionText = fields[2];
             int position = positionText.ParsePosition();
             if (position == -1)
-                throw new Exception($"Error in 23andMe raw file. Invalid position '{positionText}'.");
+                throw new ParseException("Error in 23andMe raw file. Invalid position '{0}'.", positionText);
 
             string genotypeText = fields[3];
             if (genotypeText.Length > 2)
-                throw new Exception($"Error in 23andMe raw file. Invalid genotype '{genotypeText}'.");
+                throw new ParseException("Error in 23andMe raw file. Invalid genotype '{0}'.", genotypeText);
 
             var snp = new SNP();
             snp.rsID = fields[0];

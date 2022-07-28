@@ -57,7 +57,7 @@ namespace GKGenetix.Core.FileFormats
             string positionText = fields[1];
             int position;
             if (!int.TryParse(positionText, out position)) {
-                throw new Exception($"Error in VCF raw file. Invalid position '{positionText}'.");
+                throw new ParseException("Error in VCF raw file. Invalid position '{0}'.", positionText);
             }
 
             var snp = new SNP();
@@ -76,7 +76,7 @@ namespace GKGenetix.Core.FileFormats
                 quality = double.NaN;
             } else {
                 if (!double.TryParse(fields[5], out quality))
-                    throw new Exception($"Error in VCF raw file. Invalid quality '{fields[5]}'.");
+                    throw new ParseException("Error in VCF raw file. Invalid quality '{0}'.", fields[5]);
             }
 
             string filter = fields[6];

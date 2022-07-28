@@ -33,21 +33,21 @@ namespace GKGenetix.Core.FileFormats
         private char fHeaderMark;
         private StreamReader fReader;
 
-        public SNPFileReader(string fileName)
+        protected SNPFileReader(string fileName)
         {
             fReader = new StreamReader(fileName, Encoding.UTF8, true, BufferSize);
             fCanDisposed = true;
             SetParsingParameters();
         }
 
-        public SNPFileReader(Stream stream)
+        protected SNPFileReader(Stream stream)
         {
             fReader = new StreamReader(stream, Encoding.UTF8, true, BufferSize);
             fCanDisposed = true;
             SetParsingParameters();
         }
 
-        public SNPFileReader(StreamReader reader)
+        protected SNPFileReader(StreamReader reader)
         {
             fReader = reader;
             fCanDisposed = false;

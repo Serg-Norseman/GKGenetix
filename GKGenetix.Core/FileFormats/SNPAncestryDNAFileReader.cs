@@ -61,7 +61,7 @@ namespace GKGenetix.Core.FileFormats
             string positionText = fields[2];
             int position = positionText.ParsePosition();
             if (position == -1)
-                throw new Exception($"Error in AncestryDNA raw file. Invalid position '{positionText}'.");
+                throw new ParseException("Error in AncestryDNA raw file. Invalid position '{0}'.", positionText);
 
             var snp = new SNP();
             snp.rsID = fields[0];
