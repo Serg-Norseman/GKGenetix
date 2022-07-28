@@ -106,7 +106,7 @@ namespace GKGenetix.Core
                     return Chromosome.MT;
 
                 default:
-                    throw new Exception($"Unknown chromosome '{s}'.");
+                    throw new Exception(string.Format("Unknown chromosome '{0}'.", s));
             }
         }
 
