@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using GKGenetix.Core;
+using GKGenetix.Core.FileFormats;
 
 namespace GKGenetix.UI.WinForms
 {
@@ -100,7 +101,7 @@ namespace GKGenetix.UI.WinForms
                     }
 
                     foreach (var dfi in fFiles) {
-                        dfi.DNA = FileFormats.ReadFile(dfi.FileName);
+                        dfi.DNA = FileFormatsHelper.ReadFile(dfi.FileName);
                         dfi.Stage = ProcessStage.DNALoading;
                         UpdateFiles();
                     }
