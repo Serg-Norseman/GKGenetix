@@ -67,7 +67,7 @@ namespace GKGenetix.Core.FileFormats
 
             // FIXME: bad, modify later
             string refGenotype = fields[3];
-            string altGenotype = fields[4];
+            //string altGenotype = fields[4];
 
             snp.Genotype = new SNPGenotype(refGenotype, Orientation.Unknown);
 
@@ -79,7 +79,7 @@ namespace GKGenetix.Core.FileFormats
                     throw new ParseException("Error in VCF raw file. Invalid quality '{0}'.", fields[5]);
             }
 
-            string filter = fields[6];
+            //string filter = fields[6];
 
             return snp;
         }
