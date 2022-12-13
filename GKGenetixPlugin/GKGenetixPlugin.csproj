@@ -9,8 +9,6 @@
     <RootNamespace>GKGenetixPlugin</RootNamespace>
     <AssemblyName>GKGenetixPlugin</AssemblyName>
     <NoWin32Manifest>False</NoWin32Manifest>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
-    <NoStdLib>False</NoStdLib>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
