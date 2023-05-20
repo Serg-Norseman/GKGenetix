@@ -8,7 +8,7 @@
     <ProjectGuid>{B9225DE4-BE79-43F8-B84B-BECF360E329A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GKGenetix.UI.WinForms</RootNamespace>
+    <RootNamespace>GKGenetix.UI</RootNamespace>
     <AssemblyName>GKGenetix.UI.WinForms</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

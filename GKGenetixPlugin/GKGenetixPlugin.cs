@@ -19,20 +19,17 @@
  */
 
 using System;
-using System.Drawing;
-using System.IO;
 using System.Reflection;
 using GKCore;
 using GKCore.Design.Graphics;
 using GKCore.Interfaces;
 using GKCore.Plugins;
-using GKGenetix.UI.WinForms;
-using GKUI.Platform.Handlers;
+using GKGenetix.UI;
 
 [assembly: AssemblyTitle("GKGenetixPlugin")]
 [assembly: AssemblyDescription("GEDKeeper Genetix plugin")]
 [assembly: AssemblyProduct("GEDKeeper")]
-[assembly: AssemblyCopyright("Copyright © 2022 by Sergey V. Zhdanovskih")]
+[assembly: AssemblyCopyright("Copyright © 2022-2023 by Sergey V. Zhdanovskih")]
 [assembly: AssemblyVersion("0.1.0.0")]
 [assembly: AssemblyCulture("")]
 
@@ -57,10 +54,7 @@ namespace GKGenetixPlugin
         {
             bool result = base.Startup(host);
             try {
-                using (Stream stmIcon = LoadResourceStream("GKGenetix.png")) {
-                    Image bmp = Image.FromStream(stmIcon);
-                    fIcon = new ImageHandler(bmp);
-                }
+                fIcon = AppHost.GfxProvider.LoadResourceImage(this.GetType(), "GKGenetixPlugin.Resources.GKGenetix.png");
             } catch (Exception ex) {
                 Logger.WriteError("GenetixPlugin.Startup()", ex);
                 result = false;

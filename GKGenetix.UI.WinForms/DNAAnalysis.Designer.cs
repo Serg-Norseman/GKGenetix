@@ -1,4 +1,4 @@
-﻿namespace GKGenetix.UI.WinForms
+﻿namespace GKGenetix.UI
 {
     partial class DNAAnalysis
     {
