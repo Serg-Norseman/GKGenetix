@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net6.0</TargetFrameworks>
+        <AssemblyName>GKGenetix.UI.EtoForms</AssemblyName>
+        <RootNamespace>GKGenetix.UI</RootNamespace>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+
+        <Configurations>MSWin_Debug;MSWin_Release;Linux_Debug;Linux_Release;MacOS_Debug;MacOS_Release;FreeBSD_Debug;FreeBSD_Release</Configurations>
+    </PropertyGroup>
+
+    <Import Project="..\GKConfigurations3.targets" />
+
+
+    <ItemGroup>
+        <Reference Include="BSLib">
+            <HintPath>..\..\libs\netstd\BSLib.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Eto.Forms" Version="2.7.5" />
+        <PackageReference Include="Eto.Serialization.Xaml" Version="2.7.5" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\GKv3\GKComponents\GKComponents.csproj" />
+        <ProjectReference Include="..\GKGenetix.Core\GKGenetix.Core.nstd.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="DNAAnalysis.cs" />
+        <EmbeddedResource Include="DNAAnalysis.xeto" />
+        <Compile Include="DNAInheritanceTest.cs" />
+        <EmbeddedResource Include="DNAInheritanceTest.xeto" />
+    </ItemGroup>
+
+</Project>

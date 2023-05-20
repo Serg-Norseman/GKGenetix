@@ -1,6 +1,6 @@
 ﻿/*
  *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2022 by Sergey V. Zhdanovskih.
+ *  Copyright (C) 2009-2023 by Sergey V. Zhdanovskih.
  *
  *  This file is part of "GEDKeeper".
  *
@@ -20,7 +20,8 @@
 
 using System;
 using System.IO;
-using System.Windows.Forms;
+using Eto.Forms;
+using Eto.Serialization.Xaml;
 using GKGenetix.Core;
 using GKGenetix.Core.FileFormats;
 
@@ -28,20 +29,30 @@ namespace GKGenetix.UI
 {
     public partial class DNAAnalysis : Form, IDisplay
     {
+        #region Design components
+#pragma warning disable CS0169, CS0649, IDE0044, IDE0051
+
+        private ButtonToolItem btnLoadFile;
+        private TextArea txtOutput;
+
+#pragma warning restore CS0169, CS0649, IDE0044, IDE0051
+        #endregion
+
+
         private string fFileName;
         private DNAData fDNA;
 
         public DNAAnalysis()
         {
-            InitializeComponent();
+            XamlReader.Load(this);
         }
 
         private void btnLoadFile_Click(object sender, EventArgs e)
         {
             using (var dlg = new OpenFileDialog()) {
-                dlg.Multiselect = true;
-                if (dlg.ShowDialog() == DialogResult.OK) {
-                    var files = dlg.FileNames;
+                dlg.MultiSelect = true;
+                if (dlg.ShowDialog(this) == DialogResult.Ok) {
+                    var files = dlg.Filenames;
 
                     foreach (var file in files) {
                         fFileName = file;
@@ -60,7 +71,7 @@ namespace GKGenetix.UI
                             WriteLine("    > " + moreSpecific + "\t" + h.Name);
                         }
                         WriteLine("\r\n");
-                        Application.DoEvents();
+                        Application.Instance.RunIteration();
 
                         Analytics.DetermineHaplogroupsTree(fDNA, this);
                     }
