@@ -35,8 +35,6 @@
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="DNAAnalysis.cs" />
         <EmbeddedResource Include="DNAAnalysis.xeto" />
-        <Compile Include="DNAInheritanceTest.cs" />
-        <EmbeddedResource Include="DNAInheritanceTest.xeto" />
     </ItemGroup>
 
 </Project>

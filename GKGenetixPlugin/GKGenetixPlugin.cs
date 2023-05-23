@@ -30,7 +30,7 @@ using GKGenetix.UI;
 [assembly: AssemblyDescription("GEDKeeper Genetix plugin")]
 [assembly: AssemblyProduct("GEDKeeper")]
 [assembly: AssemblyCopyright("Copyright © 2022-2023 by Sergey V. Zhdanovskih")]
-[assembly: AssemblyVersion("0.1.0.0")]
+[assembly: AssemblyVersion("0.2.0.0")]
 [assembly: AssemblyCulture("")]
 
 namespace GKGenetixPlugin
@@ -126,6 +126,8 @@ namespace GKGenetixPlugin
     }
 
 
+#if !ETO
+
     public class DNAInheritanceTestPlugin : GenetixPlugin
     {
         private string fDisplayName = "DNAInheritanceTestPlugin";
@@ -186,4 +188,7 @@ namespace GKGenetixPlugin
             return result;
         }
     }
+
+#endif
+
 }
