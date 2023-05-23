@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0</TargetFrameworks>
         <AssemblyName>GKGenetix.Core</AssemblyName>
-        <RootNamespace />
+        <RootNamespace>GKGenetix.Core</RootNamespace>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 

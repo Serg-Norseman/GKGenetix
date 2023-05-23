@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BSLib;
 using GKGenetix.Core.FileFormats;
@@ -42,6 +43,24 @@ namespace GKGenetix.Core
     {
         // haplogroups to search for (2016, build 37)
         public static readonly IList<HaplogroupMutation> dbHaplogroupMutationsY = FileFormatsHelper.ReadHaplogroupMutations("ydna_snp_index_2016.txt.gz");
+
+        public static void DetermineHaplogroupsY(string fileName, DNAData dna, IDisplay display)
+        {
+            display.WriteLine("File name: " + Path.GetFileName(fileName));
+            display.WriteLine("Sex: " + dna.Sex.ToString());
+            display.WriteLine("SNPs: " + dna.SNP.Count.ToString());
+            display.WriteLine("Chromosomes: " + dna.Chromosomes.Count.ToString());
+
+            var haplogroups = DetermineHaplogroupsY(dna);
+            display.WriteLine("Y Haplogroups: ");
+            foreach (var h in haplogroups) {
+                string moreSpecific = h.Specific ? "*" : " ";
+                display.WriteLine("    > " + moreSpecific + "\t" + h.Name);
+            }
+            display.WriteLine("\r\n");
+
+            DetermineHaplogroupsTree(dna, display);
+        }
 
         /// <summary>
         /// Determines the Y haplogroup.
