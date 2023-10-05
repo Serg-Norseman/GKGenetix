@@ -37,9 +37,9 @@ namespace GKGenetixPlugin
 {
     public enum CLS
     {
-        /* 00 */ LSID_Title,
-        /* 01 */ LSID_DNAAnalysis,
-        /* 02 */ LSID_DNAInheritanceTest,
+        Title = 1,
+        DNAAnalysis,
+        DNAInheritanceTest,
     }
 
 
@@ -104,7 +104,7 @@ namespace GKGenetixPlugin
         {
             try {
                 fLangMan = Host.CreateLangMan(this);
-                fDisplayName = fLangMan.LS(CLS.LSID_DNAAnalysis);
+                fDisplayName = fLangMan.LS(CLS.DNAAnalysis);
 
                 //if (fForm != null) fForm.SetLocale();
             } catch (Exception ex) {
@@ -168,7 +168,7 @@ namespace GKGenetixPlugin
         {
             try {
                 fLangMan = Host.CreateLangMan(this);
-                fDisplayName = fLangMan.LS(CLS.LSID_DNAInheritanceTest);
+                fDisplayName = fLangMan.LS(CLS.DNAInheritanceTest);
 
                 //if (fForm != null) fForm.SetLocale();
             } catch (Exception ex) {
