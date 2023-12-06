@@ -54,7 +54,7 @@ namespace GKGenetixPlugin
         {
             bool result = base.Startup(host);
             try {
-                fIcon = AppHost.GfxProvider.LoadResourceImage(this.GetType(), "GKGenetixPlugin.Resources.GKGenetix.png");
+                fIcon = AppHost.GfxProvider.LoadResourceImage(this.GetType(), "GKGenetixPlugin.Resources.GKGenetix.png", ImageTarget.UI);
             } catch (Exception ex) {
                 Logger.WriteError("GenetixPlugin.Startup()", ex);
                 result = false;
