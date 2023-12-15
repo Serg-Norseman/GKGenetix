@@ -19,6 +19,8 @@
  */
 
 using System;
+using System.Drawing.Imaging;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using GKGenetix.Core;
@@ -74,6 +76,49 @@ namespace GKGenetix.UI
         {
             txtOutput.Text += value;
             txtOutput.Text += "\r\n";
+        }
+
+        private void btnGenImage_Click(object sender, EventArgs e)
+        {
+            int imageWidth = 1024;
+            int imageHeight = fDNA.SNP.Count / imageWidth;
+            if (fDNA.SNP.Count % imageWidth != 0)
+                imageHeight++;
+
+            var backColor = Color.FromArgb(48, 48, 48);
+
+            var image = new Bitmap(imageWidth, imageHeight);
+            var pixelIdx = 0;
+            foreach (var nucleotide in fDNA.SNP) {
+                Color color;
+                switch (nucleotide.Genotype.A2) {
+                    case 'A':
+                        color = Color.Red;
+                        break;
+                    case 'T':
+                        color = Color.Yellow;
+                        break;
+                    case 'G':
+                        color = Color.Blue;
+                        break;
+                    case 'C':
+                        color = Color.ForestGreen;
+                        break;
+                    case 'N':
+                    case '0':
+                        color = backColor;
+                        break;
+                    default:
+                        throw new Exception();
+                }
+                var row = pixelIdx / imageWidth;
+                var column = pixelIdx - row * imageWidth;
+                image.SetPixel(column, row, color);
+                pixelIdx++;
+            }
+
+            string outputFilePath = Path.ChangeExtension(fFileName, ".png");
+            image.Save(outputFilePath, ImageFormat.Png);
         }
     }
 }

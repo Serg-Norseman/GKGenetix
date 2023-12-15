@@ -5,6 +5,7 @@
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton btnLoadFile;
+        private System.Windows.Forms.ToolStripButton btnGenImage;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.TextBox txtOutput;
 
@@ -20,6 +21,7 @@
         {
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.btnLoadFile = new System.Windows.Forms.ToolStripButton();
+            this.btnGenImage = new System.Windows.Forms.ToolStripButton();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.txtOutput = new System.Windows.Forms.TextBox();
             this.toolStrip1.SuspendLayout();
@@ -32,7 +34,7 @@
             // 
             this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.btnLoadFile});
+            this.btnLoadFile, this.btnGenImage});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1955, 39);
@@ -46,6 +48,14 @@
             this.btnLoadFile.Size = new System.Drawing.Size(73, 36);
             this.btnLoadFile.Text = "Load File";
             this.btnLoadFile.Click += new System.EventHandler(this.btnLoadFile_Click);
+            // 
+            // btnGenImage
+            // 
+            this.btnGenImage.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.btnGenImage.Name = "btnLoadFile";
+            this.btnGenImage.Size = new System.Drawing.Size(73, 36);
+            this.btnGenImage.Text = "Gen Image";
+            this.btnGenImage.Click += new System.EventHandler(this.btnGenImage_Click);
             // 
             // splitContainer1
             // 
