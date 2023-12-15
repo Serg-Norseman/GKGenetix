@@ -19,7 +19,7 @@
  */
 
 using System.Windows.Forms;
-using GKGenetix.UI.WinForms;
+using GKGenetix.UI;
 
 namespace GKGenetix
 {
