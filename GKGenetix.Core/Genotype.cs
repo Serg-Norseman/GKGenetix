@@ -1,6 +1,6 @@
 ﻿/*
  *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2022 by Sergey V. Zhdanovskih.
+ *  Copyright (C) 2009-2024 by Sergey V. Zhdanovskih.
  *
  *  This file is part of "GEDKeeper".
  *
@@ -96,6 +96,33 @@ namespace GKGenetix.Core
         public Genotype GetComplement()
         {
             return new Genotype(GeneLab.GetComplementaryNucleotide(A1), GeneLab.GetComplementaryNucleotide(A2));
+        }
+
+        public static Nucleotide ParseNucleotide(char a)
+        {
+            Nucleotide result;
+            switch (a) {
+                case 'A':
+                    result = Nucleotide.A;
+                    break;
+                case 'C':
+                    result = Nucleotide.C;
+                    break;
+                case 'G':
+                    result = Nucleotide.G;
+                    break;
+                case 'T':
+                    result = Nucleotide.T;
+                    break;
+                case 'U':
+                    result = Nucleotide.U;
+                    break;
+                case 'N':
+                default:
+                    result = Nucleotide.None;
+                    break;
+            }
+            return result;
         }
     }
 }
