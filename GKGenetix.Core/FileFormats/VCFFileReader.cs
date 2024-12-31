@@ -1,6 +1,6 @@
 ﻿/*
  *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2022 by Sergey V. Zhdanovskih.
+ *  Copyright (C) 2009-2024 by Sergey V. Zhdanovskih.
  *
  *  This file is part of "GEDKeeper".
  *
@@ -18,7 +18,6 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
 using System.IO;
 
 namespace GKGenetix.Core.FileFormats
@@ -86,30 +85,9 @@ namespace GKGenetix.Core.FileFormats
 
         private Nucleotide[] ParseBase(string field)
         {
-            Nucleotide[] result = new Nucleotide[field.Length];
+            var result = new Nucleotide[field.Length];
             for (int i = 0; i < field.Length; i++) {
-                switch (field[i]) {
-                    case 'A':
-                        result[i] = Nucleotide.A;
-                        break;
-                    case 'C':
-                        result[i] = Nucleotide.C;
-                        break;
-                    case 'G':
-                        result[i] = Nucleotide.G;
-                        break;
-                    case 'T':
-                        result[i] = Nucleotide.T;
-                        break;
-                    case 'U':
-                        result[i] = Nucleotide.U;
-                        break;
-                    case 'N':
-                        result[i] = Nucleotide.N;
-                        break;
-                    default:
-                        return new Nucleotide[0];
-                }
+                result[i] = Genotype.ParseNucleotide(field[i]);
             }
             return result;
         }
