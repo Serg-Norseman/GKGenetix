@@ -1,6 +1,6 @@
 ﻿/*
  *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2022 by Sergey V. Zhdanovskih.
+ *  Copyright (C) 2009-2024 by Sergey V. Zhdanovskih.
  *
  *  This file is part of "GEDKeeper".
  *
@@ -23,36 +23,33 @@ using System;
 namespace GKGenetix.Core
 {
     [Flags]
-    public enum Nucleotide : int
+    public enum Nucleotide : byte
     {
+        None = 0,
+
         /// <summary>
         /// Adenine (complementary pair - T/U)
         /// </summary>
-        A = 1,
+        A = 1 << 0,
 
         /// <summary>
         /// Cytosine (complementary pair - G)
         /// </summary>
-        C = 2,
+        C = 1 << 1,
 
         /// <summary>
         /// Guanine (complementary pair - C)
         /// </summary>
-        G = 4,
+        G = 1 << 2,
 
         /// <summary>
         /// Thymine (DNA only; complementary pair - A)
         /// </summary>
-        T = 8,
+        T = 1 << 3,
 
         /// <summary>
         /// Uracil (RNA only; complementary pair - A)
         /// </summary>
-        U = 16,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        N = 32,
+        U = 1 << 4,
     }
 }

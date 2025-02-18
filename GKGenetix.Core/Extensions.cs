@@ -1,6 +1,6 @@
 ﻿/*
  *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2022 by Sergey V. Zhdanovskih.
+ *  Copyright (C) 2009-2024 by Sergey V. Zhdanovskih.
  *
  *  This file is part of "GEDKeeper".
  *
@@ -19,13 +19,9 @@
  */
 
 using System;
-using System.Linq;
 
 namespace GKGenetix.Core
 {
-    
-
-
     public static class Extensions
     {
         public static string ToString(this Chromosome chromosome)
