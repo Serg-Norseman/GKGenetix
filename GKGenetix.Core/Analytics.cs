@@ -1,6 +1,6 @@
 ﻿/*
  *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2022 by Sergey V. Zhdanovskih.
+ *  Copyright (C) 2009-2024 by Sergey V. Zhdanovskih.
  *
  *  This file is part of "GEDKeeper".
  *
@@ -70,7 +70,7 @@ namespace GKGenetix.Core
         public static List<PersonalHaplogroup> DetermineHaplogroupsY(DNAData dna)
         {
             // list of haplogroups that were expressed in Y chromosome
-            List<string> hgs = new List<string>();
+            var hgs = new List<string>();
 
             // look at Y chromosome
             var chrY = dna.Chromosomes[23];
@@ -229,7 +229,7 @@ namespace GKGenetix.Core
 
                 // calculation percent different of inheritance scores
                 correlation = Math.Abs(parentScore[0] - parentScore[1]);
-                correlation = correlation / ((parentScore[0] + parentScore[1]) / 2);
+                correlation /= ((parentScore[0] + parentScore[1]) / 2);
 
                 // Determine sex of parent and child, then output sex chromosomes
                 d1.DetermineSex();
