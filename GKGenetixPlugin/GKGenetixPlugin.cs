@@ -1,6 +1,6 @@
 ﻿/*
  *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2022-2023 by Sergey V. Zhdanovskih.
+ *  Copyright (C) 2022-2025 by Sergey V. Zhdanovskih.
  *
  *  This file is part of "GEDKeeper".
  *
@@ -29,7 +29,7 @@ using GKGenetix.UI;
 [assembly: AssemblyTitle("GKGenetixPlugin")]
 [assembly: AssemblyDescription("GEDKeeper Genetix plugin")]
 [assembly: AssemblyProduct("GEDKeeper")]
-[assembly: AssemblyCopyright("Copyright © 2022-2023 by Sergey V. Zhdanovskih")]
+[assembly: AssemblyCopyright("Copyright © 2022-2025 by Sergey V. Zhdanovskih")]
 [assembly: AssemblyVersion("0.2.0.0")]
 [assembly: AssemblyCulture("")]
 
@@ -42,33 +42,14 @@ namespace GKGenetixPlugin
         DNAInheritanceTest,
     }
 
-
-    public abstract class GenetixPlugin : OrdinaryPlugin
+    public class DNAAnalysisPlugin : OrdinaryPlugin
     {
+        private string fDisplayName = "DNAAnalysisPlugin";
+        private ILangMan fLangMan;
         private IImage fIcon;
 
         public override IImage Icon { get { return fIcon; } }
         public override PluginCategory Category { get { return PluginCategory.Common; } }
-
-        public override bool Startup(IHost host)
-        {
-            bool result = base.Startup(host);
-            try {
-                fIcon = AppHost.GfxProvider.LoadResourceImage(this.GetType(), "GKGenetixPlugin.Resources.GKGenetix.png", ImageTarget.UI);
-            } catch (Exception ex) {
-                Logger.WriteError("GenetixPlugin.Startup()", ex);
-                result = false;
-            }
-            return result;
-        }
-    }
-
-
-    public class DNAAnalysisPlugin : GenetixPlugin
-    {
-        private string fDisplayName = "DNAAnalysisPlugin";
-        private ILangMan fLangMan;
-
         public override string DisplayName { get { return fDisplayName; } }
         public override ILangMan LangMan { get { return fLangMan; } }
 
@@ -108,8 +89,20 @@ namespace GKGenetixPlugin
 
                 //if (fForm != null) fForm.SetLocale();
             } catch (Exception ex) {
-                Logger.WriteError("DNAAnalysisPlugin.OnLanguageChange()", ex);
+                Logger.WriteError("GKGenetixPlugin.OnLanguageChange()", ex);
             }
+        }
+
+        public override bool Startup(IHost host)
+        {
+            bool result = base.Startup(host);
+            try {
+                fIcon = AppHost.GfxProvider.LoadResourceImage(this.GetType(), "GKGenetixPlugin.Resources.GKGenetix.png", ImageTarget.UI);
+            } catch (Exception ex) {
+                Logger.WriteError("GKGenetixPlugin.Startup()", ex);
+                result = false;
+            }
+            return result;
         }
 
         public override bool Shutdown()
@@ -118,77 +111,10 @@ namespace GKGenetixPlugin
             try {
                 CloseForm();
             } catch (Exception ex) {
-                Logger.WriteError("DNAAnalysisPlugin.Shutdown()", ex);
+                Logger.WriteError("GKGenetixPlugin.Shutdown()", ex);
                 result = false;
             }
             return result;
         }
     }
-
-
-#if !ETO
-
-    public class DNAInheritanceTestPlugin : GenetixPlugin
-    {
-        private string fDisplayName = "DNAInheritanceTestPlugin";
-        private ILangMan fLangMan;
-
-        public override string DisplayName { get { return fDisplayName; } }
-        public override ILangMan LangMan { get { return fLangMan; } }
-
-        private DNAInheritanceTest fForm;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing) {
-                CloseForm();
-            }
-            base.Dispose(disposing);
-        }
-
-        internal void CloseForm()
-        {
-            if (fForm != null) {
-                fForm.Close();
-                fForm = null;
-            }
-        }
-
-        public override void Execute()
-        {
-            if (fForm == null) {
-                fForm = new DNAInheritanceTest();
-                fForm.Show();
-            } else {
-                CloseForm();
-            }
-        }
-
-        public override void OnLanguageChange()
-        {
-            try {
-                fLangMan = Host.CreateLangMan(this);
-                fDisplayName = fLangMan.LS(CLS.DNAInheritanceTest);
-
-                //if (fForm != null) fForm.SetLocale();
-            } catch (Exception ex) {
-                Logger.WriteError("DNAInheritanceTestPlugin.OnLanguageChange()", ex);
-            }
-        }
-
-        public override bool Shutdown()
-        {
-            bool result = true;
-            try {
-                CloseForm();
-            } catch (Exception ex) {
-                Logger.WriteError("DNAInheritanceTestPlugin.Shutdown()", ex);
-                result = false;
-            }
-            return result;
-        }
-    }
-
-#endif
-
 }

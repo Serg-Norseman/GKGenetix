@@ -159,10 +159,21 @@ namespace GKGenetix.Core
                     throw new Exception("The number of chromosomes does not match");
                 }
 
+                bool notAligned = false;
+                string message = string.Empty;
                 for (int i = 0; i < d1.Chromosomes.Count; i++) {
                     if (d1.Chromosomes[i].EndPosition != d2.Chromosomes[i].EndPosition) {
-                        throw new Exception("Chromosomes not aligned at chromo " + (i + 1));
+                        message = "Chromosomes not aligned at chromo " + (i + 1);
+                        notAligned = true;
+                        display.WriteLine(message);
                     }
+                    if (d1.Chromosomes[i].Size != d2.Chromosomes[i].Size) {
+                        var szMessage = "Chromosomes has different size at chromo " + (i + 1);
+                        display.WriteLine(szMessage);
+                    }
+                }
+                if (notAligned) {
+                    throw new Exception(message);
                 }
 
                 // holds the scores of all 4 comparisons of each chromosome
@@ -419,6 +430,7 @@ namespace GKGenetix.Core
 
                 display.WriteLine("\r\n\r\n");
             } catch (Exception ex) {
+                display.WriteLine(ex.Message);
                 display.WriteLine(ex.StackTrace.ToString());
             }
         }

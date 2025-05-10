@@ -1,6 +1,6 @@
 ﻿/*
  *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2022 by Sergey V. Zhdanovskih.
+ *  Copyright (C) 2009-2025 by Sergey V. Zhdanovskih.
  *
  *  This file is part of "GEDKeeper".
  *
@@ -19,8 +19,9 @@
  */
 
 using System;
-using System.Drawing.Imaging;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
 using GKGenetix.Core;
@@ -28,17 +29,32 @@ using GKGenetix.Core.FileFormats;
 
 namespace GKGenetix.UI
 {
+    internal enum ProcessStage
+    {
+        FileName, DNALoading, SexDefine, Analysis
+    }
+
+    internal class DNAFileInfo
+    {
+        public string FileName;
+        public ProcessStage Stage;
+        public DNAData DNA;
+    }
+
     public partial class DNAAnalysis : Form, IDisplay
     {
+        private List<DNAFileInfo> fFiles;
         private string fFileName;
         private DNAData fDNA;
 
         public DNAAnalysis()
         {
             InitializeComponent();
+
+            fFiles = new List<DNAFileInfo>();
         }
 
-        private void btnLoadFile_Click(object sender, EventArgs e)
+        private void btnSimpleAnalysis_Click(object sender, EventArgs e)
         {
             using (var dlg = new OpenFileDialog()) {
                 dlg.Multiselect = true;
@@ -119,6 +135,83 @@ namespace GKGenetix.UI
 
             string outputFilePath = Path.ChangeExtension(fFileName, ".png");
             image.Save(outputFilePath, ImageFormat.Png);
+        }
+
+        private void UpdateFilesIT()
+        {
+            lvFiles.BeginUpdate();
+            lvFiles.Clear();
+            lvFiles.Columns.Add("File name", 160);
+
+            foreach (DNAFileInfo dfi in fFiles) {
+                var item = lvFiles.Items.Add(Path.GetFileName(dfi.FileName));
+
+                if (dfi.Stage >= ProcessStage.DNALoading) {
+                    if (lvFiles.Columns.Count < 2) {
+                        lvFiles.Columns.Add("Loaded", 40);
+                    }
+                    item.SubItems.Add("ok");
+                }
+
+                if (dfi.Stage >= ProcessStage.SexDefine) {
+                    if (lvFiles.Columns.Count < 3) {
+                        lvFiles.Columns.Add("Sex", 40);
+                    }
+                    item.SubItems.Add(dfi.DNA.Sex.ToString());
+                }
+
+                if (dfi.Stage >= ProcessStage.Analysis) {
+                    if (lvFiles.Columns.Count < 4) {
+                        lvFiles.Columns.Add("Analysis", 40);
+                    }
+                    item.SubItems.Add("Done");
+                }
+            }
+            lvFiles.EndUpdate();
+
+            Application.DoEvents();
+        }
+
+        private void btnInheritanceTest_Click(object sender, EventArgs e)
+        {
+            using (var dlg = new OpenFileDialog()) {
+                dlg.Multiselect = true;
+                if (dlg.ShowDialog() == DialogResult.OK) {
+                    var files = dlg.FileNames;
+
+                    fFiles.Clear();
+                    foreach (var file in files) {
+                        var dfi = new DNAFileInfo();
+                        dfi.FileName = file;
+                        fFiles.Add(dfi);
+                        UpdateFilesIT();
+                    }
+
+                    foreach (var dfi in fFiles) {
+                        dfi.DNA = FileFormatsHelper.ReadFile(dfi.FileName);
+                        dfi.Stage = ProcessStage.DNALoading;
+                        UpdateFilesIT();
+                    }
+
+                    foreach (var dfi in fFiles) {
+                        dfi.DNA.DetermineSex();
+                        dfi.Stage = ProcessStage.SexDefine;
+                        UpdateFilesIT();
+                    }
+
+                    for (int i = 0; i < fFiles.Count; i++) {
+                        var dfi1 = fFiles[i];
+
+                        for (int k = i + 1; k < fFiles.Count; k++) {
+                            var dfi2 = fFiles[k];
+                            Analytics.Compare(dfi1.DNA, dfi2.DNA, this);
+                        }
+
+                        dfi1.Stage = ProcessStage.Analysis;
+                        UpdateFilesIT();
+                    }
+                }
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿/*
  *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2022 by Sergey V. Zhdanovskih.
+ *  Copyright (C) 2009-2025 by Sergey V. Zhdanovskih.
  *
  *  This file is part of "GEDKeeper".
  *
@@ -20,6 +20,7 @@
 
 using System;
 using System.Windows.Forms;
+using GKGenetix.UI;
 
 namespace GKGenetix
 {
@@ -30,7 +31,7 @@ namespace GKGenetix
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm());
+            Application.Run(new DNAAnalysis());
         }
     }
 }
