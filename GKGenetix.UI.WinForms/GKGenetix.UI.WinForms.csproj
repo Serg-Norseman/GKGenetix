@@ -34,12 +34,6 @@
     <Compile Include="DNAAnalysis.Designer.cs">
       <DependentUpon>DNAAnalysis.cs</DependentUpon>
     </Compile>
-    <Compile Include="DNAInheritanceTest.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="DNAInheritanceTest.Designer.cs">
-      <DependentUpon>DNAInheritanceTest.cs</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
