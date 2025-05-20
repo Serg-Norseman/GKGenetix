@@ -23,15 +23,15 @@ namespace GenetixKit
 
         private void ROHFrm_Load(object sender, EventArgs e)
         {
-            GGKUtilLib.setStatus("Calculating ROH ...");
-            this.Text = "Runs of Homozygosity - " + kit + " (" + GGKUtilLib.getKitName(kit) + ")";
+            GKUtilLib.setStatus("Calculating ROH ...");
+            this.Text = "Runs of Homozygosity - " + kit + " (" + GKUtilLib.getKitName(kit) + ")";
             bwROH.RunWorkerAsync(kit);
         }
 
         private void bwROH_DoWork(object sender, DoWorkEventArgs e)
         {
             string kit = e.Argument.ToString();
-            object[] roh_results = GGKUtilLib.ROH(kit);
+            object[] roh_results = GKUtilLib.ROH(kit);
             segment_idx = (DataTable)roh_results[0];
             segments = (List<DataTable>)roh_results[1];
         }
@@ -118,7 +118,7 @@ namespace GenetixKit
 
 
             }
-            GGKUtilLib.setStatus("Done.");
+            GKUtilLib.setStatus("Done.");
         }
 
         private void dgvSegmentIdx_SelectionChanged(object sender, EventArgs e)

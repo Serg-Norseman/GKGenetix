@@ -24,8 +24,8 @@ namespace GenetixKit
         private void MatchingKitsFrm_Load(object sender, EventArgs e)
         {
             lblKit.Text = kit;
-            lblName.Text = GGKUtilLib.queryDatabase("kit_master", new string[] { "name" }, "WHERE kit_no='" + kit + "'").Rows[0].ItemArray[0].ToString();
-            DataTable dt = GGKUtilLib.QueryDB("SELECT cmp_id,kit'Kit No',name'Name',at_longest'Autosomal Longest',at_total'Autosomal Total',x_longest'X Longest',x_total'X Total',mrca'MRCA' FROM (SELECT a.cmp_id,a.kit1'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca FROM cmp_status a,kit_master b WHERE a.at_total!=0 AND a.kit1!='" + kit + "' AND a.kit2='" + kit + "' AND a.status_autosomal=1 AND b.kit_no=a.kit1 AND b.disabled=0 UNION SELECT a.cmp_id,a.kit2'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca FROM cmp_status a,kit_master b WHERE a.at_total!=0 AND a.kit2!='" + kit + "' AND a.kit1='" + kit + "' AND a.status_autosomal=1 AND b.kit_no=a.kit2 AND b.disabled=0) ORDER BY at_longest DESC,at_total DESC");
+            lblName.Text = GKUtilLib.queryDatabase("kit_master", new string[] { "name" }, "WHERE kit_no='" + kit + "'").Rows[0].ItemArray[0].ToString();
+            DataTable dt = GKUtilLib.QueryDB("SELECT cmp_id,kit'Kit No',name'Name',at_longest'Autosomal Longest',at_total'Autosomal Total',x_longest'X Longest',x_total'X Total',mrca'MRCA' FROM (SELECT a.cmp_id,a.kit1'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca FROM cmp_status a,kit_master b WHERE a.at_total!=0 AND a.kit1!='" + kit + "' AND a.kit2='" + kit + "' AND a.status_autosomal=1 AND b.kit_no=a.kit1 AND b.disabled=0 UNION SELECT a.cmp_id,a.kit2'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca FROM cmp_status a,kit_master b WHERE a.at_total!=0 AND a.kit2!='" + kit + "' AND a.kit1='" + kit + "' AND a.status_autosomal=1 AND b.kit_no=a.kit2 AND b.disabled=0) ORDER BY at_longest DESC,at_total DESC");
             dgvMatches.Columns.Clear();
             dgvMatches.DataSource = dt;
             dgvMatches.Columns[0].Visible = false;
@@ -67,13 +67,13 @@ namespace GenetixKit
             string cmp_id = o[0];
             string kit2 = o[1];
             string name2 = o[2];
-            segment_dt = GGKUtilLib.QueryDB("select chromosome'Chromosome',start_position'Start Position',end_position'End Position',segment_length_cm'Segment Length (cM)',snp_count'SNP Count',segment_id from cmp_autosomal where cmp_id='" + cmp_id + "'");
+            segment_dt = GKUtilLib.QueryDB("select chromosome'Chromosome',start_position'Start Position',end_position'End Position',segment_length_cm'Segment Length (cM)',snp_count'SNP Count',segment_id from cmp_autosomal where cmp_id='" + cmp_id + "'");
 
-            if (GGKUtilLib.isPhased(kit)) {
+            if (GKUtilLib.isPhased(kit)) {
                 phased_kit = kit;
                 unphased_kit = kit2;
                 phased = true;
-            } else if (GGKUtilLib.isPhased(kit2)) {
+            } else if (GKUtilLib.isPhased(kit2)) {
                 phased_kit = kit2;
                 unphased_kit = kit;
                 phased = true;
@@ -124,7 +124,7 @@ namespace GenetixKit
         void bWorker2_DoWork(object sender, DoWorkEventArgs e)
         {
             object[] o = (object[])e.Argument;
-            dt_alleles = GGKUtilLib.QueryDB("select rsid'RSID',position'Position',kit1_genotype'" + o[0] + " (" + o[1] + ")',kit2_genotype'" + o[2] + " (" + o[3] + ")',match'Match' from cmp_mrca where segment_id='" + o[4] + "'");
+            dt_alleles = GKUtilLib.QueryDB("select rsid'RSID',position'Position',kit1_genotype'" + o[0] + " (" + o[1] + ")',kit2_genotype'" + o[2] + " (" + o[3] + ")',match'Match' from cmp_mrca where segment_id='" + o[4] + "'");
         }
 
         void bWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -160,7 +160,7 @@ namespace GenetixKit
                 string chr = dgvSegments.SelectedRows[0].Cells[0].Value.ToString();
                 string start_pos = dgvSegments.SelectedRows[0].Cells[1].Value.ToString();
                 string end_pos = dgvSegments.SelectedRows[0].Cells[2].Value.ToString();
-                PhasedSegmentVisualizerFrm frm = new PhasedSegmentVisualizerFrm(phased_kit, unphased_kit, chr, start_pos, end_pos);
+                PhasedSegmentFrm frm = new PhasedSegmentFrm(phased_kit, unphased_kit, chr, start_pos, end_pos);
                 frm.ShowDialog(Program.GGKitFrmMainInst);
                 frm.Dispose();
             }

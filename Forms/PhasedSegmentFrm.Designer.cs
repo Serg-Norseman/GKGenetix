@@ -1,6 +1,6 @@
 ﻿namespace GenetixKit
 {
-    partial class PhasedSegmentVisualizerFrm
+    partial class PhasedSegmentFrm
     {
         /// <summary>
         /// Required designer variable.
