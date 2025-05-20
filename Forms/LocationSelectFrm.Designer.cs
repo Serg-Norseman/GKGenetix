@@ -1,16 +1,8 @@
-﻿namespace GenetixKit
+﻿namespace GenetixKit.Forms
 {
     partial class LocationSelectFrm
     {
-        private System.ComponentModel.IContainer components = null;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null)) {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        private System.Windows.Forms.PictureBox pbWorldMap;
 
         private void InitializeComponent()
         {
@@ -47,7 +39,5 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbWorldMap)).EndInit();
             this.ResumeLayout(false);
         }
-
-        private System.Windows.Forms.PictureBox pbWorldMap;
     }
 }

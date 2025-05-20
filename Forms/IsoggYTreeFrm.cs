@@ -6,8 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using GenetixKit.Core;
 
-namespace GenetixKit
+namespace GenetixKit.Forms
 {
     public partial class IsoggYTreeFrm : Form
     {

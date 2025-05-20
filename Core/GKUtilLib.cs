@@ -13,8 +13,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
+using GenetixKit.Forms;
 
-namespace GenetixKit
+namespace GenetixKit.Core
 {
     class GKUtilLib
     {

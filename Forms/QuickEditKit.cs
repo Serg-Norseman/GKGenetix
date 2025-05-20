@@ -4,8 +4,9 @@ using System.ComponentModel;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Windows.Forms;
+using GenetixKit.Core;
 
-namespace GenetixKit
+namespace GenetixKit.Forms
 {
     public partial class QuickEditKit : Form
     {

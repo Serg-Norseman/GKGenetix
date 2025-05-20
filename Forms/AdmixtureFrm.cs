@@ -4,13 +4,14 @@ using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using GenetixKit.Core;
 
-namespace GenetixKit
+namespace GenetixKit.Forms
 {
     public partial class AdmixtureFrm : Form
     {
-        string kit = null;
-        List<string> plotted = new List<string>();
+        private readonly string kit = null;
+        private List<string> plotted = new List<string>();
 
         public AdmixtureFrm(string kit)
         {

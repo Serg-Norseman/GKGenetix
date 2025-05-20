@@ -5,8 +5,9 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using GenetixKit.Core;
 
-namespace GenetixKit
+namespace GenetixKit.Forms
 {
     public partial class MitoMapFrm : Form
     {

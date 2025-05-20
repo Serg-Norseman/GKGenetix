@@ -8,8 +8,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using GenetixKit.Core;
 
-namespace GenetixKit
+namespace GenetixKit.Forms
 {
     public partial class NewEditKitFrm : Form
     {
