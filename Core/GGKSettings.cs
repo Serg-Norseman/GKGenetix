@@ -5,7 +5,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 
-namespace Genetic_Genealogy_Kit
+namespace GenetixKit
 {
     class GGKSettings
     {

@@ -12,7 +12,7 @@ using System.Xml.Linq;
 using System.Collections;
 using System.Diagnostics;
 
-namespace Genetic_Genealogy_Kit
+namespace GenetixKit
 {
     public partial class IsoggYTreeFrm : Form
     {

@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace Genetic_Genealogy_Kit
+namespace GenetixKit
 {
     class GGKUtilLib
     {

@@ -1,4 +1,4 @@
-﻿namespace Genetic_Genealogy_Kit
+﻿namespace GenetixKit
 {
     partial class IsoggYTreeFrm
     {

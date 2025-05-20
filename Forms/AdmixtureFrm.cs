@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 
-namespace Genetic_Genealogy_Kit
+namespace GenetixKit
 {
     public partial class AdmixtureFrm : Form
     {
