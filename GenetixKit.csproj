@@ -155,61 +155,13 @@
     <Compile Include="Forms\SettingsFrm.Designer.cs">
       <DependentUpon>SettingsFrm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="Forms\AdmixtureFrm.resx">
-      <DependentUpon>AdmixtureFrm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\GKMainFrm.resx">
       <DependentUpon>GKMainFrm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\LocationSelectFrm.resx">
-      <DependentUpon>LocationSelectFrm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\IsoggYTreeFrm.resx">
-      <DependentUpon>IsoggYTreeFrm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MitoMapFrm.resx">
-      <DependentUpon>MitoMapFrm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MtPhylogenyFrm.resx">
-      <DependentUpon>MtPhylogenyFrm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MatchingKitsFrm.resx">
-      <DependentUpon>MatchingKitsFrm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\NewEditKitFrm.resx">
-      <DependentUpon>NewEditKitFrm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OneToOneCmpFrm.resx">
-      <DependentUpon>OneToOneCmpFrm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PhasingFrm.resx">
-      <DependentUpon>PhasingFrm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ProcessKitsFrm.resx">
-      <DependentUpon>ProcessKitsFrm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\QuickEditKit.resx">
-      <DependentUpon>QuickEditKit.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ROHFrm.resx">
-      <DependentUpon>ROHFrm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PhasedSegmentFrm.resx">
-      <DependentUpon>PhasedSegmentFrm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\SelectKitFrm.resx">
-      <DependentUpon>SelectKitFrm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\SelectTwoKitsFrm.resx">
-      <DependentUpon>SelectTwoKitsFrm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\SettingsFrm.resx">
-      <DependentUpon>SettingsFrm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Resources\map.csv.gz" />
     <None Include="Resources\mtdna_map.csv" />
