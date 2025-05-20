@@ -1,16 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.Xml;
-using System.IO;
 using System.Xml.Linq;
-using System.Collections;
-using System.Diagnostics;
 
 namespace GenetixKit
 {
@@ -29,15 +24,15 @@ namespace GenetixKit
         }
 
         private void MainFrm_Load(object sender, EventArgs e)
-        {            
-            timer1.Enabled = true;             
+        {
+            timer1.Enabled = true;
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Enabled = false;
             label2.Text = GGKUtilLib.getKitName(kit);
-            txtSNPs.Text = GGKUtilLib.queryValue("kit_ysnps", new string[] { "ysnps" }, "where kit_no='"+kit+"'");
+            txtSNPs.Text = GGKUtilLib.queryValue("kit_ysnps", new string[] { "ysnps" }, "where kit_no='" + kit + "'");
             GGKUtilLib.setStatus("Plotting on ISOGG Y-Tree ...");
             //
             XDocument doc = XDocument.Parse(GenetixKit.Properties.Resources.ytree);
@@ -45,9 +40,8 @@ namespace GenetixKit
             TreeNode root = new TreeNode("Adam");
             treeView1.Nodes.Add(root);
 
-            foreach (XElement el in doc.Root.Elements())
-            {
-                buildTree(root,el);    
+            foreach (XElement el in doc.Root.Elements()) {
+                buildTree(root, el);
             }
             root.Expand();
             //
@@ -60,13 +54,12 @@ namespace GenetixKit
         }
 
 
-        private void buildTree(TreeNode parent,XElement elmt)
+        private void buildTree(TreeNode parent, XElement elmt)
         {
             TreeNode tn = null;
             XAttribute attrib_name = elmt.Attribute("name");
             XAttribute attrib_markers = elmt.Attribute("markers");
-            if (attrib_name != null)
-            {
+            if (attrib_name != null) {
                 string attrib_value = attrib_name.Value.Trim();
                 string value = attrib_markers.Value.Trim();
                 value = value.Replace(",", ", ");
@@ -74,16 +67,14 @@ namespace GenetixKit
                 if (attrib_value.IndexOf(',') != -1)
                     attrib_value = removeDuplicates(attrib_value);
                 //
-                if (attrib_value != "")
-                {
+                if (attrib_value != "") {
                     tn = new TreeNode(attrib_value);
                     snp_map.Add(tn, value);
                     parent.Nodes.Add(tn);
                 }
 
                 //
-                foreach (XElement el in elmt.Elements())
-                {
+                foreach (XElement el in elmt.Elements()) {
                     if (tn != null)
                         buildTree(tn, el);
                     else
@@ -96,10 +87,9 @@ namespace GenetixKit
         {
             string[] tmp = value.Split(",".ToCharArray()).Distinct().ToArray();
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < tmp.Length;i++)
-            {
+            for (int i = 0; i < tmp.Length; i++) {
                 sb.Append(tmp[i]);
-                if(i!=tmp.Length-1)
+                if (i != tmp.Length - 1)
                     sb.Append(", ");
             }
             return sb.ToString();
@@ -107,41 +97,32 @@ namespace GenetixKit
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            timer3.Enabled = true;   
+            timer3.Enabled = true;
         }
 
         private void markOnTree()
-        {                        
-            foreach (TreeNode node in snp_map.Keys)
-            {
+        {
+            foreach (TreeNode node in snp_map.Keys) {
                 node.ForeColor = Color.Gray;
                 node.BackColor = Color.White;
             }
             treeView1.CollapseAll();
             TreeNode hg_maxpath = null;
 
-            string hg_snps = "";            
+            string hg_snps = "";
 
-            foreach (TreeNode key in snp_map.Keys)
-            {
-                hg_snps= (string)snp_map[key];
+            foreach (TreeNode key in snp_map.Keys) {
+                hg_snps = (string)snp_map[key];
                 if (hg_snps.Trim().Equals("-"))
                     continue;
-                foreach (string hg_snp in hg_snps.Replace(" ","").Split(new char[]{',','/'}))
-                {
-                    foreach (string snp in snp_array)
-                    {
-                        if (snp.EndsWith("-"))
-                        {
-                            if (hg_snp.Trim() == snp.Substring(0, snp.Length - 1).Trim())
-                            {
-                                if (key.ForeColor == Color.White && key.BackColor==Color.DarkGreen)
-                                {
+                foreach (string hg_snp in hg_snps.Replace(" ", "").Split(new char[] { ',', '/' })) {
+                    foreach (string snp in snp_array) {
+                        if (snp.EndsWith("-")) {
+                            if (hg_snp.Trim() == snp.Substring(0, snp.Length - 1).Trim()) {
+                                if (key.ForeColor == Color.White && key.BackColor == Color.DarkGreen) {
                                     key.ForeColor = Color.Orange;
                                     key.BackColor = Color.LightGreen;
-                                }
-                                else if (key.ForeColor != Color.Orange && key.BackColor != Color.LightGreen)
-                                {
+                                } else if (key.ForeColor != Color.Orange && key.BackColor != Color.LightGreen) {
                                     key.ForeColor = Color.Yellow;
                                     key.BackColor = Color.Red;
                                 }
@@ -151,82 +132,68 @@ namespace GenetixKit
                                 //
 
                             }
-                        }
-                        else if (snp.EndsWith("+"))
-                        {                            
-                            if (hg_snp.Trim() == snp.Substring(0, snp.Length - 1).Trim())
-                            {
+                        } else if (snp.EndsWith("+")) {
+                            if (hg_snp.Trim() == snp.Substring(0, snp.Length - 1).Trim()) {
                                 //MessageBox.Show(key.FullPath.LastIndexOf('\\').ToString());
-                                if (key.ForeColor == Color.Yellow && key.BackColor == Color.Red)
-                                {
+                                if (key.ForeColor == Color.Yellow && key.BackColor == Color.Red) {
                                     key.ForeColor = Color.Orange;
                                     key.BackColor = Color.LightGreen;
-                                }
-                                else if (key.ForeColor != Color.Orange && key.BackColor != Color.LightGreen)
-                                {
+                                } else if (key.ForeColor != Color.Orange && key.BackColor != Color.LightGreen) {
                                     key.ForeColor = Color.White;
                                     key.BackColor = Color.DarkGreen;
                                 }
                                 //key.NodeFont = new Font("Microsoft Sans Serif", 7.8f,FontStyle.Bold);
                                 key.Expand();
                                 key.EnsureVisible();
-                                if (hg_maxpath == null)
-                                {
+                                if (hg_maxpath == null) {
                                     hg_maxpath = key;
-                                }
-                                else
-                                {
-                                   
+                                } else {
+
                                     //if (key.FullPath.Length > hg_maxpath.FullPath.Length)
                                     if (key.FullPath.LastIndexOf('\\') > hg_maxpath.FullPath.LastIndexOf('\\') && key.Parent.BackColor != Color.Red)
                                         hg_maxpath = key;
                                 }
                             }
-                        }
-                        else
-                        {
-                           /*
-                            if (hg_snp.Trim() == snp.Trim())
-                            {
-                                if (key.ForeColor == Color.Yellow && key.BackColor == Color.Red)
-                                {
-                                    key.ForeColor = Color.Orange;
-                                    key.BackColor = Color.LightGreen;
-                                }
-                                else if (key.ForeColor != Color.Orange && key.BackColor != Color.LightGreen)
-                                {
-                                    key.ForeColor = Color.White;
-                                    key.BackColor = Color.DarkGreen;
-                                }
-                                //key.NodeFont = new Font("Microsoft Sans Serif", 7.8f,FontStyle.Bold);
-                                key.Expand();
-                                key.EnsureVisible();
-                                if (hg_maxpath == null)
-                                {
-                                    hg_maxpath = key;
-                                }
-                                else
-                                {
-                                    //if (key.FullPath.Length > hg_maxpath.FullPath.Length)
-                                    if (key.FullPath.LastIndexOf('\\') > hg_maxpath.FullPath.LastIndexOf('\\') && key.Parent.BackColor != Color.Red)
-                                        hg_maxpath = key;
-                                }
-                            }
-                            */
+                        } else {
+                            /*
+                             if (hg_snp.Trim() == snp.Trim())
+                             {
+                                 if (key.ForeColor == Color.Yellow && key.BackColor == Color.Red)
+                                 {
+                                     key.ForeColor = Color.Orange;
+                                     key.BackColor = Color.LightGreen;
+                                 }
+                                 else if (key.ForeColor != Color.Orange && key.BackColor != Color.LightGreen)
+                                 {
+                                     key.ForeColor = Color.White;
+                                     key.BackColor = Color.DarkGreen;
+                                 }
+                                 //key.NodeFont = new Font("Microsoft Sans Serif", 7.8f,FontStyle.Bold);
+                                 key.Expand();
+                                 key.EnsureVisible();
+                                 if (hg_maxpath == null)
+                                 {
+                                     hg_maxpath = key;
+                                 }
+                                 else
+                                 {
+                                     //if (key.FullPath.Length > hg_maxpath.FullPath.Length)
+                                     if (key.FullPath.LastIndexOf('\\') > hg_maxpath.FullPath.LastIndexOf('\\') && key.Parent.BackColor != Color.Red)
+                                         hg_maxpath = key;
+                                 }
+                             }
+                             */
                         }
                     }
                 }
             }
-            foreach (TreeNode node in snp_map.Keys)
-            {
-                if (node.BackColor != Color.DarkGreen && node.BackColor != Color.Red && node.BackColor!=Color.LightGreen)
-                {
+            foreach (TreeNode node in snp_map.Keys) {
+                if (node.BackColor != Color.DarkGreen && node.BackColor != Color.Red && node.BackColor != Color.LightGreen) {
                     node.ForeColor = Color.Gray;
                     node.BackColor = Color.White;
                 }
             }
-            if (hg_maxpath != null)
-            {
+            if (hg_maxpath != null) {
                 hg_maxpath.NodeFont = new Font("Microsoft Sans Serif", 7.8f, FontStyle.Underline);
                 hg_maxpath.EnsureVisible();
                 treeView1.SelectedNode = hg_maxpath;
@@ -239,8 +206,7 @@ namespace GenetixKit
         {
             if (node.Parent == null)
                 return;
-            foreach(TreeNode sibnode in node.Parent.Nodes)
-            {
+            foreach (TreeNode sibnode in node.Parent.Nodes) {
                 if (sibnode == node)
                     continue;
                 sibnode.Collapse();
@@ -250,12 +216,10 @@ namespace GenetixKit
 
         private string[] filterSNPsOnTree(string my_snp)
         {
-            string[] entered_snps = my_snp.Replace(" ", "").Split(new char[]{','});
+            string[] entered_snps = my_snp.Replace(" ", "").Split(new char[] { ',' });
             List<string> valid_snps = new List<string>();
-            foreach(string s in entered_snps)
-            {
-                if(snp_on_tree.Contains(s.Substring(0,s.Length-1)))
-                {
+            foreach (string s in entered_snps) {
+                if (snp_on_tree.Contains(s.Substring(0, s.Length - 1))) {
                     valid_snps.Add(s);
                 }
             }
@@ -276,38 +240,32 @@ namespace GenetixKit
             snpTextBox.Text = " " + (string)snp_map[node] + " ";
             snpTextBox.SelectAll();
             snpTextBox.SelectionColor = Color.Gray;
-            label1.Text = "Defining SNPs for "+node.Text;
+            label1.Text = "Defining SNPs for " + node.Text;
             // color:
 
             int start = -1;
             string[] begin = new string[] { " ", "/" };
             string[] end = new string[] { " ", "/", "," };
             string search_term = null;
-            foreach (string snp in snp_array)
-            {
+            foreach (string snp in snp_array) {
                 if (snp.Equals(""))
                     continue;
                 foreach (string b1 in begin)
-                    foreach (string e1 in end)
-                    {
+                    foreach (string e1 in end) {
                         search_term = b1 + snp.Substring(0, snp.Length - 1) + e1;
                         start = snpTextBox.Find(search_term);
-                        if (start != -1)
-                        {
+                        if (start != -1) {
                             snpTextBox.Select(start + 1, snp.Length - 1);
-                            if (snp.EndsWith("-"))
-                            {
+                            if (snp.EndsWith("-")) {
                                 snpTextBox.SelectionBackColor = Color.Red;
                                 snpTextBox.SelectionColor = Color.Yellow;
-                            }
-                            else if (snp.EndsWith("+"))
-                            {
+                            } else if (snp.EndsWith("+")) {
                                 snpTextBox.SelectionBackColor = Color.DarkGreen;
                                 snpTextBox.SelectionColor = Color.White;
                             }
                         }
                     }
             }
-        }      
+        }
     }
 }

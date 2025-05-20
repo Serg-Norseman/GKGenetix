@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace GenetixKit
@@ -36,16 +33,15 @@ namespace GenetixKit
             dgvEditKit.Rows.Clear();
             SQLiteCommand query = new SQLiteCommand(@"SELECT kit_no,name,sex,disabled,coalesce(x,0),coalesce(y,0),last_modified FROM kit_master WHERE reference=0 order by last_modified DESC", cnn);
             SQLiteDataReader reader = query.ExecuteReader();
-            string sex="U";
+            string sex = "U";
             string xy = null;
-            while (reader.Read())
-            {
+            while (reader.Read()) {
                 int new_idx = dgvEditKit.Rows.Add();
                 DataGridViewRow row = dgvEditKit.Rows[new_idx];
                 row.Cells[0].Value = reader.GetString(0);
                 row.Cells[1].Value = reader.GetString(1);
 
-                sex=reader.GetString(2);
+                sex = reader.GetString(2);
                 if (sex == "U")
                     row.Cells[2].Value = "Unknown";
                 else if (sex == "M")
@@ -81,36 +77,31 @@ namespace GenetixKit
             SQLiteConnection conn = GGKUtilLib.getDBConnection();
             string sex = "";
             string location = "";
-            using(SQLiteTransaction trans=conn.BeginTransaction())
-            {
-                foreach (DataGridViewRow row in dgvEditKit.Rows)
-                {
-                    SQLiteCommand upCmd = new SQLiteCommand("UPDATE kit_master set name=@name, sex=@sex, disabled=@disabled, x=@x, y=@y WHERE kit_no=@kit_no",conn);
+            using (SQLiteTransaction trans = conn.BeginTransaction()) {
+                foreach (DataGridViewRow row in dgvEditKit.Rows) {
+                    SQLiteCommand upCmd = new SQLiteCommand("UPDATE kit_master set name=@name, sex=@sex, disabled=@disabled, x=@x, y=@y WHERE kit_no=@kit_no", conn);
                     upCmd.Parameters.AddWithValue("@name", row.Cells[1].Value.ToString());
-                    
+
                     sex = row.Cells[2].Value.ToString();
                     if (sex == "Unknown")
-                    upCmd.Parameters.AddWithValue("@sex", "U");
+                        upCmd.Parameters.AddWithValue("@sex", "U");
                     else if (sex == "Male")
                         upCmd.Parameters.AddWithValue("@sex", "M");
                     else if (sex == "Female")
                         upCmd.Parameters.AddWithValue("@sex", "F");
-                    
-                    if(((bool)row.Cells[3].Value))
+
+                    if (((bool)row.Cells[3].Value))
                         upCmd.Parameters.AddWithValue("@disabled", "1");
                     else
                         upCmd.Parameters.AddWithValue("@disabled", "0");
 
                     location = row.Cells[4].Value.ToString();
-                    if (location == "Unknown")
-                    {
+                    if (location == "Unknown") {
                         upCmd.Parameters.AddWithValue("@x", "0");
                         upCmd.Parameters.AddWithValue("@y", "0");
-                    }
-                    else
-                    {
-                        upCmd.Parameters.AddWithValue("@x", location.Split(new char[]{':'})[0]);
-                        upCmd.Parameters.AddWithValue("@y", location.Split(new char[]{':'})[1]);
+                    } else {
+                        upCmd.Parameters.AddWithValue("@x", location.Split(new char[] { ':' })[0]);
+                        upCmd.Parameters.AddWithValue("@y", location.Split(new char[] { ':' })[1]);
                     }
 
                     upCmd.Parameters.AddWithValue("@kit_no", row.Cells[0].Value.ToString());
@@ -119,19 +110,18 @@ namespace GenetixKit
                 //
                 trans.Commit();
             }
-            
+
             GGKUtilLib.setStatus("Saved.");
         }
 
         public void Delete()
         {
-            if (MessageBox.Show("You had selected " + dgvEditKit.SelectedRows.Count.ToString() + " kits to be deleted. Are you sure?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
+            if (MessageBox.Show("You had selected " + dgvEditKit.SelectedRows.Count.ToString() + " kits to be deleted. Are you sure?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
                 GGKUtilLib.setStatus("Deleting " + dgvEditKit.SelectedRows.Count.ToString() + " kit(s) and all it's associated data ...");
                 this.Enabled = false;
                 GGKUtilLib.disableMenu();
                 GGKUtilLib.disableToolbar();
-                bwDelete.RunWorkerAsync(dgvEditKit);        
+                bwDelete.RunWorkerAsync(dgvEditKit);
             }
         }
 
@@ -139,10 +129,8 @@ namespace GenetixKit
         {
             GGKUtilLib.setStatus("Enabling ...");
             SQLiteConnection conn = GGKUtilLib.getDBConnection();
-            using (SQLiteTransaction trans = conn.BeginTransaction())
-            {
-                foreach (DataGridViewRow row in dgvEditKit.SelectedRows)
-                {
+            using (SQLiteTransaction trans = conn.BeginTransaction()) {
+                foreach (DataGridViewRow row in dgvEditKit.SelectedRows) {
                     SQLiteCommand upCmd = new SQLiteCommand("UPDATE kit_master set disabled=@disabled WHERE kit_no=@kit_no", conn);
                     upCmd.Parameters.AddWithValue("@name", row.Cells[1].Value.ToString());
                     upCmd.Parameters.AddWithValue("@disabled", "0");
@@ -153,7 +141,7 @@ namespace GenetixKit
                 //
                 trans.Commit();
             }
-            
+
             GGKUtilLib.setStatus("Enabled.");
         }
 
@@ -161,10 +149,8 @@ namespace GenetixKit
         {
             GGKUtilLib.setStatus("Disabling ...");
             SQLiteConnection conn = GGKUtilLib.getDBConnection();
-            using (SQLiteTransaction trans = conn.BeginTransaction())
-            {
-                foreach (DataGridViewRow row in dgvEditKit.SelectedRows)
-                {
+            using (SQLiteTransaction trans = conn.BeginTransaction()) {
+                foreach (DataGridViewRow row in dgvEditKit.SelectedRows) {
                     SQLiteCommand upCmd = new SQLiteCommand("UPDATE kit_master set disabled=@disabled WHERE kit_no=@kit_no", conn);
                     upCmd.Parameters.AddWithValue("@name", row.Cells[1].Value.ToString());
                     upCmd.Parameters.AddWithValue("@disabled", "1");
@@ -175,7 +161,7 @@ namespace GenetixKit
                 //
                 trans.Commit();
             }
-            
+
             GGKUtilLib.setStatus("Disabled.");
         }
 
@@ -183,17 +169,15 @@ namespace GenetixKit
         {
             var senderGrid = (DataGridView)sender;
 
-            if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0)
-            {
-                string location=dgvEditKit.Rows[e.RowIndex].Cells[4].Value.ToString();
+            if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0) {
+                string location = dgvEditKit.Rows[e.RowIndex].Cells[4].Value.ToString();
                 int x = 0;
                 int y = 0;
-                if (location != "Unknown")
-                {
+                if (location != "Unknown") {
                     x = int.Parse(location.Split(new char[] { ':' })[0]);
                     y = int.Parse(location.Split(new char[] { ':' })[1]);
                 }
-                LocationSelectFrm frm = new LocationSelectFrm(x,y);
+                LocationSelectFrm frm = new LocationSelectFrm(x, y);
                 frm.ShowDialog(Program.GGKitFrmMainInst);
                 x = frm.X;
                 y = frm.Y;
@@ -207,11 +191,9 @@ namespace GenetixKit
             DataGridView dgv = (DataGridView)e.Argument;
             SQLiteConnection conn = GGKUtilLib.getDBConnection();
             List<DataGridViewRow> rows = new List<DataGridViewRow>();
-            using (SQLiteTransaction trans = conn.BeginTransaction())
-            {
+            using (SQLiteTransaction trans = conn.BeginTransaction()) {
 
-                foreach (DataGridViewRow row in dgv.SelectedRows)
-                {
+                foreach (DataGridViewRow row in dgv.SelectedRows) {
                     SQLiteCommand upCmd = new SQLiteCommand("DELETE FROM kit_master WHERE kit_no=@kit_no", conn);
                     upCmd.Parameters.AddWithValue("@kit_no", row.Cells[0].Value.ToString());
                     upCmd.ExecuteNonQuery();
@@ -220,10 +202,9 @@ namespace GenetixKit
                 //
                 trans.Commit();
             }
-            
 
-            this.Invoke(new MethodInvoker(delegate
-            {
+
+            this.Invoke(new MethodInvoker(delegate {
                 foreach (DataGridViewRow row in rows)
                     dgvEditKit.Rows.Remove(row);
             }));

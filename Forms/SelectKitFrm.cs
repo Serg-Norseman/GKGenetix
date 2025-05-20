@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace GenetixKit
@@ -32,15 +29,14 @@ namespace GenetixKit
         {
             return kit;
         }
-        
+
         public SelectKitFrm(int operation)
         {
             InitializeComponent();
             //
             selected_operation = operation;
             string hide_ref = GGKSettings.getParameterValue("Admixture.ReferencePopulations.Hide");
-            switch (selected_operation)
-            {
+            switch (selected_operation) {
                 case OPEN_KIT:
                     btnOpen.Text = "Open";
                     if (hide_ref == "1")
@@ -50,7 +46,7 @@ namespace GenetixKit
                     break;
                 case EXPORT_KIT:
                     btnOpen.Text = "Export";
-                    if(hide_ref=="1")
+                    if (hide_ref == "1")
                         select_sql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master WHERE reference=0 order by last_modified DESC";
                     else
                         select_sql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master order by last_modified DESC";
@@ -110,21 +106,18 @@ namespace GenetixKit
         private void OpenKitFrm_Load(object sender, EventArgs e)
         {
             timer1.Enabled = true;
-            
+
         }
 
         private void dataGridViewOpenKit_SelectionChanged(object sender, EventArgs e)
         {
-            try
-            {
+            try {
                 if (dataGridViewOpenKit.SelectedRows.Count > 0)
-                    kitLbl.Text = dataGridViewOpenKit.SelectedRows[0].Cells[0].Value.ToString(); 
+                    kitLbl.Text = dataGridViewOpenKit.SelectedRows[0].Cells[0].Value.ToString();
+            } catch (Exception) {
+                //ignore               
             }
-            catch (Exception)
-            {
-               //ignore               
-            }
-                       
+
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -132,38 +125,34 @@ namespace GenetixKit
             timer1.Enabled = false;
             disabled.Clear();
             DataGridViewCellStyle gray = new DataGridViewCellStyle();
-            gray.ForeColor=Color.LightGray;
+            gray.ForeColor = Color.LightGray;
 
-            SQLiteConnection cnn = GGKUtilLib.getDBConnection();            
+            SQLiteConnection cnn = GGKUtilLib.getDBConnection();
             dataGridViewOpenKit.Rows.Clear();
             string hide = GGKSettings.getParameterValue("Admixture.ReferencePopulations.Hide");
             SQLiteCommand query = new SQLiteCommand(select_sql, cnn);
             SQLiteDataReader reader = query.ExecuteReader();
-            while(reader.Read())
-            {
+            while (reader.Read()) {
                 int new_idx = dataGridViewOpenKit.Rows.Add();
-                DataGridViewRow row = dataGridViewOpenKit.Rows[new_idx];                
-                row.Cells[0].Value =reader.GetString(0);
-                row.Cells[1].Value =reader.GetString(1);
-                row.Cells[2].Value =reader.GetString(3);
-                if (reader.GetInt16(2) == 1)
-                {
+                DataGridViewRow row = dataGridViewOpenKit.Rows[new_idx];
+                row.Cells[0].Value = reader.GetString(0);
+                row.Cells[1].Value = reader.GetString(1);
+                row.Cells[2].Value = reader.GetString(3);
+                if (reader.GetInt16(2) == 1) {
                     row.DefaultCellStyle = gray;
                     disabled.Add(reader.GetString(0));
                 }
-                
+
             }
             query.Dispose();
             cnn.Dispose();
 
-            if (dataGridViewOpenKit.Rows.Count > 0)
-            {
+            if (dataGridViewOpenKit.Rows.Count > 0) {
                 dataGridViewOpenKit.CurrentCell = dataGridViewOpenKit.Rows[0].Cells[0];
                 kitLbl.Text = dataGridViewOpenKit.SelectedRows[0].Cells[0].Value.ToString();
             }
-            if(dataGridViewOpenKit.Rows.Count==0)
-            {
-                MessageBox.Show("There are no kits available to open.","",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
+            if (dataGridViewOpenKit.Rows.Count == 0) {
+                MessageBox.Show("There are no kits available to open.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 this.Close();
             }
 
@@ -180,9 +169,8 @@ namespace GenetixKit
         }
 
         private void SelectKit(string kit)
-        {            
-            switch (selected_operation)
-            {
+        {
+            switch (selected_operation) {
                 case OPEN_KIT:
                     GGKUtilLib.hideAllMdiChildren();
                     NewEditKitFrm newKitFrm = Program.GGKitFrmMainInst.getNewEditKitFrm();
@@ -197,12 +185,11 @@ namespace GenetixKit
                 case EXPORT_KIT:
                     //ToDo:
                     GGKUtilLib.hideAllMdiChildren();
-                    if (saveFileDialog.ShowDialog(this) == DialogResult.OK)
-                    {
+                    if (saveFileDialog.ShowDialog(this) == DialogResult.OK) {
                         btnOpen.Text = "Exporting ...";
                         btnOpen.Enabled = false;
                         GGKUtilLib.setStatus("Exporting. Please wait ...");
-                        bwExport.RunWorkerAsync(new string[] { kit, saveFileDialog.FileName, saveFileDialog.FilterIndex.ToString()});
+                        bwExport.RunWorkerAsync(new string[] { kit, saveFileDialog.FileName, saveFileDialog.FilterIndex.ToString() });
                     }
                     return;
                 case SELECT_ONE_TO_MANY:
@@ -274,14 +261,11 @@ namespace GenetixKit
 
         private void SelectKitFrm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (bwExport.IsBusy)
-            {
-                if (MessageBox.Show("Exporting kit .. Do you want to cancel it and close this window?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
+            if (bwExport.IsBusy) {
+                if (MessageBox.Show("Exporting kit .. Do you want to cancel it and close this window?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
                     GGKUtilLib.setStatus("Export Cancelled.");
                     bwExport.CancelAsync();
-                }
-                else
+                } else
                     e.Cancel = true;
             }
         }

@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace GenetixKit
@@ -17,7 +14,7 @@ namespace GenetixKit
         bool phased = false;
         DataTable segment_dt = null;
         DataTable dt_alleles = null;
-        
+
         public MatchingKitsFrm(string kit)
         {
             InitializeComponent();
@@ -27,7 +24,7 @@ namespace GenetixKit
         private void MatchingKitsFrm_Load(object sender, EventArgs e)
         {
             lblKit.Text = kit;
-            lblName.Text = GGKUtilLib.queryDatabase("kit_master", new string[] { "name" },"WHERE kit_no='"+kit+"'").Rows[0].ItemArray[0].ToString();
+            lblName.Text = GGKUtilLib.queryDatabase("kit_master", new string[] { "name" }, "WHERE kit_no='" + kit + "'").Rows[0].ItemArray[0].ToString();
             DataTable dt = GGKUtilLib.QueryDB("SELECT cmp_id,kit'Kit No',name'Name',at_longest'Autosomal Longest',at_total'Autosomal Total',x_longest'X Longest',x_total'X Total',mrca'MRCA' FROM (SELECT a.cmp_id,a.kit1'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca FROM cmp_status a,kit_master b WHERE a.at_total!=0 AND a.kit1!='" + kit + "' AND a.kit2='" + kit + "' AND a.status_autosomal=1 AND b.kit_no=a.kit1 AND b.disabled=0 UNION SELECT a.cmp_id,a.kit2'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca FROM cmp_status a,kit_master b WHERE a.at_total!=0 AND a.kit2!='" + kit + "' AND a.kit1='" + kit + "' AND a.status_autosomal=1 AND b.kit_no=a.kit2 AND b.disabled=0) ORDER BY at_longest DESC,at_total DESC");
             dgvMatches.Columns.Clear();
             dgvMatches.DataSource = dt;
@@ -41,27 +38,26 @@ namespace GenetixKit
             dgvMatches.Columns[6].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             dgvMatches.Columns[7].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
-            DataGridViewCellStyle style= new DataGridViewCellStyle();
-            style.Format="N2";
+            DataGridViewCellStyle style = new DataGridViewCellStyle();
+            style.Format = "N2";
 
             dgvMatches.Columns[3].DefaultCellStyle = style;
             dgvMatches.Columns[4].DefaultCellStyle = style;
             dgvMatches.Columns[5].DefaultCellStyle = style;
             dgvMatches.Columns[6].DefaultCellStyle = style;
-           
+
         }
 
         private void dgvMatches_SelectionChanged(object sender, EventArgs e)
         {
-            if (dgvMatches.SelectedRows.Count > 0)
-            {
+            if (dgvMatches.SelectedRows.Count > 0) {
                 string cmp_id = dgvMatches.SelectedRows[0].Cells[0].Value.ToString();
                 string kit2 = dgvMatches.SelectedRows[0].Cells[1].Value.ToString();
-                string name2 = dgvMatches.SelectedRows[0].Cells[2].Value.ToString();   
+                string name2 = dgvMatches.SelectedRows[0].Cells[2].Value.ToString();
                 BackgroundWorker bWorker = new BackgroundWorker();
                 bWorker.DoWork += bWorker_DoWork;
                 bWorker.RunWorkerCompleted += bWorker_RunWorkerCompleted;
-                bWorker.RunWorkerAsync(new string[] { cmp_id, kit2 ,name2});
+                bWorker.RunWorkerAsync(new string[] { cmp_id, kit2, name2 });
             }
         }
 
@@ -73,30 +69,25 @@ namespace GenetixKit
             string name2 = o[2];
             segment_dt = GGKUtilLib.QueryDB("select chromosome'Chromosome',start_position'Start Position',end_position'End Position',segment_length_cm'Segment Length (cM)',snp_count'SNP Count',segment_id from cmp_autosomal where cmp_id='" + cmp_id + "'");
 
-            if (GGKUtilLib.isPhased(kit))
-            {
+            if (GGKUtilLib.isPhased(kit)) {
                 phased_kit = kit;
                 unphased_kit = kit2;
                 phased = true;
-            }
-            else if (GGKUtilLib.isPhased(kit2))
-            {
+            } else if (GGKUtilLib.isPhased(kit2)) {
                 phased_kit = kit2;
                 unphased_kit = kit;
                 phased = true;
-            }
-            else
+            } else
                 phased = false;
-            e.Result = new string[]{kit2,name2};
+            e.Result = new string[] { kit2, name2 };
         }
 
         void bWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (segment_dt != null)
-            {
+            if (segment_dt != null) {
                 string[] o = (string[])e.Result;
-                lblSegLabel.Text = "List of matching segments for kit " + o[0] + " (" + o[1] + ")";                
-                dgvSegments.Columns.Clear();         
+                lblSegLabel.Text = "List of matching segments for kit " + o[0] + " (" + o[1] + ")";
+                dgvSegments.Columns.Clear();
                 dgvSegments.DataSource = segment_dt;
                 segment_dt = null;
                 DataGridViewCellStyle style = new DataGridViewCellStyle();
@@ -111,15 +102,14 @@ namespace GenetixKit
                 dgvSegments.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
                 dgvSegments.Columns[5].Visible = false;
-                
+
             }
-            
+
         }
 
         private void dgvSegments_SelectionChanged(object sender, EventArgs e)
         {
-            if (dgvSegments.SelectedRows.Count > 0)
-            {
+            if (dgvSegments.SelectedRows.Count > 0) {
                 BackgroundWorker bWorker2 = new BackgroundWorker();
                 bWorker2.DoWork += bWorker2_DoWork;
                 bWorker2.RunWorkerCompleted += bWorker2_RunWorkerCompleted;
@@ -127,20 +117,19 @@ namespace GenetixKit
 
                 //lblSegLabel.Text = "List of matching segments for kit " + dgvMatches.SelectedRows[0].Cells[1].Value.ToString() + " (" + dgvMatches.SelectedRows[0].Cells[2].Value.ToString() + ")";
                 dgvAlleles.Columns.Clear();
-                bWorker2.RunWorkerAsync(new string[]{kit,lblName.Text,dgvMatches.SelectedRows[0].Cells[1].Value.ToString(),dgvMatches.SelectedRows[0].Cells[2].Value.ToString(),segment_id});
+                bWorker2.RunWorkerAsync(new string[] { kit, lblName.Text, dgvMatches.SelectedRows[0].Cells[1].Value.ToString(), dgvMatches.SelectedRows[0].Cells[2].Value.ToString(), segment_id });
             }
         }
 
         void bWorker2_DoWork(object sender, DoWorkEventArgs e)
         {
-            object[] o= (object[])e.Argument;
+            object[] o = (object[])e.Argument;
             dt_alleles = GGKUtilLib.QueryDB("select rsid'RSID',position'Position',kit1_genotype'" + o[0] + " (" + o[1] + ")',kit2_genotype'" + o[2] + " (" + o[3] + ")',match'Match' from cmp_mrca where segment_id='" + o[4] + "'");
         }
 
         void bWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (dt_alleles != null)
-            {
+            if (dt_alleles != null) {
                 dgvAlleles.Columns.Clear();
                 dgvAlleles.DataSource = dt_alleles;
 
@@ -150,8 +139,7 @@ namespace GenetixKit
                 dgvAlleles.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 dgvAlleles.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 
-                foreach (DataGridViewRow row in dgvAlleles.Rows)
-                {
+                foreach (DataGridViewRow row in dgvAlleles.Rows) {
                     if (row.Cells[4].Value.ToString() == "-")
                         row.DefaultCellStyle.BackColor = Color.LightGray;
                     else if (row.Cells[4].Value.ToString() == "")
@@ -168,8 +156,7 @@ namespace GenetixKit
 
         private void dgvSegments_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (phased)
-            {
+            if (phased) {
                 string chr = dgvSegments.SelectedRows[0].Cells[0].Value.ToString();
                 string start_pos = dgvSegments.SelectedRows[0].Cells[1].Value.ToString();
                 string end_pos = dgvSegments.SelectedRows[0].Cells[2].Value.ToString();
