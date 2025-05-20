@@ -232,14 +232,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <EmbeddedResource Include="Forms\SelectTwoKitsFrm.resx">
       <DependentUpon>SelectTwoKitsFrm.cs</DependentUpon>
     </EmbeddedResource>
@@ -252,6 +247,11 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
@@ -261,25 +261,20 @@
     <None Include="Resources\ysnp_hg19.txt.gz" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\baby.png" />
     <Content Include="Resources\snps_on_tree.txt" />
     <Content Include="Resources\ytree.xml" />
-    <None Include="Resources\boy.png" />
     <Content Include="Resources\delete.png" />
     <Content Include="Resources\diff.exe" />
     <Content Include="Resources\disable.png" />
     <Content Include="Resources\enable.png" />
     <Content Include="Resources\eraser.png" />
-    <None Include="Resources\girl.png" />
     <Content Include="Resources\icon.ico" />
     <Content Include="Resources\logo.png" />
-    <None Include="Resources\man-2-icon.png" />
     <None Include="Resources\mtDNAPhylogeny.xml" />
     <Content Include="Resources\paste.png" />
     <None Include="Resources\refresh.png" />
     <Content Include="System.Data.SQLite.dll" />
     <Content Include="Resources\tree.ico" />
-    <None Include="Resources\woman-icon.png" />
     <Content Include="Resources\world_map.png" />
   </ItemGroup>
   <ItemGroup />

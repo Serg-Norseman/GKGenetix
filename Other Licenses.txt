@@ -23,14 +23,11 @@ HGDP Autosomal Reference Population: http://www.hagsc.org/hgdp/files.html
 ISOGG Y-Tree: http://isogg.org/tree/
 mtDNA Phylogeny: http://www.mtdnacommunity.org/downloads/mtDNAPhylogeny.xml
 Mitocondria Locations: http://www.mitomap.org/bin/view.pl/MITOMAP/GenomeLoci
+
 Application Icon: https://www.iconfinder.com/icons/171268/tree_icon#size=128
 Eraser icon: http://www.iconarchive.com/show/farm-fresh-icons-by-fatcow/draw-eraser-icon.html
 Paste icon: http://findicons.com/icon/67168/gnome_edit_paste?id=67897
 Delete icon: https://www.iconfinder.com/icons/100980/delete_trash_icon#size=16
 Disable icon: http://findicons.com/icon/116499/150?id=293646
 Enable icon: http://findicons.com/icon/2982/tick
-Girl: http://www.iconarchive.com/show/pretty-office-9-icons-by-custom-icon-design/baby-girl-icon.html
-Boy: http://www.iconarchive.com/show/pretty-office-9-icons-by-custom-icon-design/baby-boy-icon.html
-Woman: http://www.iconarchive.com/show/pretty-office-4-icons-by-custom-icon-design/woman-icon.html
-Man: http://www.iconarchive.com/show/pretty-office-2-icons-by-custom-icon-design/man-icon.html
 Refresh Icon: http://www.iconarchive.com/show/basic-2-icons-by-pixelmixer/reload-icon.html
