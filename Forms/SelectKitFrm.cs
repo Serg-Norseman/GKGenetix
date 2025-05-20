@@ -35,7 +35,7 @@ namespace GenetixKit
             InitializeComponent();
             //
             selected_operation = operation;
-            string hide_ref = GGKSettings.getParameterValue("Admixture.ReferencePopulations.Hide");
+            string hide_ref = GKSettings.getParameterValue("Admixture.ReferencePopulations.Hide");
             switch (selected_operation) {
                 case OPEN_KIT:
                     btnOpen.Text = "Open";
@@ -127,9 +127,9 @@ namespace GenetixKit
             DataGridViewCellStyle gray = new DataGridViewCellStyle();
             gray.ForeColor = Color.LightGray;
 
-            SQLiteConnection cnn = GGKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKUtilLib.getDBConnection();
             dataGridViewOpenKit.Rows.Clear();
-            string hide = GGKSettings.getParameterValue("Admixture.ReferencePopulations.Hide");
+            string hide = GKSettings.getParameterValue("Admixture.ReferencePopulations.Hide");
             SQLiteCommand query = new SQLiteCommand(select_sql, cnn);
             SQLiteDataReader reader = query.ExecuteReader();
             while (reader.Read()) {
@@ -172,7 +172,7 @@ namespace GenetixKit
         {
             switch (selected_operation) {
                 case OPEN_KIT:
-                    GGKUtilLib.hideAllMdiChildren();
+                    GKUtilLib.hideAllMdiChildren();
                     NewEditKitFrm newKitFrm = Program.GGKitFrmMainInst.getNewEditKitFrm();
                     if (newKitFrm == null)
                         newKitFrm = new NewEditKitFrm(kit, disabled.Contains(kit));
@@ -184,30 +184,30 @@ namespace GenetixKit
                     break;
                 case EXPORT_KIT:
                     //ToDo:
-                    GGKUtilLib.hideAllMdiChildren();
+                    GKUtilLib.hideAllMdiChildren();
                     if (saveFileDialog.ShowDialog(this) == DialogResult.OK) {
                         btnOpen.Text = "Exporting ...";
                         btnOpen.Enabled = false;
-                        GGKUtilLib.setStatus("Exporting. Please wait ...");
+                        GKUtilLib.setStatus("Exporting. Please wait ...");
                         bwExport.RunWorkerAsync(new string[] { kit, saveFileDialog.FileName, saveFileDialog.FilterIndex.ToString() });
                     }
                     return;
                 case SELECT_ONE_TO_MANY:
-                    GGKUtilLib.hideAllMdiChildren();
+                    GKUtilLib.hideAllMdiChildren();
                     MatchingKitsFrm frm = new MatchingKitsFrm(kit);
                     frm.MdiParent = Program.GGKitFrmMainInst;
                     frm.Visible = true;
                     frm.WindowState = FormWindowState.Maximized;
                     break;
                 case SELECT_ADMIXTURE:
-                    GGKUtilLib.hideAllMdiChildren();
+                    GKUtilLib.hideAllMdiChildren();
                     AdmixtureFrm afrm = new AdmixtureFrm(kit);
                     afrm.MdiParent = Program.GGKitFrmMainInst;
                     afrm.Visible = true;
                     afrm.WindowState = FormWindowState.Maximized;
                     break;
                 case SELECT_ROH:
-                    GGKUtilLib.hideAllMdiChildren();
+                    GKUtilLib.hideAllMdiChildren();
                     ROHFrm rohfrm = new ROHFrm(kit);
                     rohfrm.MdiParent = Program.GGKitFrmMainInst;
                     rohfrm.Visible = true;
@@ -218,21 +218,21 @@ namespace GenetixKit
                     this.Visible = false;
                     return;
                 case SELECT_MTPHYLOGENY:
-                    GGKUtilLib.hideAllMdiChildren();
+                    GKUtilLib.hideAllMdiChildren();
                     MtPhylogenyFrm mtFrm = new MtPhylogenyFrm(kit);
                     mtFrm.MdiParent = Program.GGKitFrmMainInst;
                     mtFrm.Visible = true;
                     mtFrm.WindowState = FormWindowState.Maximized;
                     break;
                 case SELECT_MITOMAP:
-                    GGKUtilLib.hideAllMdiChildren();
+                    GKUtilLib.hideAllMdiChildren();
                     MitoMapFrm mpFrm = new MitoMapFrm(kit);
                     mpFrm.MdiParent = Program.GGKitFrmMainInst;
                     mpFrm.Visible = true;
                     mpFrm.WindowState = FormWindowState.Maximized;
                     break;
                 case SELECT_ISOGGYTREE:
-                    GGKUtilLib.hideAllMdiChildren();
+                    GKUtilLib.hideAllMdiChildren();
                     IsoggYTreeFrm yFrm = new IsoggYTreeFrm(kit);
                     yFrm.MdiParent = Program.GGKitFrmMainInst;
                     yFrm.Visible = true;
@@ -250,12 +250,12 @@ namespace GenetixKit
             string filename = ((string[])e.Argument)[1];
             int option = int.Parse(((string[])e.Argument)[2]);
             //
-            GGKUtilLib.exportKit(kit_no, filename, option);
+            GKUtilLib.exportKit(kit_no, filename, option);
         }
 
         private void bwExport_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            GGKUtilLib.setStatus("Done.");
+            GKUtilLib.setStatus("Done.");
             this.Close();
         }
 
@@ -263,7 +263,7 @@ namespace GenetixKit
         {
             if (bwExport.IsBusy) {
                 if (MessageBox.Show("Exporting kit .. Do you want to cancel it and close this window?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-                    GGKUtilLib.setStatus("Export Cancelled.");
+                    GKUtilLib.setStatus("Export Cancelled.");
                     bwExport.CancelAsync();
                 } else
                     e.Cancel = true;

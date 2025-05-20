@@ -16,9 +16,9 @@ namespace GenetixKit
 
         private void SettingsFrm_Load(object sender, EventArgs e)
         {
-            GGKUtilLib.enableSave();
+            GKUtilLib.enableSave();
             lbSettings.Items.Clear();
-            settings = GGKSettings.getSettings();
+            settings = GKSettings.getSettings();
             lbSettings.Items.AddRange(settings.Keys.ToArray());
             if (lbSettings.Items.Count > 0) {
                 lbSettings.SelectedIndex = 0;
@@ -43,31 +43,31 @@ namespace GenetixKit
             if (data[2] == "1") {
                 tbValue.ReadOnly = true;
                 btnResetDefault.Enabled = false;
-                GGKUtilLib.disableSave();
+                GKUtilLib.disableSave();
             } else {
                 tbValue.ReadOnly = false;
                 btnResetDefault.Enabled = true;
-                GGKUtilLib.enableSave();
+                GKUtilLib.enableSave();
             }
         }
 
         public void Save()
         {
-            GGKSettings.saveParameterValue(tbKey.Text, tbValue.Text);
-            GGKUtilLib.setStatus("Value for parameter [" + tbKey.Text + "] saved.");
+            GKSettings.saveParameterValue(tbKey.Text, tbValue.Text);
+            GKUtilLib.setStatus("Value for parameter [" + tbKey.Text + "] saved.");
         }
 
         private void btnResetDefault_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Are you sure you want to reset the parameter value with default value?", "Reset Parameter Value", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-                tbValue.Text = GGKSettings.getDefaultResetSettings()[tbKey.Text][0];
+                tbValue.Text = GKSettings.getDefaultResetSettings()[tbKey.Text][0];
                 Save();
             }
         }
 
         private void SettingsFrm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            GGKUtilLib.disableSave();
+            GKUtilLib.disableSave();
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Data.SQLite;
 
 namespace GenetixKit
 {
-    class GGKSettings
+    class GKSettings
     {
 
         private static SortedDictionary<string, string[]> settings = null;
@@ -49,7 +49,7 @@ namespace GenetixKit
         {
             if (settings == null) {
                 settings = new SortedDictionary<string, string[]>();
-                DataTable dt_settings = GGKUtilLib.queryDatabase("ggk_settings", new string[] { "key", "value", "description", "readonly", "last_modified" });
+                DataTable dt_settings = GKUtilLib.queryDatabase("ggk_settings", new string[] { "key", "value", "description", "readonly", "last_modified" });
                 object[] data = null;
                 foreach (DataRow row in dt_settings.Rows) {
                     data = row.ItemArray;
@@ -60,7 +60,7 @@ namespace GenetixKit
 
         public static void saveParameterValue(string key, string value)
         {
-            SQLiteConnection cnn = GGKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKUtilLib.getDBConnection();
             SQLiteCommand upCmd = new SQLiteCommand(@"UPDATE ggk_settings set value=@value WHERE key=@key", cnn);
             upCmd.Parameters.AddWithValue("@value", value);
             upCmd.Parameters.AddWithValue("@key", key);
@@ -80,7 +80,7 @@ namespace GenetixKit
 
         public static void _addParameter(string key, string value, string desc, string read_only)
         {
-            SQLiteConnection cnn = GGKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKUtilLib.getDBConnection();
             SQLiteCommand upCmd = new SQLiteCommand(@"INSERT into ggk_settings(key,value,description,readonly) VALUES (@key,@value,@desc,@readonly)", cnn);
             upCmd.Parameters.AddWithValue("@key", key);
             upCmd.Parameters.AddWithValue("@value", value);

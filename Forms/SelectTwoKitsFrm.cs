@@ -22,7 +22,7 @@ namespace GenetixKit
             InitializeComponent();
 
             selected_operation = operation;
-            string hide_ref = GGKSettings.getParameterValue("Admixture.ReferencePopulations.Hide");
+            string hide_ref = GKSettings.getParameterValue("Admixture.ReferencePopulations.Hide");
             switch (selected_operation) {
                 case SELECT_ADMIXTURE:
                     if (hide_ref == "1")
@@ -39,7 +39,7 @@ namespace GenetixKit
         private void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Enabled = false;
-            SQLiteConnection cnn = GGKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKUtilLib.getDBConnection();
             dataGridView1.Rows.Clear();
             dataGridView2.Rows.Clear();
             SQLiteCommand query = new SQLiteCommand(select_sql, cnn);
@@ -83,7 +83,7 @@ namespace GenetixKit
             // open mdi child
             switch (selected_operation) {
                 case SELECT_ADMIXTURE:
-                    GGKUtilLib.hideAllMdiChildren();
+                    GKUtilLib.hideAllMdiChildren();
                     OneToOneCmpFrm cmp = new OneToOneCmpFrm(kit1, kit2);
                     cmp.MdiParent = Program.GGKitFrmMainInst;
                     cmp.Visible = true;

@@ -16,10 +16,10 @@ namespace GenetixKit
 
         private void QuickEditKit_Load(object sender, EventArgs e)
         {
-            GGKUtilLib.enableSave();
-            GGKUtilLib.enableDeleteKitToolbarBtn();
-            GGKUtilLib.enable_DisableKitToolbarBtn();
-            GGKUtilLib.enable_EnableKitToolbarBtn();
+            GKUtilLib.enableSave();
+            GKUtilLib.enableDeleteKitToolbarBtn();
+            GKUtilLib.enable_DisableKitToolbarBtn();
+            GKUtilLib.enable_EnableKitToolbarBtn();
             timer1.Enabled = true;
         }
 
@@ -29,7 +29,7 @@ namespace GenetixKit
             DataGridViewCellStyle gray = new DataGridViewCellStyle();
             gray.ForeColor = Color.LightGray;
 
-            SQLiteConnection cnn = GGKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKUtilLib.getDBConnection();
             dgvEditKit.Rows.Clear();
             SQLiteCommand query = new SQLiteCommand(@"SELECT kit_no,name,sex,disabled,coalesce(x,0),coalesce(y,0),last_modified FROM kit_master WHERE reference=0 order by last_modified DESC", cnn);
             SQLiteDataReader reader = query.ExecuteReader();
@@ -65,16 +65,16 @@ namespace GenetixKit
 
         private void QuickEditKit_FormClosing(object sender, FormClosingEventArgs e)
         {
-            GGKUtilLib.disableSave();
-            GGKUtilLib.disableDeleteKitToolbarBtn();
-            GGKUtilLib.disable_DisableKitToolbarBtn();
-            GGKUtilLib.disable_EnableKitToolbarBtn();
+            GKUtilLib.disableSave();
+            GKUtilLib.disableDeleteKitToolbarBtn();
+            GKUtilLib.disable_DisableKitToolbarBtn();
+            GKUtilLib.disable_EnableKitToolbarBtn();
         }
 
         public void Save()
         {
-            GGKUtilLib.setStatus("Saving ...");
-            SQLiteConnection conn = GGKUtilLib.getDBConnection();
+            GKUtilLib.setStatus("Saving ...");
+            SQLiteConnection conn = GKUtilLib.getDBConnection();
             string sex = "";
             string location = "";
             using (SQLiteTransaction trans = conn.BeginTransaction()) {
@@ -111,24 +111,24 @@ namespace GenetixKit
                 trans.Commit();
             }
 
-            GGKUtilLib.setStatus("Saved.");
+            GKUtilLib.setStatus("Saved.");
         }
 
         public void Delete()
         {
             if (MessageBox.Show("You had selected " + dgvEditKit.SelectedRows.Count.ToString() + " kits to be deleted. Are you sure?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-                GGKUtilLib.setStatus("Deleting " + dgvEditKit.SelectedRows.Count.ToString() + " kit(s) and all it's associated data ...");
+                GKUtilLib.setStatus("Deleting " + dgvEditKit.SelectedRows.Count.ToString() + " kit(s) and all it's associated data ...");
                 this.Enabled = false;
-                GGKUtilLib.disableMenu();
-                GGKUtilLib.disableToolbar();
+                GKUtilLib.disableMenu();
+                GKUtilLib.disableToolbar();
                 bwDelete.RunWorkerAsync(dgvEditKit);
             }
         }
 
         public void Enable()
         {
-            GGKUtilLib.setStatus("Enabling ...");
-            SQLiteConnection conn = GGKUtilLib.getDBConnection();
+            GKUtilLib.setStatus("Enabling ...");
+            SQLiteConnection conn = GKUtilLib.getDBConnection();
             using (SQLiteTransaction trans = conn.BeginTransaction()) {
                 foreach (DataGridViewRow row in dgvEditKit.SelectedRows) {
                     SQLiteCommand upCmd = new SQLiteCommand("UPDATE kit_master set disabled=@disabled WHERE kit_no=@kit_no", conn);
@@ -142,13 +142,13 @@ namespace GenetixKit
                 trans.Commit();
             }
 
-            GGKUtilLib.setStatus("Enabled.");
+            GKUtilLib.setStatus("Enabled.");
         }
 
         public void Disable()
         {
-            GGKUtilLib.setStatus("Disabling ...");
-            SQLiteConnection conn = GGKUtilLib.getDBConnection();
+            GKUtilLib.setStatus("Disabling ...");
+            SQLiteConnection conn = GKUtilLib.getDBConnection();
             using (SQLiteTransaction trans = conn.BeginTransaction()) {
                 foreach (DataGridViewRow row in dgvEditKit.SelectedRows) {
                     SQLiteCommand upCmd = new SQLiteCommand("UPDATE kit_master set disabled=@disabled WHERE kit_no=@kit_no", conn);
@@ -162,7 +162,7 @@ namespace GenetixKit
                 trans.Commit();
             }
 
-            GGKUtilLib.setStatus("Disabled.");
+            GKUtilLib.setStatus("Disabled.");
         }
 
         private void dgvEditKit_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -189,7 +189,7 @@ namespace GenetixKit
         private void bwDelete_DoWork(object sender, DoWorkEventArgs e)
         {
             DataGridView dgv = (DataGridView)e.Argument;
-            SQLiteConnection conn = GGKUtilLib.getDBConnection();
+            SQLiteConnection conn = GKUtilLib.getDBConnection();
             List<DataGridViewRow> rows = new List<DataGridViewRow>();
             using (SQLiteTransaction trans = conn.BeginTransaction()) {
 
@@ -213,11 +213,11 @@ namespace GenetixKit
         private void bwDelete_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
 
-            GGKUtilLib.setStatus("Deleted.");
+            GKUtilLib.setStatus("Deleted.");
 
             this.Enabled = true;
-            GGKUtilLib.enableMenu();
-            GGKUtilLib.enableToolbar();
+            GKUtilLib.enableMenu();
+            GKUtilLib.enableToolbar();
         }
     }
 }

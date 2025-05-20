@@ -6,14 +6,12 @@ using System.Windows.Forms;
 
 namespace GenetixKit
 {
-    public partial class GGKitFrmMain : Form
+    public partial class GKMainFrm : Form
     {
-        AboutGGKFrm aboutFrm = null;
-        LicenseFrm licFrm = null;
         NewEditKitFrm newKitFrm = null;
         SettingsFrm settingsFrm = null;
 
-        public GGKitFrmMain()
+        public GKMainFrm()
         {
             InitializeComponent();
         }
@@ -26,30 +24,6 @@ namespace GenetixKit
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
-        }
-
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            hideAllChildren("AboutGGKFrm");
-            if (aboutFrm == null)
-                aboutFrm = new AboutGGKFrm();
-            if (aboutFrm.IsDisposed)
-                aboutFrm = new AboutGGKFrm();
-            aboutFrm.MdiParent = this;
-            aboutFrm.Visible = true;
-            aboutFrm.WindowState = FormWindowState.Maximized;
-        }
-
-        private void licenseToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            hideAllChildren("LicenseFrm");
-            if (licFrm == null)
-                licFrm = new LicenseFrm();
-            if (licFrm.IsDisposed)
-                licFrm = new LicenseFrm();
-            licFrm.MdiParent = this;
-            licFrm.Visible = true;
-            licFrm.WindowState = FormWindowState.Maximized;
         }
 
         public void hideAllChildren(string exceptFrm)
@@ -106,12 +80,12 @@ namespace GenetixKit
 
         private void saveToolStripButton_Click(object sender, EventArgs e)
         {
-            GGKUtilLib.SaveInfoFromActiveMdiChild();
+            GKUtilLib.SaveInfoFromActiveMdiChild();
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GGKUtilLib.SaveInfoFromActiveMdiChild();
+            GKUtilLib.SaveInfoFromActiveMdiChild();
         }
 
         public void enableToolbar()
@@ -171,17 +145,17 @@ namespace GenetixKit
 
         private void toolStripDisableBtn_Click(object sender, EventArgs e)
         {
-            GGKUtilLib.disableKit();
+            GKUtilLib.disableKit();
         }
 
         private void toolStripEnableIcon_Click(object sender, EventArgs e)
         {
-            GGKUtilLib.enableKit();
+            GKUtilLib.enableKit();
         }
 
         private void toolStripDeleteBtn_Click(object sender, EventArgs e)
         {
-            GGKUtilLib.deleteKit();
+            GKUtilLib.deleteKit();
         }
 
         private void GGKitFrmMain_Load(object sender, EventArgs e)
@@ -201,17 +175,17 @@ namespace GenetixKit
 
         private void enableToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GGKUtilLib.enableKit();
+            GKUtilLib.enableKit();
         }
 
         private void disableToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GGKUtilLib.disableKit();
+            GKUtilLib.disableKit();
         }
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GGKUtilLib.deleteKit();
+            GKUtilLib.deleteKit();
         }
 
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
@@ -231,7 +205,7 @@ namespace GenetixKit
 
         private void bwImport_DoWork(object sender, DoWorkEventArgs e)
         {
-            GGKUtilLib.importKit(e.Argument.ToString());
+            GKUtilLib.importKit(e.Argument.ToString());
         }
 
         private void bwImport_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -256,14 +230,14 @@ namespace GenetixKit
         private void factoryResetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Are you sure to delete everything and reset to factory defaults?", "Factory Reset", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes) {
-                GGKUtilLib.FactoryReset();
+                GKUtilLib.FactoryReset();
             }
         }
 
         private void bwIChkAndFix_DoWork(object sender, DoWorkEventArgs e)
         {
-            GGKUtilLib.integrityCheckAndFix();
-            DataTable dt = GGKUtilLib.QueryDB("select * from kit_master where reference=1");
+            GKUtilLib.integrityCheckAndFix();
+            DataTable dt = GKUtilLib.QueryDB("select * from kit_master where reference=1");
             if (dt.Rows.Count == 0) {
                 this.Invoke(new MethodInvoker(delegate {
                     admixtureToolStripMenuItem.Enabled = false;

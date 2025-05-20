@@ -22,7 +22,7 @@ namespace GenetixKit
 
         bool save_success = false;
 
-        Dictionary<string, string[]> ymap = GGKUtilLib.getYMap();
+        Dictionary<string, string[]> ymap = GKUtilLib.getYMap();
         string ysnps = null;
         string mtdna = null;
         bool kit_disabled = false;
@@ -34,7 +34,7 @@ namespace GenetixKit
             if (kit == null) {
                 this.Text = "New Kit";
                 txtKit.Enabled = true;
-                GGKUtilLib.enableSave();
+                GKUtilLib.enableSave();
             } else {
                 kit_disabled = disabled;
                 this.Text = "Edit Kit";
@@ -49,7 +49,7 @@ namespace GenetixKit
             // autosomal file dropped.
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
                 string[] filePaths = (string[])(e.Data.GetData(DataFormats.FileDrop));
-                GGKUtilLib.setStatus("Parsing autosomal file(s) ...");
+                GKUtilLib.setStatus("Parsing autosomal file(s) ...");
                 if (bwNewKitAutosomalJob.IsBusy)
                     bwNewKitAutosomalJob.CancelAsync();
                 bwNewKitAutosomalJob.RunWorkerAsync(filePaths);
@@ -78,7 +78,7 @@ namespace GenetixKit
                 string[] filePaths = (string[])e.Argument;
 
                 foreach (string file_path in filePaths) {
-                    Object[] dnaout = GGKUtilLib.getAutosomalDNAList(file_path);
+                    Object[] dnaout = GKUtilLib.getAutosomalDNAList(file_path);
                     ArrayList rows = (ArrayList)dnaout[0];
                     List<string> ysnps_arr = (List<string>)dnaout[1];
                     ArrayList mtdna_arr = (ArrayList)dnaout[2];
@@ -148,14 +148,14 @@ namespace GenetixKit
             if (mtdna != null)
                 textBoxMtDNA.Text = mtdna;
 
-            GGKUtilLib.setProgress(-1);
-            GGKUtilLib.setStatus("Done.");
+            GKUtilLib.setProgress(-1);
+            GKUtilLib.setStatus("Done.");
         }
 
         private void bwNewKitAutosomalJob_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            GGKUtilLib.setProgress(e.ProgressPercentage);
-            GGKUtilLib.setStatus(e.UserState.ToString());
+            GKUtilLib.setProgress(e.ProgressPercentage);
+            GKUtilLib.setStatus(e.UserState.ToString());
         }
 
         private void NewKitFrm_Load(object sender, EventArgs e)
@@ -193,7 +193,7 @@ namespace GenetixKit
             // file dropped.
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) {
                 string[] filePaths = (string[])(e.Data.GetData(DataFormats.FileDrop));
-                GGKUtilLib.setStatus("Parsing Y-DNA file(s) ...");
+                GKUtilLib.setStatus("Parsing Y-DNA file(s) ...");
                 bwNewKitYDNAJob.RunWorkerAsync(filePaths[0]);
             }
         }
@@ -217,7 +217,7 @@ namespace GenetixKit
                         }
                     } else if (data[0] == "Novel Variant") {
                         if (ymap.ContainsKey(data[1])) {
-                            snp = GGKUtilLib.getYSNP(data[1], data[6]);
+                            snp = GKUtilLib.getYSNP(data[1], data[6]);
                             if (snp[0].IndexOf(";") == -1)
                                 sb.Append(snp[0] + snp[1] + ", ");
                             else
@@ -240,7 +240,7 @@ namespace GenetixKit
         private void bwNewKitYDNAJob_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             textBoxYDNA.Text = ysnps;
-            GGKUtilLib.setStatus("Done.");
+            GKUtilLib.setStatus("Done.");
         }
 
         private void textBoxMtDNA_DragEnter(object sender, DragEventArgs e)
@@ -260,7 +260,7 @@ namespace GenetixKit
                 //
                 try {
                     tbFASTA.Text = File.ReadAllText(fasta_file);
-                    textBoxMtDNA.Text = GGKUtilLib.getMtDNAMarkers(fasta_file);
+                    textBoxMtDNA.Text = GKUtilLib.getMtDNAMarkers(fasta_file);
                 } catch (Exception) {
                     MessageBox.Show("Unable to extract mtDNA mutations from " + fasta_file);
                 }
@@ -350,11 +350,11 @@ namespace GenetixKit
                 bwNewKitYDNAJob.CancelAsync();
             if (bwPopuate.IsBusy)
                 bwPopuate.CancelAsync();
-            GGKUtilLib.disableSave();
-            GGKUtilLib.disable_DisableKitToolbarBtn();
-            GGKUtilLib.disable_EnableKitToolbarBtn();
-            GGKUtilLib.disableDeleteKitToolbarBtn();
-            GGKUtilLib.setStatus("Done.");
+            GKUtilLib.disableSave();
+            GKUtilLib.disable_DisableKitToolbarBtn();
+            GKUtilLib.disable_EnableKitToolbarBtn();
+            GKUtilLib.disableDeleteKitToolbarBtn();
+            GKUtilLib.setStatus("Done.");
         }
 
         public void Save()
@@ -377,11 +377,11 @@ namespace GenetixKit
                 return;
 
             Object[] args = new Object[] { txtKit.Text, txtName.Text, dataGridViewAutosomal.Rows, textBoxYDNA.Text, textBoxMtDNA.Text, new DataGridViewRowCollection[] { dgvy12.Rows, dgvy25.Rows, dgvy37.Rows, dgvy67.Rows, dgvy111.Rows, dgvymisc.Rows }, cbSex.Text, tbFASTA.Text };
-            GGKUtilLib.disableSave();
-            GGKUtilLib.setStatus("Saving ...");
+            GKUtilLib.disableSave();
+            GKUtilLib.setStatus("Saving ...");
             this.Enabled = false;
-            GGKUtilLib.disableMenu();
-            GGKUtilLib.disableToolbar();
+            GKUtilLib.disableMenu();
+            GKUtilLib.disableToolbar();
             bwSave.RunWorkerAsync(args);
         }
 
@@ -398,12 +398,12 @@ namespace GenetixKit
             string sex = args[6].ToString();
             string fasta = args[7].ToString();
 
-            SQLiteConnection cnn = GGKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKUtilLib.getDBConnection();
 
             try {
                 SQLiteCommand upCmd = null;
                 //kit master
-                string kit_name = GGKUtilLib.getKitName(kit_no);
+                string kit_name = GKUtilLib.getKitName(kit_no);
                 if (kit_name == "Unknown") {
                     // new kit
                     upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_master(kit_no, name, sex)values(@kit_no,@name,@sex)", cnn);
@@ -520,17 +520,17 @@ namespace GenetixKit
 
         private void bwSave_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            GGKUtilLib.setProgress(e.ProgressPercentage);
+            GKUtilLib.setProgress(e.ProgressPercentage);
             if (e.UserState != null)
-                GGKUtilLib.setStatus(e.UserState.ToString());
+                GKUtilLib.setStatus(e.UserState.ToString());
         }
 
         private void bwSave_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            GGKUtilLib.setProgress(-1);
+            GKUtilLib.setProgress(-1);
             this.Enabled = true;
-            GGKUtilLib.enableMenu();
-            GGKUtilLib.enableToolbar();
+            GKUtilLib.enableMenu();
+            GKUtilLib.enableToolbar();
             if (save_success)
                 this.Close();
         }
@@ -555,14 +555,14 @@ namespace GenetixKit
             foreach (Control ctrl in editableCtrls)
                 ctrl.Enabled = false;
 
-            GGKUtilLib.setStatus("Please wait ...");
+            GKUtilLib.setStatus("Please wait ...");
             bwPopuate.RunWorkerAsync(kit);
         }
 
         private void bwPopuate_DoWork(object sender, DoWorkEventArgs e)
         {
             string kit = (string)e.Argument;
-            SQLiteConnection cnn = GGKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKUtilLib.getDBConnection();
             //kit master
             SQLiteCommand query = new SQLiteCommand(@"SELECT name, sex from kit_master where kit_no=@kit_no", cnn);
             query.Parameters.AddWithValue("@kit_no", kit);
@@ -703,16 +703,16 @@ namespace GenetixKit
                 ctrl.Enabled = true;
             //
             doControlActivities(kit_disabled);
-            GGKUtilLib.setStatus("Done.");
+            GKUtilLib.setStatus("Done.");
         }
 
         private void doControlActivities(bool disabled)
         {
             if (disabled) {
-                GGKUtilLib.enable_EnableKitToolbarBtn();
-                GGKUtilLib.disable_DisableKitToolbarBtn();
-                GGKUtilLib.enableDeleteKitToolbarBtn();
-                GGKUtilLib.disableSave();
+                GKUtilLib.enable_EnableKitToolbarBtn();
+                GKUtilLib.disable_DisableKitToolbarBtn();
+                GKUtilLib.enableDeleteKitToolbarBtn();
+                GKUtilLib.disableSave();
 
                 txtName.ReadOnly = true;
                 dataGridViewAutosomal.ReadOnly = true;
@@ -725,10 +725,10 @@ namespace GenetixKit
                 dgvymisc.ReadOnly = true;
                 textBoxMtDNA.ReadOnly = true;
             } else {
-                GGKUtilLib.disable_EnableKitToolbarBtn();
-                GGKUtilLib.enable_DisableKitToolbarBtn();
-                GGKUtilLib.enableDeleteKitToolbarBtn();
-                GGKUtilLib.enableSave();
+                GKUtilLib.disable_EnableKitToolbarBtn();
+                GKUtilLib.enable_DisableKitToolbarBtn();
+                GKUtilLib.enableDeleteKitToolbarBtn();
+                GKUtilLib.enableSave();
 
                 txtName.ReadOnly = false;
                 dataGridViewAutosomal.ReadOnly = false;
@@ -746,7 +746,7 @@ namespace GenetixKit
         public void Disable()
         {
             string kit_no = txtKit.Text;
-            SQLiteConnection cnn = GGKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKUtilLib.getDBConnection();
             using (SQLiteTransaction dbTrans = cnn.BeginTransaction()) {
                 try {
                     SQLiteCommand upCmd = new SQLiteCommand(@"UPDATE kit_master set disabled=1 where kit_no=@kit_no", cnn);
@@ -757,7 +757,7 @@ namespace GenetixKit
                 } catch (Exception err) {
                     dbTrans.Rollback();
                     MessageBox.Show("Unable to disable kit " + kit_no + "\r\nTechnical Error: " + err.Message);
-                    GGKUtilLib.setStatus("Unable to disable kit " + kit_no);
+                    GKUtilLib.setStatus("Unable to disable kit " + kit_no);
                 }
             }
 
@@ -766,7 +766,7 @@ namespace GenetixKit
         public void Enable()
         {
             string kit_no = txtKit.Text;
-            SQLiteConnection cnn = GGKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKUtilLib.getDBConnection();
             using (SQLiteTransaction dbTrans = cnn.BeginTransaction()) {
                 try {
                     SQLiteCommand upCmd = new SQLiteCommand(@"UPDATE kit_master set disabled=0 where kit_no=@kit_no", cnn);
@@ -777,7 +777,7 @@ namespace GenetixKit
                 } catch (Exception err) {
                     dbTrans.Rollback();
                     MessageBox.Show("Unable to enable kit " + kit_no + "\r\nTechnical Error: " + err.Message);
-                    GGKUtilLib.setStatus("Unable to enable kit " + kit_no);
+                    GKUtilLib.setStatus("Unable to enable kit " + kit_no);
                 }
             }
 
@@ -787,9 +787,9 @@ namespace GenetixKit
         {
             string kit_no = txtKit.Text;
             if (MessageBox.Show("Are you sure to delete kit " + kit_no + "?", "Delete?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-                GGKUtilLib.setStatus("Deleting " + kit_no + "...");
+                GKUtilLib.setStatus("Deleting " + kit_no + "...");
                 doControlActivities(true);
-                GGKUtilLib.disableToolbar();
+                GKUtilLib.disableToolbar();
                 bwDelete.RunWorkerAsync(kit_no);
             }
         }
@@ -797,13 +797,13 @@ namespace GenetixKit
         private void dataGridViewAutosomal_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
             MessageBox.Show("Data Error. Technical Details: " + e.Exception.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            GGKUtilLib.setStatus("Data Error. Technical Details: " + e.Exception.Message);
+            GKUtilLib.setStatus("Data Error. Technical Details: " + e.Exception.Message);
         }
 
         private void dgvy_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
             MessageBox.Show("Data Error. Technical Details: " + e.Exception.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            GGKUtilLib.setStatus("Data Error. Technical Details: " + e.Exception.Message);
+            GKUtilLib.setStatus("Data Error. Technical Details: " + e.Exception.Message);
         }
 
         private void dgvymisc_MouseDown(object sender, MouseEventArgs e)
@@ -871,7 +871,7 @@ namespace GenetixKit
         {
 
             string kit_no = (string)e.Argument;
-            SQLiteConnection cnn = GGKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKUtilLib.getDBConnection();
             try {
                 SQLiteCommand upCmd = new SQLiteCommand(@"DELETE from kit_master where kit_no=@kit_no", cnn);
                 upCmd.Parameters.AddWithValue("@kit_no", kit_no);
@@ -880,7 +880,7 @@ namespace GenetixKit
             } catch (Exception err) {
                 this.Invoke(new MethodInvoker(delegate {
                     MessageBox.Show("Unable to delete kit " + kit_no + "\r\nTechnical Error: " + err.Message);
-                    GGKUtilLib.setStatus("Unable to delete kit " + kit_no);
+                    GKUtilLib.setStatus("Unable to delete kit " + kit_no);
                 }));
             }
 
@@ -888,8 +888,8 @@ namespace GenetixKit
 
         private void bwDelete_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            GGKUtilLib.enableToolbar();
-            GGKUtilLib.setStatus("Done.");
+            GKUtilLib.enableToolbar();
+            GKUtilLib.setStatus("Done.");
         }
 
         private void tbFASTA_DragEnter(object sender, DragEventArgs e)
@@ -909,7 +909,7 @@ namespace GenetixKit
                 //
                 try {
                     tbFASTA.Text = File.ReadAllText(fasta_file);
-                    textBoxMtDNA.Text = GGKUtilLib.getMtDNAMarkers(fasta_file);
+                    textBoxMtDNA.Text = GKUtilLib.getMtDNAMarkers(fasta_file);
                 } catch (Exception) {
                     MessageBox.Show("Unable to extract mtDNA mutations from " + fasta_file);
                 }

@@ -30,27 +30,27 @@ namespace GenetixKit
             //
             this.kit1 = kit1;
             this.kit2 = kit2;
-            this.name1 = GGKUtilLib.getKitName(kit1);
-            this.name2 = GGKUtilLib.getKitName(kit2);
+            this.name1 = GKUtilLib.getKitName(kit1);
+            this.name2 = GKUtilLib.getKitName(kit2);
             dgvMatching.Columns[3].HeaderText = name1;
             dgvMatching.Columns[4].HeaderText = name2;
-            GGKUtilLib.setStatus("Comparing kits " + kit1 + " and " + kit2 + " ...");
+            GKUtilLib.setStatus("Comparing kits " + kit1 + " and " + kit2 + " ...");
             bwCompare.RunWorkerAsync();
         }
 
         private void bwCompare_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (GGKUtilLib.isPhased(kit1)) {
+            if (GKUtilLib.isPhased(kit1)) {
                 phased_kit = kit1;
                 unphased_kit = kit2;
                 phased = true;
-            } else if (GGKUtilLib.isPhased(kit2)) {
+            } else if (GKUtilLib.isPhased(kit2)) {
                 phased_kit = kit2;
                 unphased_kit = kit1;
                 phased = true;
             } else
                 phased = false;
-            object[] cmp_results = GGKUtilLib.compareOneToOne(kit1, kit2);
+            object[] cmp_results = GKUtilLib.compareOneToOne(kit1, kit2);
             segment_idx = (DataTable)cmp_results[0];
             segments = (List<DataTable>)cmp_results[1];
         }
@@ -134,7 +134,7 @@ namespace GenetixKit
                     }
                 }
             }
-            GGKUtilLib.setStatus("Done.");
+            GKUtilLib.setStatus("Done.");
         }
 
         private void dgvSegmentIdx_SelectionChanged(object sender, EventArgs e)
@@ -187,7 +187,7 @@ namespace GenetixKit
 
         private void OneToOneCmpFrm_Load(object sender, EventArgs e)
         {
-            GGKUtilLib.enableSave();
+            GKUtilLib.enableSave();
         }
 
         public void Save()
@@ -208,13 +208,13 @@ namespace GenetixKit
                     }
                 File.WriteAllText(saveFileDlg.FileName, sb.ToString());
                 sb.Length = 0;
-                GGKUtilLib.setStatus("CA Profile saved.");
+                GKUtilLib.setStatus("CA Profile saved.");
             }
         }
 
         private void OneToOneCmpFrm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            GGKUtilLib.disableSave();
+            GKUtilLib.disableSave();
         }
 
         private void dgvSegmentIdx_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -223,7 +223,7 @@ namespace GenetixKit
                 string chr = dgvSegmentIdx.SelectedRows[0].Cells[0].Value.ToString();
                 string start_pos = dgvSegmentIdx.SelectedRows[0].Cells[1].Value.ToString();
                 string end_pos = dgvSegmentIdx.SelectedRows[0].Cells[2].Value.ToString();
-                PhasedSegmentVisualizerFrm frm = new PhasedSegmentVisualizerFrm(kit1, kit2, chr, start_pos, end_pos);
+                PhasedSegmentFrm frm = new PhasedSegmentFrm(kit1, kit2, chr, start_pos, end_pos);
                 frm.ShowDialog(Program.GGKitFrmMainInst);
                 frm.Dispose();
             }

@@ -16,7 +16,7 @@ using System.Windows.Forms;
 
 namespace GenetixKit
 {
-    class GGKUtilLib
+    class GKUtilLib
     {
 
         public const int AUTOSOMAL_FTDNA = 0;
@@ -76,7 +76,7 @@ namespace GenetixKit
         {
             if (File.Exists(SQLITE_DB))
                 File.Move(SQLITE_DB, SQLITE_DB + "-" + DateTime.Now.Ticks.ToString("X"));
-            SQLiteConnection connection = new SQLiteConnection(@"Data Source=" + GGKUtilLib.SQLITE_DB + @";Version=3; Compress=True; New=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;");
+            SQLiteConnection connection = new SQLiteConnection(@"Data Source=" + GKUtilLib.SQLITE_DB + @";Version=3; Compress=True; New=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;");
             connection.Open();
             Dictionary<string, string> pragma = new Dictionary<string, string>();
 
@@ -101,8 +101,8 @@ namespace GenetixKit
 
         public static SQLiteConnection getDBConnection()
         {
-            if (File.Exists(GGKUtilLib.SQLITE_DB)) {
-                SQLiteConnection connection = new SQLiteConnection(@"Data Source=" + GGKUtilLib.SQLITE_DB + @";Version=3; Compress=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;");
+            if (File.Exists(GKUtilLib.SQLITE_DB)) {
+                SQLiteConnection connection = new SQLiteConnection(@"Data Source=" + GKUtilLib.SQLITE_DB + @";Version=3; Compress=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;");
                 connection.Open();
                 Dictionary<string, string> pragma = new Dictionary<string, string>();
 
@@ -149,18 +149,18 @@ namespace GenetixKit
             }
             conn.Close();
             if (list.Contains("ggk_settings")) {
-                GGKSettings.loadSettings();
-                SortedDictionary<string, string[]> db_settings = GGKSettings.getSettings();
-                SortedDictionary<string, string[]> upgrade_settings = GGKSettings.getDefaultResetSettings();
+                GKSettings.loadSettings();
+                SortedDictionary<string, string[]> db_settings = GKSettings.getSettings();
+                SortedDictionary<string, string[]> upgrade_settings = GKSettings.getDefaultResetSettings();
                 foreach (string key in upgrade_settings.Keys) {
                     if (!db_settings.ContainsKey(key)) {
                         // insert into db...
-                        GGKSettings._addParameter(key, upgrade_settings[key][0], upgrade_settings[key][1], upgrade_settings[key][2]);
+                        GKSettings._addParameter(key, upgrade_settings[key][0], upgrade_settings[key][1], upgrade_settings[key][2]);
                     }
                 }
             }
 
-            GGKSettings.loadSettings(true);
+            GKSettings.loadSettings(true);
         }
 
 
@@ -242,7 +242,7 @@ namespace GenetixKit
 
         private static void insertDefaultSettings(SQLiteConnection cnn)
         {
-            SortedDictionary<string, string[]> settings = GGKSettings.getDefaultResetSettings();
+            SortedDictionary<string, string[]> settings = GKSettings.getDefaultResetSettings();
             SQLiteCommand upCmd = null;
             using (var transaction = cnn.BeginTransaction()) {
                 foreach (string key in settings.Keys) {
@@ -551,7 +551,7 @@ namespace GenetixKit
         {
             if (ymap == null) {
                 ymap = new Dictionary<string, string[]>();
-                string csv = Encoding.UTF8.GetString(GGKUtilLib.GUnzip(GenetixKit.Properties.Resources.ysnp_hg19));
+                string csv = Encoding.UTF8.GetString(GKUtilLib.GUnzip(GenetixKit.Properties.Resources.ysnp_hg19));
                 StringReader reader = new StringReader(csv);
                 string l = null;
                 string[] d = null;
@@ -735,7 +735,7 @@ namespace GenetixKit
                     //
                     if (chr == "Y") {
                         if (ymap.ContainsKey(pos)) {
-                            snp = GGKUtilLib.getYSNP(pos, genotype);
+                            snp = GKUtilLib.getYSNP(pos, genotype);
                             if (snp[0].IndexOf(";") == -1)
                                 ysnp.Add(snp[0] + snp[1]);
                             else
@@ -1094,7 +1094,7 @@ namespace GenetixKit
             string name = null;
 
             name = getKitName(kit);
-            SQLiteConnection cnn = GGKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKUtilLib.getDBConnection();
             // kit autosomal - RSID,Chromosome,Position,Genotypoe
             SQLiteCommand query = new SQLiteCommand(@"SELECT kit_no,rsid,chromosome,position,genotype from kit_autosomal where kit_no=@kit_no order by chromosome,position", cnn);
             query.Parameters.AddWithValue("@kit_no", kit);
@@ -1271,7 +1271,7 @@ namespace GenetixKit
                 setProgress(20);
             }));
 
-            SQLiteConnection cnn = GGKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKUtilLib.getDBConnection();
 
             try {
                 //remove existing - on delete cascade...
@@ -1434,7 +1434,7 @@ namespace GenetixKit
                 int prev_snp_count = 0;
                 int errorRadius = 250;
                 int no_call_counter = 0;
-                int no_call_limit = int.Parse(GGKSettings.getParameterValue("Compare.NoCalls.Limit"));
+                int no_call_limit = int.Parse(GKSettings.getParameterValue("Compare.NoCalls.Limit"));
                 while (reader.Read()) {
                     if (bwCompare != null)
                         if (bwCompare.CancellationPending)
@@ -1454,9 +1454,9 @@ namespace GenetixKit
                     position = reader.GetInt32(2);
                     if (prev_chr == chromosome) {
                         if (chromosome == "X")
-                            errorRadius = int.Parse(GGKSettings.getParameterValue("Compare.X.Threshold.SNPs")) / 2;
+                            errorRadius = int.Parse(GKSettings.getParameterValue("Compare.X.Threshold.SNPs")) / 2;
                         else
-                            errorRadius = int.Parse(GGKSettings.getParameterValue("Compare.Autosomal.Threshold.SNPs")) / 2;
+                            errorRadius = int.Parse(GKSettings.getParameterValue("Compare.Autosomal.Threshold.SNPs")) / 2;
 
                         if (reader.GetInt32(5) == 1) {
                             // match both alleles
@@ -1546,7 +1546,7 @@ namespace GenetixKit
                 cnn.Close();
                 //
                 //save
-                GGKUtilLib.addAutosomalCmp(kit1, kit2, segments_idx, segments, reference);
+                GKUtilLib.addAutosomalCmp(kit1, kit2, segments_idx, segments, reference);
 
             }
             return new object[] { segments_idx, segments };
@@ -1575,8 +1575,8 @@ namespace GenetixKit
             double mb_th = MB_THRESHOLD;
 
             if (reference) {
-                snp_th = int.Parse(GGKSettings.getParameterValue("Admixture.Threshold.SNPs"));
-                cm_th = double.Parse(GGKSettings.getParameterValue("Admixture.Threshold.cM"));
+                snp_th = int.Parse(GKSettings.getParameterValue("Admixture.Threshold.SNPs"));
+                cm_th = double.Parse(GKSettings.getParameterValue("Admixture.Threshold.cM"));
 
                 if ((end_pos - start_pos) > 5000) {
                     cm_len = getLength_in_cM(chromosome, start_pos, end_pos);
@@ -1591,11 +1591,11 @@ namespace GenetixKit
                 }
             } else {
                 if (chromosome == "X") {
-                    cm_th = double.Parse(GGKSettings.getParameterValue("Compare.X.Threshold.cM"));
-                    snp_th = int.Parse(GGKSettings.getParameterValue("Compare.X.Threshold.SNPs"));
+                    cm_th = double.Parse(GKSettings.getParameterValue("Compare.X.Threshold.cM"));
+                    snp_th = int.Parse(GKSettings.getParameterValue("Compare.X.Threshold.SNPs"));
                 } else {
-                    cm_th = double.Parse(GGKSettings.getParameterValue("Compare.Autosomal.Threshold.cM"));
-                    snp_th = int.Parse(GGKSettings.getParameterValue("Compare.Autosomal.Threshold.SNPs"));
+                    cm_th = double.Parse(GKSettings.getParameterValue("Compare.Autosomal.Threshold.cM"));
+                    snp_th = int.Parse(GKSettings.getParameterValue("Compare.Autosomal.Threshold.SNPs"));
                 }
 
                 if ((end_pos - start_pos) / 1000000.0 > mb_th) {
@@ -1621,7 +1621,7 @@ namespace GenetixKit
             if (kit_name.ContainsKey(kit))
                 return kit_name[kit];
             else {
-                DataTable dt = GGKUtilLib.queryDatabase("kit_master", new string[] { "name" }, "where kit_no='" + kit + "'");
+                DataTable dt = GKUtilLib.queryDatabase("kit_master", new string[] { "name" }, "where kit_no='" + kit + "'");
                 if (dt.Rows.Count > 0) {
                     kit_name.Add(kit, dt.Rows[0].ItemArray[0].ToString());
                     return dt.Rows[0].ItemArray[0].ToString();
@@ -1680,7 +1680,7 @@ namespace GenetixKit
                 int prev_snp_count = 0;
                 int errorRadius = 250;
                 int no_call_counter = 0;
-                int no_call_limit = int.Parse(GGKSettings.getParameterValue("Compare.NoCalls.Limit"));
+                int no_call_limit = int.Parse(GKSettings.getParameterValue("Compare.NoCalls.Limit"));
                 while (reader.Read()) {
                     rsid = reader.GetString(0);
                     chromosome = reader.GetString(1);
@@ -1695,9 +1695,9 @@ namespace GenetixKit
 
                     if (prev_chr == chromosome) {
                         if (chromosome == "X")
-                            errorRadius = int.Parse(GGKSettings.getParameterValue("Compare.X.Threshold.SNPs")) / 2;
+                            errorRadius = int.Parse(GKSettings.getParameterValue("Compare.X.Threshold.SNPs")) / 2;
                         else
-                            errorRadius = int.Parse(GGKSettings.getParameterValue("Compare.Autosomal.Threshold.SNPs")) / 2;
+                            errorRadius = int.Parse(GKSettings.getParameterValue("Compare.Autosomal.Threshold.SNPs")) / 2;
 
                         if (genotype[0] == genotype[1] && genotype[0] != '-' && genotype[0] != '?') {
                             // match 
@@ -1765,8 +1765,8 @@ namespace GenetixKit
             double mb_th = MB_THRESHOLD;
 
             if (reference) {
-                snp_th = int.Parse(GGKSettings.getParameterValue("Admixture.Threshold.SNPs"));
-                cm_th = double.Parse(GGKSettings.getParameterValue("Admixture.Threshold.cM"));
+                snp_th = int.Parse(GKSettings.getParameterValue("Admixture.Threshold.SNPs"));
+                cm_th = double.Parse(GKSettings.getParameterValue("Admixture.Threshold.cM"));
 
                 if ((end_pos - start_pos) > 5000) {
                     cm_len = getLength_in_cM(chromosome, start_pos, end_pos);
@@ -1782,11 +1782,11 @@ namespace GenetixKit
             } else {
 
                 if (chromosome == "X") {
-                    cm_th = double.Parse(GGKSettings.getParameterValue("Compare.X.Threshold.cM"));
-                    snp_th = int.Parse(GGKSettings.getParameterValue("Compare.X.Threshold.SNPs"));
+                    cm_th = double.Parse(GKSettings.getParameterValue("Compare.X.Threshold.cM"));
+                    snp_th = int.Parse(GKSettings.getParameterValue("Compare.X.Threshold.SNPs"));
                 } else {
-                    cm_th = double.Parse(GGKSettings.getParameterValue("Compare.Autosomal.Threshold.cM"));
-                    snp_th = int.Parse(GGKSettings.getParameterValue("Compare.Autosomal.Threshold.SNPs"));
+                    cm_th = double.Parse(GKSettings.getParameterValue("Compare.Autosomal.Threshold.cM"));
+                    snp_th = int.Parse(GKSettings.getParameterValue("Compare.Autosomal.Threshold.SNPs"));
                 }
 
                 if ((end_pos - start_pos) / 1000000.0 > mb_th) {
@@ -1890,13 +1890,13 @@ namespace GenetixKit
             int errorRadius = 250;
             int snp_th = -1;
             if (chromosome == "X") {
-                snp_th = int.Parse(GGKSettings.getParameterValue("Compare.X.Threshold.SNPs"));
+                snp_th = int.Parse(GKSettings.getParameterValue("Compare.X.Threshold.SNPs"));
                 errorRadius = snp_th / 2;
             } else {
-                snp_th = int.Parse(GGKSettings.getParameterValue("Compare.Autosomal.Threshold.SNPs"));
+                snp_th = int.Parse(GKSettings.getParameterValue("Compare.Autosomal.Threshold.SNPs"));
                 errorRadius = snp_th / 2;
             }
-            int no_call_limit = int.Parse(GGKSettings.getParameterValue("Compare.NoCalls.Limit"));
+            int no_call_limit = int.Parse(GKSettings.getParameterValue("Compare.NoCalls.Limit"));
 
             int paternal_no_call_count = 0;
             int maternal_no_call_count = 0;

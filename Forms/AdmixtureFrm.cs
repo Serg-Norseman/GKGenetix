@@ -20,8 +20,8 @@ namespace GenetixKit
 
         private void AdmixtureFrm_Load(object sender, EventArgs e)
         {
-            kitLbl.Text = kit + " (" + GGKUtilLib.getKitName(kit) + ")";
-            DataTable dt = GGKUtilLib.QueryDB("select name,at_total,at_longest,x,y FROM (select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit1='" + kit + "' and a.kit2=b.kit_no and a.kit2 like 'HGDP%' and a.status_autosomal=1 and a.at_longest<3 and a.at_total!=0 UNION select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit2='" + kit + "' and a.kit1=b.kit_no and a.kit1 like 'HGDP%' and a.status_autosomal=1 and a.at_longest<3 and a.at_total!=0) ORDER BY at_total DESC");
+            kitLbl.Text = kit + " (" + GKUtilLib.getKitName(kit) + ")";
+            DataTable dt = GKUtilLib.QueryDB("select name,at_total,at_longest,x,y FROM (select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit1='" + kit + "' and a.kit2=b.kit_no and a.kit2 like 'HGDP%' and a.status_autosomal=1 and a.at_longest<3 and a.at_total!=0 UNION select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit2='" + kit + "' and a.kit1=b.kit_no and a.kit1 like 'HGDP%' and a.status_autosomal=1 and a.at_longest<3 and a.at_total!=0) ORDER BY at_total DESC");
             double total = 0.0;
             foreach (DataRow row in dt.Rows) {
                 total += double.Parse(row.ItemArray[1].ToString());
