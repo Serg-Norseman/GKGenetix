@@ -341,10 +341,6 @@ namespace Genetic_Genealogy_Kit
 
         private void rbMale_CheckedChanged(object sender, EventArgs e)
         {
-            if(rbMale.Checked)            
-                pbChild.Image = GenetixKit.Properties.Resources.boy;
-            else
-                pbChild.Image = GenetixKit.Properties.Resources.girl;
         }
     }
 }
