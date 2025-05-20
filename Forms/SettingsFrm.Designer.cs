@@ -1,4 +1,4 @@
-﻿namespace GenetixKit
+﻿namespace GenetixKit.Forms
 {
     partial class SettingsFrm
     {

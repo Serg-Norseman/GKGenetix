@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SQLite;
 
-namespace GenetixKit
+namespace GenetixKit.Core
 {
     class GKSettings
     {

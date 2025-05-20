@@ -5,8 +5,9 @@ using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Windows.Forms;
+using GenetixKit.Core;
 
-namespace GenetixKit
+namespace GenetixKit.Forms
 {
     public partial class PhasingFrm : Form
     {

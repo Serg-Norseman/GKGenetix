@@ -2,11 +2,11 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace GenetixKit
+namespace GenetixKit.Forms
 {
     public partial class LocationSelectFrm : Form
     {
-        Image origial = null;
+        private Image origial = null;
 
         public int X = 0;
         public int Y = 0;
