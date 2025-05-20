@@ -1,4 +1,4 @@
-Genetic-Genealogy-Kit
-=====================
+GenetixKit (Genetic-Genealogy-Kit)
+==================================
 
-GGK is a kit management, analysis and matching tool for Y-DNA, Autosomal DNA, X-DNA and mt-DNA.
+Management, analysis and matching tool for Autosomal, X, Y and Mitochondrial DNA.

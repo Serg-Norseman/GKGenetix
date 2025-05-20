@@ -33,7 +33,7 @@ namespace Genetic_Genealogy_Kit
 
         private void MitoMapFrm_Load(object sender, EventArgs e)
         {
-            string csv = Genetic_Genealogy_Kit.Properties.Resources.mtdna_map;
+            string csv = GenetixKit.Properties.Resources.mtdna_map;
             StreamReader reader = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(csv)));
             string line = null;
             string[] data = null;

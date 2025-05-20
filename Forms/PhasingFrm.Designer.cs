@@ -234,7 +234,7 @@
             // pictureBox1
             // 
             this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Image = global::Genetic_Genealogy_Kit.Properties.Resources.father;
+            this.pictureBox1.Image = global::GenetixKit.Properties.Resources.father;
             this.pictureBox1.Location = new System.Drawing.Point(14, 63);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(62, 87);
@@ -245,7 +245,7 @@
             // pictureBox2
             // 
             this.pictureBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox2.Image = global::Genetic_Genealogy_Kit.Properties.Resources.mother;
+            this.pictureBox2.Image = global::GenetixKit.Properties.Resources.mother;
             this.pictureBox2.Location = new System.Drawing.Point(150, 63);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(62, 87);
@@ -256,7 +256,7 @@
             // pbChild
             // 
             this.pbChild.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pbChild.Image = global::Genetic_Genealogy_Kit.Properties.Resources.boy;
+            this.pbChild.Image = global::GenetixKit.Properties.Resources.boy;
             this.pbChild.Location = new System.Drawing.Point(82, 225);
             this.pbChild.Name = "pbChild";
             this.pbChild.Size = new System.Drawing.Size(62, 87);

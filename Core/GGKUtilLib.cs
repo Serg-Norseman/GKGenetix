@@ -427,7 +427,7 @@ namespace Genetic_Genealogy_Kit
             // required for cM calculation
             if(map==null)
                 map=new Dictionary<int, double>[23];
-            using(MemoryStream ms = new MemoryStream(GUnzip(Genetic_Genealogy_Kit.Properties.Resources.map_csv)))
+            using(MemoryStream ms = new MemoryStream(GUnzip(GenetixKit.Properties.Resources.map_csv)))
             {
                 StreamReader reader =new StreamReader(ms);
                 string line = reader.ReadLine(); //header
@@ -581,7 +581,7 @@ namespace Genetic_Genealogy_Kit
         public static char[] getRSRS()
         {
             if (RSRS==null)
-                RSRS = Encoding.ASCII.GetString(GUnzip(Genetic_Genealogy_Kit.Properties.Resources.RSRS)).ToCharArray();
+                RSRS = Encoding.ASCII.GetString(GUnzip(GenetixKit.Properties.Resources.RSRS)).ToCharArray();
             return RSRS;
         }
 
@@ -590,7 +590,7 @@ namespace Genetic_Genealogy_Kit
             if (ymap == null)
             {
                 ymap = new Dictionary<string, string[]>();
-                string csv = Encoding.UTF8.GetString(GGKUtilLib.GUnzip(Genetic_Genealogy_Kit.Properties.Resources.ysnp_hg19));
+                string csv = Encoding.UTF8.GetString(GGKUtilLib.GUnzip(GenetixKit.Properties.Resources.ysnp_hg19));
                 StringReader reader = new StringReader(csv);
                 string l = null;
                 string[] d = null;
@@ -880,7 +880,7 @@ namespace Genetic_Genealogy_Kit
             File.WriteAllText(diff_work_dir + "rsrs.txt", rsrs);
             File.WriteAllText(diff_work_dir + "user.txt", user);
 
-            File.WriteAllBytes(diff_work_dir + "diff.exe", Genetic_Genealogy_Kit.Properties.Resources.diff);
+            File.WriteAllBytes(diff_work_dir + "diff.exe", GenetixKit.Properties.Resources.diff);
             Process p = execute(diff_work_dir + "rsrs.txt", diff_work_dir + "user.txt", diff_work_dir);
             StringBuilder sb = new StringBuilder();
             string line = null;

@@ -118,7 +118,7 @@
             // btnRefresh
             // 
             this.btnRefresh.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.btnRefresh.Image = global::Genetic_Genealogy_Kit.Properties.Resources.refresh;
+            this.btnRefresh.Image = global::GenetixKit.Properties.Resources.refresh;
             this.btnRefresh.Location = new System.Drawing.Point(347, 3);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(29, 28);

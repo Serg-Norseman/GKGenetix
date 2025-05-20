@@ -459,7 +459,7 @@
             // 
             this.toolStripEnableIcon.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripEnableIcon.Enabled = false;
-            this.toolStripEnableIcon.Image = global::Genetic_Genealogy_Kit.Properties.Resources.enable;
+            this.toolStripEnableIcon.Image = global::GenetixKit.Properties.Resources.enable;
             this.toolStripEnableIcon.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripEnableIcon.Name = "toolStripEnableIcon";
             this.toolStripEnableIcon.Size = new System.Drawing.Size(23, 22);
@@ -470,7 +470,7 @@
             // 
             this.toolStripDisableBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripDisableBtn.Enabled = false;
-            this.toolStripDisableBtn.Image = global::Genetic_Genealogy_Kit.Properties.Resources.disable;
+            this.toolStripDisableBtn.Image = global::GenetixKit.Properties.Resources.disable;
             this.toolStripDisableBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDisableBtn.Name = "toolStripDisableBtn";
             this.toolStripDisableBtn.Size = new System.Drawing.Size(23, 22);
@@ -481,7 +481,7 @@
             // 
             this.toolStripDeleteBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.toolStripDeleteBtn.Enabled = false;
-            this.toolStripDeleteBtn.Image = global::Genetic_Genealogy_Kit.Properties.Resources.delete;
+            this.toolStripDeleteBtn.Image = global::GenetixKit.Properties.Resources.delete;
             this.toolStripDeleteBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDeleteBtn.Name = "toolStripDeleteBtn";
             this.toolStripDeleteBtn.Size = new System.Drawing.Size(23, 22);

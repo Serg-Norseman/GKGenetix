@@ -98,7 +98,7 @@
             // pbWorldMap
             // 
             this.pbWorldMap.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pbWorldMap.Image = global::Genetic_Genealogy_Kit.Properties.Resources.world_map;
+            this.pbWorldMap.Image = global::GenetixKit.Properties.Resources.world_map;
             this.pbWorldMap.Location = new System.Drawing.Point(3, 3);
             this.pbWorldMap.Name = "pbWorldMap";
             this.pbWorldMap.Size = new System.Drawing.Size(764, 464);
