@@ -5,9 +5,7 @@ using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace GenetixKit
@@ -18,7 +16,7 @@ namespace GenetixKit
         string kit2 = null;
 
         DataTable segment_idx = new DataTable();
-        List<DataTable> segments = new List<DataTable>();        
+        List<DataTable> segments = new List<DataTable>();
 
         bool redo_again = false;
         bool no_admixture = false;
@@ -37,20 +35,18 @@ namespace GenetixKit
 
             DataTable dt = null;
 
-            if(no_admixture)
+            if (no_admixture)
                 dt = GGKUtilLib.queryDatabase("kit_master", new string[] { "kit_no", "reference", "name" }, "where disabled=0 and reference=0");
             else
-                dt = GGKUtilLib.queryDatabase("kit_master", new string[] { "kit_no", "reference" ,"name"}, "where disabled=0");
+                dt = GGKUtilLib.queryDatabase("kit_master", new string[] { "kit_no", "reference", "name" }, "where disabled=0");
 
             int progress = 0;
             int total = 0;
             string ref1 = "0";
             string ref2 = "0";
 
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                for (int j = i; j < dt.Rows.Count; j++)
-                {
+            for (int i = 0; i < dt.Rows.Count; i++) {
+                for (int j = i; j < dt.Rows.Count; j++) {
                     if (bwCompare.CancellationPending)
                         break;
                     kit1 = dt.Rows[i].ItemArray[0].ToString();
@@ -73,10 +69,8 @@ namespace GenetixKit
             string name1 = "";
             string name2 = "";
             bool reference = false;
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                for (int j = i; j < dt.Rows.Count; j++)
-                {
+            for (int i = 0; i < dt.Rows.Count; i++) {
+                for (int j = i; j < dt.Rows.Count; j++) {
                     if (bwCompare.CancellationPending)
                         break;
                     kit1 = dt.Rows[i].ItemArray[0].ToString();
@@ -89,7 +83,7 @@ namespace GenetixKit
                     if (ref1 == "1" && ref2 == "1")
                         continue;
 
-                    if(ref1=="1"||ref2=="1")
+                    if (ref1 == "1" || ref2 == "1")
                         reference = true;
                     else
                         reference = false;
@@ -97,26 +91,22 @@ namespace GenetixKit
                     name1 = dt.Rows[i].ItemArray[2].ToString();
                     name2 = dt.Rows[j].ItemArray[2].ToString();
                     idx++;
-                   
-                    this.Invoke(new MethodInvoker(delegate
-                    {
-                        
-                        if (reference)
-                        {
+
+                    this.Invoke(new MethodInvoker(delegate {
+
+                        if (reference) {
                             lblComparing.Text = "Comparing Reference " + kit1 + " (" + name1 + ") and " + kit2 + " (" + name2 + ") ... " + progress.ToString() + "%";
                             tbStatus.Text += ("Comparing Reference " + kit1 + " (" + name1 + ") and " + kit2 + " (" + name2 + "): ");
-                        }
-                        else
-                        {
+                        } else {
                             lblComparing.Text = "Comparing Kits " + kit1 + " (" + name1 + ") and " + kit2 + " (" + name2 + ") ... " + progress.ToString() + "%";
                             tbStatus.Text += ("Comparing Kits " + kit1 + " (" + name1 + ") and " + kit2 + " (" + name2 + "): ");
                         }
                         tbStatus.Select(tbStatus.Text.Length - 1, 0);
-                        tbStatus.ScrollToCaret();                        
+                        tbStatus.ScrollToCaret();
                     }));
                     progress = idx * 100 / total;
 
-                    object[] cmp_results = GGKUtilLib.compareOneToOne(kit1, kit2, bwCompare,reference,true);
+                    object[] cmp_results = GGKUtilLib.compareOneToOne(kit1, kit2, bwCompare, reference, true);
 
                     if (bwCompare.CancellationPending)
                         break;
@@ -124,25 +114,20 @@ namespace GenetixKit
                     segment_idx = (DataTable)cmp_results[0];
                     segments = (List<DataTable>)cmp_results[1];
                     //if (segment_idx.Rows.Count>0)
-                    if (segment_idx.Rows.Count>0 || redo_again)
-                    {
+                    if (segment_idx.Rows.Count > 0 || redo_again) {
                         if (!this.IsHandleCreated)
                             break;
 
-                        this.Invoke(new MethodInvoker(delegate
-                        {
-                            if(reference)
+                        this.Invoke(new MethodInvoker(delegate {
+                            if (reference)
                                 tbStatus.Text += segment_idx.Rows.Count.ToString() + " compound segments found.\r\n";
                             else
                                 tbStatus.Text += segment_idx.Rows.Count.ToString() + " matching segments found.\r\n";
                             tbStatus.Select(tbStatus.Text.Length - 1, 0);
                             tbStatus.ScrollToCaret();
                         }));
-                    }
-                    else
-                    {
-                        this.Invoke(new MethodInvoker(delegate
-                        {
+                    } else {
+                        this.Invoke(new MethodInvoker(delegate {
                             tbStatus.Text += "Earlier comparision exists, Skipping.\r\n";
                             tbStatus.Select(tbStatus.Text.Length - 1, 0);
                             tbStatus.ScrollToCaret();
@@ -161,7 +146,7 @@ namespace GenetixKit
 
         private void bwCompare_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (!this.IsHandleCreated)            
+            if (!this.IsHandleCreated)
                 return;
             lblComparing.Text = "Comparision Completed.";
             tbStatus.Text += "Comparision Completed.\r\n";
@@ -174,26 +159,19 @@ namespace GenetixKit
 
         private void btnStart_Click(object sender, EventArgs e)
         {
-            if (btnStart.Text == "Start")
-            {
+            if (btnStart.Text == "Start") {
                 redo_again = cbDontSkip.Checked;
                 redo_visual = cbRedoVisual.Checked;
                 no_admixture = cbNoAdmixture.Checked;
                 GGKUtilLib.setStatus("Processing Kits ...");
-                if (bwCompare.IsBusy)
-                {
-                    MessageBox.Show("Process is busy!","Please Wait!",MessageBoxButtons.OK,MessageBoxIcon.Stop);
-                }
-                else
-                {
+                if (bwCompare.IsBusy) {
+                    MessageBox.Show("Process is busy!", "Please Wait!", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                } else {
                     bwCompare.RunWorkerAsync();
                     btnStart.Text = "Stop";
                 }
-            }
-            else if (btnStart.Text == "Stop")
-            {
-                if (MessageBox.Show("Are you sure you want to cancel the process?", "Cancel?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
+            } else if (btnStart.Text == "Stop") {
+                if (MessageBox.Show("Are you sure you want to cancel the process?", "Cancel?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
                     GGKUtilLib.setStatus("Done.");
                     GGKUtilLib.setProgress(-1);
                     bwCompare.CancelAsync();
@@ -206,7 +184,7 @@ namespace GenetixKit
         }
 
         private void bwCompare_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {            
+        {
             GGKUtilLib.setProgress(e.ProgressPercentage);
             GGKUtilLib.setStatus(e.UserState.ToString());
             progressBar.Value = e.ProgressPercentage;
@@ -214,32 +192,29 @@ namespace GenetixKit
 
         private void ProcessKitsFrm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            
-            if (bwCompare.IsBusy||bwROH.IsBusy||bwPhaseVisualizer.IsBusy)
-            {
+
+            if (bwCompare.IsBusy || bwROH.IsBusy || bwPhaseVisualizer.IsBusy) {
                 GGKUtilLib.setStatus("Cancelling...");
                 GGKUtilLib.setProgress(-1);
                 btnStart.Text = "Cancelling";
                 btnStart.Enabled = false;
-                if(bwCompare.IsBusy)
+                if (bwCompare.IsBusy)
                     bwCompare.CancelAsync();
                 if (bwROH.IsBusy)
                     bwROH.CancelAsync();
-                if(bwPhaseVisualizer.IsBusy)
+                if (bwPhaseVisualizer.IsBusy)
                     bwPhaseVisualizer.CancelAsync();
                 e.Cancel = true;
                 timer1.Enabled = true;
-            }
-            else
-            {
+            } else {
                 GGKUtilLib.setStatus("Done.");
-                GGKUtilLib.setProgress(-1);                
+                GGKUtilLib.setProgress(-1);
             }
         }
 
         private void timer1_Tick(object sender, EventArgs e)
-        {            
-             this.Close();
+        {
+            this.Close();
         }
 
         private void bwROH_DoWork(object sender, DoWorkEventArgs e)
@@ -247,23 +222,19 @@ namespace GenetixKit
             DataTable dt = GGKUtilLib.QueryDB("select kit_no,roh_status from kit_master where reference=0 and disabled=0");
             string kit = null;
             string roh = null;
-            foreach(DataRow row in dt.Rows)
-            {
+            foreach (DataRow row in dt.Rows) {
                 if (bwROH.CancellationPending)
                     break;
                 kit = row.ItemArray[0].ToString();
                 roh = row.ItemArray[1].ToString();
-                if (roh == "0")
-                {
+                if (roh == "0") {
                     bwROH.ReportProgress(dt.Rows.IndexOf(row) * 100 / dt.Rows.Count, "Runs of Homozygosity for kit #" + kit + " (" + GGKUtilLib.getKitName(kit) + ") - Processing ...");
                     GGKUtilLib.ROH(kit);
-                }
-                else if (roh == "1")
-                {
+                } else if (roh == "1") {
                     bwROH.ReportProgress(dt.Rows.IndexOf(row) * 100 / dt.Rows.Count, "Runs of Homozygosity for kit #" + kit + " (" + GGKUtilLib.getKitName(kit) + ") - Already Exists. Skipping..");
                 }
             }
-            
+
         }
 
         private void bwROH_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -274,7 +245,7 @@ namespace GenetixKit
             progressBar.Value = e.ProgressPercentage;
 
             lblComparing.Text = e.UserState.ToString();
-            tbStatus.Text += e.UserState.ToString()+"\r\n";
+            tbStatus.Text += e.UserState.ToString() + "\r\n";
             tbStatus.Select(tbStatus.Text.Length - 1, 0);
             tbStatus.ScrollToCaret();
         }
@@ -301,8 +272,7 @@ namespace GenetixKit
             string start_position = null;
             string end_position = null;
             int percent = 0;
-            foreach (DataRow row in dt2.Rows)
-            {
+            foreach (DataRow row in dt2.Rows) {
 
                 if (bwPhaseVisualizer.CancellationPending)
                     break;
@@ -312,8 +282,7 @@ namespace GenetixKit
 
                 DataTable dt3 = GGKUtilLib.QueryDB("select unphased_kit,chromosome,start_position,end_position FROM (select kit1'unphased_kit',chromosome,start_position,end_position from cmp_autosomal where kit2='" + phased_kit + "' UNION select kit2'unphased_kit',chromosome,start_position,end_position from cmp_autosomal where kit1='" + phased_kit + "') order by cast(chromosome as integer),start_position");
 
-                foreach (DataRow row3 in dt3.Rows)
-                {
+                foreach (DataRow row3 in dt3.Rows) {
                     if (bwPhaseVisualizer.CancellationPending)
                         break;
                     unphased_kit = row3.ItemArray[0].ToString();
@@ -321,28 +290,23 @@ namespace GenetixKit
                     start_position = row3.ItemArray[2].ToString();
                     end_position = row3.ItemArray[3].ToString();
 
-                    DataTable exists=GGKUtilLib.QueryDB("select * from cmp_phased where phased_kit='"+phased_kit+"' and match_kit='"+unphased_kit+"' and chromosome='"+chromosome+"' and start_position="+start_position+" and end_position="+end_position);
+                    DataTable exists = GGKUtilLib.QueryDB("select * from cmp_phased where phased_kit='" + phased_kit + "' and match_kit='" + unphased_kit + "' and chromosome='" + chromosome + "' and start_position=" + start_position + " and end_position=" + end_position);
 
-                    if (exists.Rows.Count > 0)
-                    {
+                    if (exists.Rows.Count > 0) {
                         //already exists...
-                        if (!redo_visual)
-                        {
-                            bwPhaseVisualizer.ReportProgress(percent, "Segment [" + GGKUtilLib.getKitName(phased_kit) + ":" + GGKUtilLib.getKitName(unphased_kit) + "] Chr " + chromosome + ": " + start_position + "-" + end_position + ", Already Processed. Skipping ...");                        
+                        if (!redo_visual) {
+                            bwPhaseVisualizer.ReportProgress(percent, "Segment [" + GGKUtilLib.getKitName(phased_kit) + ":" + GGKUtilLib.getKitName(unphased_kit) + "] Chr " + chromosome + ": " + start_position + "-" + end_position + ", Already Processed. Skipping ...");
                             continue;
-                        }
-                        else
-                        {
-                            GGKUtilLib.UpdateDB("DELETE from cmp_phased where phased_kit='"+phased_kit+"'");
+                        } else {
+                            GGKUtilLib.UpdateDB("DELETE from cmp_phased where phased_kit='" + phased_kit + "'");
                         }
                     }
-                    
+
                     bwPhaseVisualizer.ReportProgress(percent, "Segment [" + GGKUtilLib.getKitName(phased_kit) + ":" + GGKUtilLib.getKitName(unphased_kit) + "] Chr " + chromosome + ": " + start_position + "-" + end_position + ", Processing ...");
-                    
+
 
                     DataTable dt = GGKUtilLib.QueryDB("select a.position,a.genotype,p.paternal_genotype,p.maternal_genotype from kit_autosomal a,kit_phased p where a.kit_no='" + unphased_kit + "' and a.position>" + start_position + " and a.position<" + end_position + " and a.chromosome='" + chromosome + "' and p.rsid=a.rsid and p.kit_no='" + phased_kit + "' order by a.position");
-                    if (dt.Rows.Count > 0)
-                    {
+                    if (dt.Rows.Count > 0) {
                         if (bwPhaseVisualizer.CancellationPending)
                             break;
 

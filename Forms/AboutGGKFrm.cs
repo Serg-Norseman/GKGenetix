@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -25,14 +21,11 @@ namespace GenetixKit
 
         public string AssemblyTitle
         {
-            get
-            {
+            get {
                 object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
-                if (attributes.Length > 0)
-                {
+                if (attributes.Length > 0) {
                     AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute)attributes[0];
-                    if (titleAttribute.Title != "")
-                    {
+                    if (titleAttribute.Title != "") {
                         return titleAttribute.Title;
                     }
                 }
@@ -42,19 +35,16 @@ namespace GenetixKit
 
         public string AssemblyVersion
         {
-            get
-            {
+            get {
                 return Assembly.GetExecutingAssembly().GetName().Version.ToString();
             }
         }
 
         public string AssemblyDescription
         {
-            get
-            {
+            get {
                 object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
-                if (attributes.Length == 0)
-                {
+                if (attributes.Length == 0) {
                     return "";
                 }
                 return ((AssemblyDescriptionAttribute)attributes[0]).Description;
@@ -63,11 +53,9 @@ namespace GenetixKit
 
         public string AssemblyProduct
         {
-            get
-            {
+            get {
                 object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyProductAttribute), false);
-                if (attributes.Length == 0)
-                {
+                if (attributes.Length == 0) {
                     return "";
                 }
                 return ((AssemblyProductAttribute)attributes[0]).Product;
@@ -76,11 +64,9 @@ namespace GenetixKit
 
         public string AssemblyCopyright
         {
-            get
-            {
+            get {
                 object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
-                if (attributes.Length == 0)
-                {
+                if (attributes.Length == 0) {
                     return "";
                 }
                 return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
@@ -89,11 +75,9 @@ namespace GenetixKit
 
         public string AssemblyCompany
         {
-            get
-            {
+            get {
                 object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyCompanyAttribute), false);
-                if (attributes.Length == 0)
-                {
+                if (attributes.Length == 0) {
                     return "";
                 }
                 return ((AssemblyCompanyAttribute)attributes[0]).Company;
@@ -107,6 +91,6 @@ namespace GenetixKit
             DeveloperFrm frm = new DeveloperFrm();
             frm.ShowDialog(Program.GGKitFrmMainInst);
         }
-        
+
     }
 }

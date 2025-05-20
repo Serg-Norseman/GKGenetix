@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace GenetixKit
@@ -28,8 +23,7 @@ namespace GenetixKit
 
             selected_operation = operation;
             string hide_ref = GGKSettings.getParameterValue("Admixture.ReferencePopulations.Hide");
-            switch (selected_operation)
-            {
+            switch (selected_operation) {
                 case SELECT_ADMIXTURE:
                     if (hide_ref == "1")
                         select_sql = @"SELECT kit_no 'Kit#',name 'Name' FROM kit_master WHERE disabled=0 AND reference=0 order by name ASC";
@@ -50,7 +44,7 @@ namespace GenetixKit
             dataGridView2.Rows.Clear();
             SQLiteCommand query = new SQLiteCommand(select_sql, cnn);
             SQLiteDataReader reader = query.ExecuteReader();
-            
+
             DataTable dt1 = null;
             DataTable dt2 = null;
 
@@ -81,29 +75,27 @@ namespace GenetixKit
             string kit1 = dataGridView1.SelectedRows[0].Cells[0].Value.ToString();
             string kit2 = dataGridView2.SelectedRows[0].Cells[0].Value.ToString();
 
-            if(kit1==kit2)
-            {
-                MessageBox.Show("Please select different kits to compare.","One-to-One Compare",MessageBoxButtons.OK,MessageBoxIcon.Error);
+            if (kit1 == kit2) {
+                MessageBox.Show("Please select different kits to compare.", "One-to-One Compare", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             // open mdi child
-            switch (selected_operation)
-            {
+            switch (selected_operation) {
                 case SELECT_ADMIXTURE:
                     GGKUtilLib.hideAllMdiChildren();
-                    OneToOneCmpFrm cmp = new OneToOneCmpFrm(kit1,kit2);
+                    OneToOneCmpFrm cmp = new OneToOneCmpFrm(kit1, kit2);
                     cmp.MdiParent = Program.GGKitFrmMainInst;
                     cmp.Visible = true;
                     cmp.WindowState = FormWindowState.Maximized;
                     this.Close();
-                    break;                
+                    break;
 
                 default:
                     break;
             }
 
-            
+
             //
         }
 
@@ -114,16 +106,13 @@ namespace GenetixKit
             DataGridViewCellStyle style_yes = new DataGridViewCellStyle();
             style_yes.ForeColor = Color.Black;
 
-            if (dataGridView1.SelectedRows.Count > 0)
-            {
+            if (dataGridView1.SelectedRows.Count > 0) {
                 selected_kit_one = dataGridView1.SelectedRows[0].Cells[0].Value.ToString();
-                foreach (DataGridViewRow row in dataGridView1.Rows)
-                {
+                foreach (DataGridViewRow row in dataGridView1.Rows) {
                     if (row.Cells[0].Value.ToString() != selected_kit_two)
                         row.DefaultCellStyle = style_yes;
                 }
-                foreach (DataGridViewRow row in dataGridView2.Rows)
-                {
+                foreach (DataGridViewRow row in dataGridView2.Rows) {
                     if (row.Cells[0].Value.ToString() == selected_kit_one)
                         row.DefaultCellStyle = style_no;
                     else
@@ -141,16 +130,13 @@ namespace GenetixKit
             DataGridViewCellStyle style_yes = new DataGridViewCellStyle();
             style_yes.ForeColor = Color.Black;
 
-            if (dataGridView2.SelectedRows.Count > 0)
-            {
+            if (dataGridView2.SelectedRows.Count > 0) {
                 selected_kit_two = dataGridView2.SelectedRows[0].Cells[0].Value.ToString();
-                foreach (DataGridViewRow row in dataGridView2.Rows)
-                {
+                foreach (DataGridViewRow row in dataGridView2.Rows) {
                     if (row.Cells[0].Value.ToString() != selected_kit_one)
                         row.DefaultCellStyle = style_yes;
                 }
-                foreach (DataGridViewRow row in dataGridView1.Rows)
-                {
+                foreach (DataGridViewRow row in dataGridView1.Rows) {
                     if (row.Cells[0].Value.ToString() == selected_kit_two)
                         row.DefaultCellStyle = style_no;
                     else

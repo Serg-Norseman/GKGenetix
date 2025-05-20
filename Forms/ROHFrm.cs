@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace GenetixKit
@@ -26,7 +24,7 @@ namespace GenetixKit
         private void ROHFrm_Load(object sender, EventArgs e)
         {
             GGKUtilLib.setStatus("Calculating ROH ...");
-            this.Text = "Runs of Homozygosity - " + kit+" ("+GGKUtilLib.getKitName(kit)+")";
+            this.Text = "Runs of Homozygosity - " + kit + " (" + GGKUtilLib.getKitName(kit) + ")";
             bwROH.RunWorkerAsync(kit);
         }
 
@@ -39,7 +37,7 @@ namespace GenetixKit
         }
 
         private void bwROH_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {            
+        {
             double total = 0;
             double longest = 0;
             double x_total = 0;
@@ -47,18 +45,14 @@ namespace GenetixKit
             int mrca = 0;
             object[] obj = null;
             double seg_len = 0;
-            foreach (DataRow row in segment_idx.Rows)
-            {
+            foreach (DataRow row in segment_idx.Rows) {
                 obj = row.ItemArray;
                 seg_len = double.Parse(obj[3].ToString());
-                if (obj[0].ToString() == "X")
-                {
+                if (obj[0].ToString() == "X") {
                     x_total += seg_len;
                     if (x_longest < seg_len)
                         x_longest = seg_len;
-                }
-                else
-                {
+                } else {
                     total += seg_len;
                     if (longest < seg_len)
                         longest = seg_len;
@@ -73,8 +67,7 @@ namespace GenetixKit
             double shared = 0;
             double range_begin = 0;
             double range_end = 0;
-            for (int gen = 0; gen < 10; gen++)
-            {
+            for (int gen = 0; gen < 10; gen++) {
                 shared = 3600 / Math.Pow(2, gen);
                 range_begin = shared - shared / 4;
                 range_end = shared + shared / 4;
@@ -83,24 +76,21 @@ namespace GenetixKit
             }
 
             //adjusting mrca for RoH specific
-            if (mrca > 0)
-            {
+            if (mrca > 0) {
                 mrca = mrca - 1;
 
                 if (mrca == 1)
                     lblMRCA.Text = mrca.ToString() + " generation back";
                 else
                     lblMRCA.Text = mrca.ToString() + " generations back";
-            }
-            else
+            } else
                 lblMRCA.Text = "Not Related";
 
 
             dgvSegmentIdx.Rows.Clear();
             dgvSegmentIdx.Columns.Clear();
             dgvSegmentIdx.DataSource = segment_idx;
-            if (dgvSegmentIdx.Columns.Count > 0)
-            {
+            if (dgvSegmentIdx.Columns.Count > 0) {
                 dgvSegmentIdx.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 dgvSegmentIdx.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 dgvSegmentIdx.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
@@ -117,10 +107,8 @@ namespace GenetixKit
                 dgvSegmentIdx.Columns[3].SortMode = DataGridViewColumnSortMode.NotSortable;
                 dgvSegmentIdx.Columns[4].SortMode = DataGridViewColumnSortMode.NotSortable;
 
-                if (dgvMatching.Columns.Count > 0)
-                {
-                    foreach (DataGridViewRow row in dgvMatching.Rows)
-                    {
+                if (dgvMatching.Columns.Count > 0) {
+                    foreach (DataGridViewRow row in dgvMatching.Rows) {
                         if (row.Cells[3].Value.ToString() == "-")
                             row.DefaultCellStyle.BackColor = Color.LightGray;
                         else if (row.Cells[3].Value.ToString() == "")
@@ -135,15 +123,12 @@ namespace GenetixKit
 
         private void dgvSegmentIdx_SelectionChanged(object sender, EventArgs e)
         {
-            if (dgvSegmentIdx.CurrentRow != null)
-            {
-                if (p_idx != dgvSegmentIdx.CurrentRow.Index)
-                {
+            if (dgvSegmentIdx.CurrentRow != null) {
+                if (p_idx != dgvSegmentIdx.CurrentRow.Index) {
                     dgvMatching.Columns.Clear();
                     dgvMatching.DataSource = segments[dgvSegmentIdx.CurrentRow.Index];
 
-                    if (dgvMatching.Columns.Count > 0)
-                    {
+                    if (dgvMatching.Columns.Count > 0) {
                         dgvMatching.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                         dgvMatching.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                         dgvMatching.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
@@ -154,8 +139,7 @@ namespace GenetixKit
                         dgvMatching.Columns[2].ReadOnly = true;
                         dgvMatching.Columns[3].ReadOnly = true;
 
-                        foreach (DataGridViewRow row in dgvMatching.Rows)
-                        {
+                        foreach (DataGridViewRow row in dgvMatching.Rows) {
                             if (row.Cells[3].Value.ToString() == "-")
                                 row.DefaultCellStyle.BackColor = Color.LightGray;
                             else if (row.Cells[3].Value.ToString() == "")

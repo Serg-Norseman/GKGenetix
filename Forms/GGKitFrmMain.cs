@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace GenetixKit
@@ -47,19 +43,18 @@ namespace GenetixKit
         private void licenseToolStripMenuItem_Click(object sender, EventArgs e)
         {
             hideAllChildren("LicenseFrm");
-            if(licFrm == null)
+            if (licFrm == null)
                 licFrm = new LicenseFrm();
             if (licFrm.IsDisposed)
                 licFrm = new LicenseFrm();
-            licFrm.MdiParent=this;
-            licFrm.Visible = true;            
+            licFrm.MdiParent = this;
+            licFrm.Visible = true;
             licFrm.WindowState = FormWindowState.Maximized;
         }
 
         public void hideAllChildren(string exceptFrm)
         {
-            foreach(Form frm in this.MdiChildren)
-            {
+            foreach (Form frm in this.MdiChildren) {
                 if (frm.Name != exceptFrm)
                     frm.Dispose();
             }
@@ -72,10 +67,9 @@ namespace GenetixKit
 
         public void setProgress(int percent)
         {
-            if (percent == -1|| percent==100)
+            if (percent == -1 || percent == 100)
                 progressBar.Visible = false;
-            else
-            {
+            else {
                 progressBar.Visible = true;
                 progressBar.Value = percent;
             }
@@ -90,7 +84,7 @@ namespace GenetixKit
         {
             hideAllChildren("");
             if (newKitFrm == null)
-                newKitFrm = new NewEditKitFrm(null,false);
+                newKitFrm = new NewEditKitFrm(null, false);
             if (newKitFrm.IsDisposed)
                 newKitFrm = new NewEditKitFrm(null, false);
             newKitFrm.MdiParent = this;
@@ -222,10 +216,9 @@ namespace GenetixKit
 
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(openFileDialogGGK.ShowDialog(this)==DialogResult.OK)
-            {
+            if (openFileDialogGGK.ShowDialog(this) == DialogResult.OK) {
                 disableToolbar();
-                setStatusMessage("Importing "+Path.GetFileName(openFileDialogGGK.FileName));
+                setStatusMessage("Importing " + Path.GetFileName(openFileDialogGGK.FileName));
                 bwImport.RunWorkerAsync(openFileDialogGGK.FileName);
             }
         }
@@ -262,8 +255,7 @@ namespace GenetixKit
 
         private void factoryResetToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Are you sure to delete everything and reset to factory defaults?", "Factory Reset", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
-            {
+            if (MessageBox.Show("Are you sure to delete everything and reset to factory defaults?", "Factory Reset", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes) {
                 GGKUtilLib.FactoryReset();
             }
         }
@@ -272,10 +264,8 @@ namespace GenetixKit
         {
             GGKUtilLib.integrityCheckAndFix();
             DataTable dt = GGKUtilLib.QueryDB("select * from kit_master where reference=1");
-            if (dt.Rows.Count == 0)
-            {
-                this.Invoke(new MethodInvoker(delegate
-                {
+            if (dt.Rows.Count == 0) {
+                this.Invoke(new MethodInvoker(delegate {
                     admixtureToolStripMenuItem.Enabled = false;
                 }));
             }
