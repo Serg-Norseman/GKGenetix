@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -52,182 +52,182 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AboutGGKFrm.cs">
+    <Compile Include="Forms\AboutGGKFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AboutGGKFrm.Designer.cs">
+    <Compile Include="Forms\AboutGGKFrm.Designer.cs">
       <DependentUpon>AboutGGKFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="AdmixtureFrm.cs">
+    <Compile Include="Forms\AdmixtureFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AdmixtureFrm.Designer.cs">
+    <Compile Include="Forms\AdmixtureFrm.Designer.cs">
       <DependentUpon>AdmixtureFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="DeveloperFrm.cs">
+    <Compile Include="Forms\DeveloperFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DeveloperFrm.Designer.cs">
+    <Compile Include="Forms\DeveloperFrm.Designer.cs">
       <DependentUpon>DeveloperFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKitFrmMain.cs">
+    <Compile Include="Forms\GGKitFrmMain.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GGKitFrmMain.Designer.cs">
+    <Compile Include="Forms\GGKitFrmMain.Designer.cs">
       <DependentUpon>GGKitFrmMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKSettings.cs" />
-    <Compile Include="GGKUtilLib.cs" />
-    <Compile Include="LicenseFrm.cs">
+    <Compile Include="Core\GGKSettings.cs" />
+    <Compile Include="Core\GGKUtilLib.cs" />
+    <Compile Include="Forms\LicenseFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LicenseFrm.Designer.cs">
+    <Compile Include="Forms\LicenseFrm.Designer.cs">
       <DependentUpon>LicenseFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LocationSelectFrm.cs">
+    <Compile Include="Forms\LocationSelectFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LocationSelectFrm.Designer.cs">
+    <Compile Include="Forms\LocationSelectFrm.Designer.cs">
       <DependentUpon>LocationSelectFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="IsoggYTreeFrm.cs">
+    <Compile Include="Forms\IsoggYTreeFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IsoggYTreeFrm.designer.cs">
+    <Compile Include="Forms\IsoggYTreeFrm.designer.cs">
       <DependentUpon>IsoggYTreeFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MitoMapFrm.cs">
+    <Compile Include="Forms\MitoMapFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MitoMapFrm.Designer.cs">
+    <Compile Include="Forms\MitoMapFrm.Designer.cs">
       <DependentUpon>MitoMapFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MtPhylogenyFrm.cs">
+    <Compile Include="Forms\MtPhylogenyFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MtPhylogenyFrm.designer.cs">
+    <Compile Include="Forms\MtPhylogenyFrm.designer.cs">
       <DependentUpon>MtPhylogenyFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MatchingKitsFrm.cs">
+    <Compile Include="Forms\MatchingKitsFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MatchingKitsFrm.Designer.cs">
+    <Compile Include="Forms\MatchingKitsFrm.Designer.cs">
       <DependentUpon>MatchingKitsFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="NewEditKitFrm.cs">
+    <Compile Include="Forms\NewEditKitFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="NewEditKitFrm.Designer.cs">
+    <Compile Include="Forms\NewEditKitFrm.Designer.cs">
       <DependentUpon>NewEditKitFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="OneToOneCmpFrm.cs">
+    <Compile Include="Forms\OneToOneCmpFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OneToOneCmpFrm.Designer.cs">
+    <Compile Include="Forms\OneToOneCmpFrm.Designer.cs">
       <DependentUpon>OneToOneCmpFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PhasingFrm.cs">
+    <Compile Include="Forms\PhasingFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PhasingFrm.Designer.cs">
+    <Compile Include="Forms\PhasingFrm.Designer.cs">
       <DependentUpon>PhasingFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ProcessKitsFrm.cs">
+    <Compile Include="Forms\ProcessKitsFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ProcessKitsFrm.Designer.cs">
+    <Compile Include="Forms\ProcessKitsFrm.Designer.cs">
       <DependentUpon>ProcessKitsFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="QuickEditKit.cs">
+    <Compile Include="Forms\QuickEditKit.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="QuickEditKit.Designer.cs">
+    <Compile Include="Forms\QuickEditKit.Designer.cs">
       <DependentUpon>QuickEditKit.cs</DependentUpon>
     </Compile>
-    <Compile Include="ROHFrm.cs">
+    <Compile Include="Forms\ROHFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ROHFrm.Designer.cs">
+    <Compile Include="Forms\ROHFrm.Designer.cs">
       <DependentUpon>ROHFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PhasedSegmentVisualizerFrm.cs">
+    <Compile Include="Forms\PhasedSegmentVisualizerFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PhasedSegmentVisualizerFrm.Designer.cs">
+    <Compile Include="Forms\PhasedSegmentVisualizerFrm.Designer.cs">
       <DependentUpon>PhasedSegmentVisualizerFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SelectKitFrm.cs">
+    <Compile Include="Forms\SelectKitFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SelectKitFrm.Designer.cs">
+    <Compile Include="Forms\SelectKitFrm.Designer.cs">
       <DependentUpon>SelectKitFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SelectTwoKitsFrm.cs">
+    <Compile Include="Forms\SelectTwoKitsFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SelectTwoKitsFrm.Designer.cs">
+    <Compile Include="Forms\SelectTwoKitsFrm.Designer.cs">
       <DependentUpon>SelectTwoKitsFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SettingsFrm.cs">
+    <Compile Include="Forms\SettingsFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SettingsFrm.Designer.cs">
+    <Compile Include="Forms\SettingsFrm.Designer.cs">
       <DependentUpon>SettingsFrm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="AboutGGKFrm.resx">
+    <EmbeddedResource Include="Forms\AboutGGKFrm.resx">
       <DependentUpon>AboutGGKFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AdmixtureFrm.resx">
+    <EmbeddedResource Include="Forms\AdmixtureFrm.resx">
       <DependentUpon>AdmixtureFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DeveloperFrm.resx">
+    <EmbeddedResource Include="Forms\DeveloperFrm.resx">
       <DependentUpon>DeveloperFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GGKitFrmMain.resx">
+    <EmbeddedResource Include="Forms\GGKitFrmMain.resx">
       <DependentUpon>GGKitFrmMain.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LicenseFrm.resx">
+    <EmbeddedResource Include="Forms\LicenseFrm.resx">
       <DependentUpon>LicenseFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="LocationSelectFrm.resx">
+    <EmbeddedResource Include="Forms\LocationSelectFrm.resx">
       <DependentUpon>LocationSelectFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="IsoggYTreeFrm.resx">
+    <EmbeddedResource Include="Forms\IsoggYTreeFrm.resx">
       <DependentUpon>IsoggYTreeFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MitoMapFrm.resx">
+    <EmbeddedResource Include="Forms\MitoMapFrm.resx">
       <DependentUpon>MitoMapFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MtPhylogenyFrm.resx">
+    <EmbeddedResource Include="Forms\MtPhylogenyFrm.resx">
       <DependentUpon>MtPhylogenyFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="MatchingKitsFrm.resx">
+    <EmbeddedResource Include="Forms\MatchingKitsFrm.resx">
       <DependentUpon>MatchingKitsFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="NewEditKitFrm.resx">
+    <EmbeddedResource Include="Forms\NewEditKitFrm.resx">
       <DependentUpon>NewEditKitFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="OneToOneCmpFrm.resx">
+    <EmbeddedResource Include="Forms\OneToOneCmpFrm.resx">
       <DependentUpon>OneToOneCmpFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PhasingFrm.resx">
+    <EmbeddedResource Include="Forms\PhasingFrm.resx">
       <DependentUpon>PhasingFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ProcessKitsFrm.resx">
+    <EmbeddedResource Include="Forms\ProcessKitsFrm.resx">
       <DependentUpon>ProcessKitsFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="QuickEditKit.resx">
+    <EmbeddedResource Include="Forms\QuickEditKit.resx">
       <DependentUpon>QuickEditKit.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ROHFrm.resx">
+    <EmbeddedResource Include="Forms\ROHFrm.resx">
       <DependentUpon>ROHFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PhasedSegmentVisualizerFrm.resx">
+    <EmbeddedResource Include="Forms\PhasedSegmentVisualizerFrm.resx">
       <DependentUpon>PhasedSegmentVisualizerFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SelectKitFrm.resx">
+    <EmbeddedResource Include="Forms\SelectKitFrm.resx">
       <DependentUpon>SelectKitFrm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -240,14 +240,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="SelectTwoKitsFrm.resx">
+    <EmbeddedResource Include="Forms\SelectTwoKitsFrm.resx">
       <DependentUpon>SelectTwoKitsFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SettingsFrm.resx">
+    <EmbeddedResource Include="Forms\SettingsFrm.resx">
       <DependentUpon>SettingsFrm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="map.csv.gz" />
-    <None Include="mtdna_map.csv" />
+    <None Include="Resources\map.csv.gz" />
+    <None Include="Resources\mtdna_map.csv" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -257,31 +257,32 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="RSRS.txt.gz" />
-    <None Include="ysnp_hg19.txt.gz" />
+    <None Include="Resources\RSRS.txt.gz" />
+    <None Include="Resources\ysnp_hg19.txt.gz" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="baby.png" />
-    <Content Include="snps_on_tree.txt" />
-    <Content Include="ytree.xml" />
-    <None Include="boy.png" />
-    <Content Include="delete.png" />
-    <Content Include="diff.exe" />
-    <Content Include="disable.png" />
-    <Content Include="enable.png" />
-    <Content Include="eraser.png" />
-    <None Include="girl.png" />
-    <Content Include="icon.ico" />
-    <Content Include="logo.png" />
-    <None Include="man-2-icon.png" />
-    <None Include="mtDNAPhylogeny.xml" />
-    <Content Include="paste.png" />
-    <None Include="refresh.png" />
+    <Content Include="Resources\baby.png" />
+    <Content Include="Resources\snps_on_tree.txt" />
+    <Content Include="Resources\ytree.xml" />
+    <None Include="Resources\boy.png" />
+    <Content Include="Resources\delete.png" />
+    <Content Include="Resources\diff.exe" />
+    <Content Include="Resources\disable.png" />
+    <Content Include="Resources\enable.png" />
+    <Content Include="Resources\eraser.png" />
+    <None Include="Resources\girl.png" />
+    <Content Include="Resources\icon.ico" />
+    <Content Include="Resources\logo.png" />
+    <None Include="Resources\man-2-icon.png" />
+    <None Include="Resources\mtDNAPhylogeny.xml" />
+    <Content Include="Resources\paste.png" />
+    <None Include="Resources\refresh.png" />
     <Content Include="System.Data.SQLite.dll" />
-    <Content Include="tree.ico" />
-    <None Include="woman-icon.png" />
-    <Content Include="world_map.png" />
+    <Content Include="Resources\tree.ico" />
+    <None Include="Resources\woman-icon.png" />
+    <Content Include="Resources\world_map.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
