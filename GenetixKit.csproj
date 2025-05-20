@@ -7,8 +7,8 @@
     <ProjectGuid>{918565A4-0748-4C0E-BC26-F725402DF66B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Genetic_Genealogy_Kit</RootNamespace>
-    <AssemblyName>Genetic Genealogy Kit</AssemblyName>
+    <RootNamespace>GenetixKit</RootNamespace>
+    <AssemblyName>GenetixKit</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

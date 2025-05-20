@@ -40,7 +40,7 @@ namespace Genetic_Genealogy_Kit
             txtSNPs.Text = GGKUtilLib.queryValue("kit_ysnps", new string[] { "ysnps" }, "where kit_no='"+kit+"'");
             GGKUtilLib.setStatus("Plotting on ISOGG Y-Tree ...");
             //
-            XDocument doc = XDocument.Parse(Genetic_Genealogy_Kit.Properties.Resources.ytree);
+            XDocument doc = XDocument.Parse(GenetixKit.Properties.Resources.ytree);
 
             TreeNode root = new TreeNode("Adam");
             treeView1.Nodes.Add(root);
@@ -51,7 +51,7 @@ namespace Genetic_Genealogy_Kit
             }
             root.Expand();
             //
-            snp_on_tree.AddRange(Genetic_Genealogy_Kit.Properties.Resources.snps_on_tree.Split(new char[] { ',' }));
+            snp_on_tree.AddRange(GenetixKit.Properties.Resources.snps_on_tree.Split(new char[] { ',' }));
 
             my_snp = txtSNPs.Text;
             snp_array = filterSNPsOnTree(my_snp);

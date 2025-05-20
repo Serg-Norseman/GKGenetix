@@ -40,7 +40,7 @@ namespace Genetic_Genealogy_Kit
         {
             label2.Text = kit + " - " + GGKUtilLib.getKitName(kit);
             this.Text = "Mitocondrial Phylogeny - (" + kit + ")" + GGKUtilLib.getKitName(kit);
-            xml_phylogeny = Genetic_Genealogy_Kit.Properties.Resources.mtDNAPhylogeny;
+            xml_phylogeny = GenetixKit.Properties.Resources.mtDNAPhylogeny;
             timer1.Enabled = true;             
         }
 

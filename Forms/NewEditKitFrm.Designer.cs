@@ -596,7 +596,7 @@
             // 
             this.btnPaste.FlatAppearance.BorderSize = 0;
             this.btnPaste.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnPaste.Image = global::Genetic_Genealogy_Kit.Properties.Resources.paste;
+            this.btnPaste.Image = global::GenetixKit.Properties.Resources.paste;
             this.btnPaste.Location = new System.Drawing.Point(0, 0);
             this.btnPaste.Margin = new System.Windows.Forms.Padding(0);
             this.btnPaste.Name = "btnPaste";
@@ -609,7 +609,7 @@
             // 
             this.btnClear.FlatAppearance.BorderSize = 0;
             this.btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClear.Image = global::Genetic_Genealogy_Kit.Properties.Resources.eraser;
+            this.btnClear.Image = global::GenetixKit.Properties.Resources.eraser;
             this.btnClear.Location = new System.Drawing.Point(30, 0);
             this.btnClear.Margin = new System.Windows.Forms.Padding(0);
             this.btnClear.Name = "btnClear";

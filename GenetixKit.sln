@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.35425.106
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenetixKit", "GenetixKit.csproj", "{918565A4-0748-4C0E-BC26-F725402DF66B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{918565A4-0748-4C0E-BC26-F725402DF66B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{918565A4-0748-4C0E-BC26-F725402DF66B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{918565A4-0748-4C0E-BC26-F725402DF66B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{918565A4-0748-4C0E-BC26-F725402DF66B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1A9ECFC5-6022-4B45-96E2-CD123A068658}
+	EndGlobalSection
+EndGlobal
