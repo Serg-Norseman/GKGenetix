@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace Genetic_Genealogy_Kit
+namespace GenetixKit
 {
     public partial class ProcessKitsFrm : Form
     {

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace Genetic_Genealogy_Kit
+namespace GenetixKit
 {
     partial class AboutGGKFrm : Form
     {

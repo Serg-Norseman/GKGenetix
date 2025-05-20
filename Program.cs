@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Genetic_Genealogy_Kit
+namespace GenetixKit
 {
     static class Program
     {

@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 using System.Net;
 using System.Windows.Forms.DataVisualization.Charting;
 
-namespace Genetic_Genealogy_Kit
+namespace GenetixKit
 {
     public partial class MtPhylogenyFrm : Form
     {

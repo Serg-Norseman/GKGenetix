@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Genetic_Genealogy_Kit
+namespace GenetixKit
 {
     public partial class NewEditKitFrm : Form
     {

@@ -10,7 +10,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 
-namespace Genetic_Genealogy_Kit
+namespace GenetixKit
 {
     public partial class PhasedSegmentVisualizerFrm : Form
     {
