@@ -46,7 +46,7 @@ namespace GenetixKit.Forms
         private void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Enabled = false;
-            SQLiteConnection cnn = GKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKSqlFuncs.getDBConnection();
             dataGridView1.Rows.Clear();
             dataGridView2.Rows.Clear();
             SQLiteCommand query = new SQLiteCommand(select_sql, cnn);
@@ -90,7 +90,7 @@ namespace GenetixKit.Forms
             // open mdi child
             switch (selected_operation) {
                 case SELECT_ADMIXTURE:
-                    GKUtilLib.hideAllMdiChildren();
+                    GKUIFuncs.hideAllMdiChildren();
                     OneToOneCmpFrm cmp = new OneToOneCmpFrm(kit1, kit2);
                     cmp.MdiParent = Program.GGKitFrmMainInst;
                     cmp.Visible = true;

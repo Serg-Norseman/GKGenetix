@@ -23,7 +23,7 @@ namespace GenetixKit.Forms
 
         private void SettingsFrm_Load(object sender, EventArgs e)
         {
-            GKUtilLib.enableSave();
+            GKUIFuncs.enableSave();
             lbSettings.Items.Clear();
             settings = GKSettings.getSettings();
             lbSettings.Items.AddRange(settings.Keys.ToArray());
@@ -50,18 +50,18 @@ namespace GenetixKit.Forms
             if (data[2] == "1") {
                 tbValue.ReadOnly = true;
                 btnResetDefault.Enabled = false;
-                GKUtilLib.disableSave();
+                GKUIFuncs.disableSave();
             } else {
                 tbValue.ReadOnly = false;
                 btnResetDefault.Enabled = true;
-                GKUtilLib.enableSave();
+                GKUIFuncs.enableSave();
             }
         }
 
         public void Save()
         {
             GKSettings.saveParameterValue(tbKey.Text, tbValue.Text);
-            GKUtilLib.setStatus("Value for parameter [" + tbKey.Text + "] saved.");
+            GKUIFuncs.setStatus("Value for parameter [" + tbKey.Text + "] saved.");
         }
 
         private void btnResetDefault_Click(object sender, EventArgs e)
@@ -74,7 +74,7 @@ namespace GenetixKit.Forms
 
         private void SettingsFrm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            GKUtilLib.disableSave();
+            GKUIFuncs.disableSave();
         }
     }
 }

@@ -87,12 +87,12 @@ namespace GenetixKit.Forms
 
         private void saveToolStripButton_Click(object sender, EventArgs e)
         {
-            GKUtilLib.SaveInfoFromActiveMdiChild();
+            GKUIFuncs.SaveInfoFromActiveMdiChild();
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GKUtilLib.SaveInfoFromActiveMdiChild();
+            GKUIFuncs.SaveInfoFromActiveMdiChild();
         }
 
         public void enableToolbar()
@@ -152,17 +152,17 @@ namespace GenetixKit.Forms
 
         private void toolStripDisableBtn_Click(object sender, EventArgs e)
         {
-            GKUtilLib.disableKit();
+            GKUIFuncs.disableKit();
         }
 
         private void toolStripEnableIcon_Click(object sender, EventArgs e)
         {
-            GKUtilLib.enableKit();
+            GKUIFuncs.enableKit();
         }
 
         private void toolStripDeleteBtn_Click(object sender, EventArgs e)
         {
-            GKUtilLib.deleteKit();
+            GKUIFuncs.deleteKit();
         }
 
         private void GGKitFrmMain_Load(object sender, EventArgs e)
@@ -182,17 +182,17 @@ namespace GenetixKit.Forms
 
         private void enableToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GKUtilLib.enableKit();
+            GKUIFuncs.enableKit();
         }
 
         private void disableToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GKUtilLib.disableKit();
+            GKUIFuncs.disableKit();
         }
 
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GKUtilLib.deleteKit();
+            GKUIFuncs.deleteKit();
         }
 
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
@@ -212,7 +212,7 @@ namespace GenetixKit.Forms
 
         private void bwImport_DoWork(object sender, DoWorkEventArgs e)
         {
-            GKUtilLib.importKit(e.Argument.ToString());
+            GKSqlFuncs.importKit(e.Argument.ToString());
         }
 
         private void bwImport_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -237,14 +237,14 @@ namespace GenetixKit.Forms
         private void factoryResetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Are you sure to delete everything and reset to factory defaults?", "Factory Reset", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes) {
-                GKUtilLib.FactoryReset();
+                GKSqlFuncs.FactoryReset();
             }
         }
 
         private void bwIChkAndFix_DoWork(object sender, DoWorkEventArgs e)
         {
-            GKUtilLib.integrityCheckAndFix();
-            DataTable dt = GKUtilLib.QueryDB("select * from kit_master where reference=1");
+            GKSqlFuncs.integrityCheckAndFix();
+            DataTable dt = GKSqlFuncs.QueryDB("select * from kit_master where reference=1");
             if (dt.Rows.Count == 0) {
                 this.Invoke(new MethodInvoker(delegate {
                     admixtureToolStripMenuItem.Enabled = false;

@@ -42,8 +42,8 @@ namespace GenetixKit.Forms
 
         private void MainFrm_Load(object sender, EventArgs e)
         {
-            label2.Text = kit + " - " + GKUtilLib.getKitName(kit);
-            this.Text = "Mitocondrial Phylogeny - (" + kit + ")" + GKUtilLib.getKitName(kit);
+            label2.Text = kit + " - " + GKSqlFuncs.getKitName(kit);
+            this.Text = "Mitocondrial Phylogeny - (" + kit + ")" + GKSqlFuncs.getKitName(kit);
             xml_phylogeny = GenetixKit.Properties.Resources.mtDNAPhylogeny;
             timer1.Enabled = true;
         }
@@ -51,7 +51,7 @@ namespace GenetixKit.Forms
         private void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Enabled = false;
-            GKUtilLib.enableSave();
+            GKUIFuncs.enableSave();
             //
             XDocument doc = XDocument.Parse(xml_phylogeny);
 
@@ -63,7 +63,7 @@ namespace GenetixKit.Forms
             }
             root.Expand();
             //
-            string mutations = GKUtilLib.queryValue("kit_mtdna", new string[] { "mutations" }, "where kit_no='" + kit + "'");
+            string mutations = GKSqlFuncs.queryValue("kit_mtdna", new string[] { "mutations" }, "where kit_no='" + kit + "'");
             txtSNPs.Text = mutations;
             //
             markOnTree();
@@ -193,8 +193,8 @@ namespace GenetixKit.Forms
             bool found_second = false;
             report.Clear();
             //
-            report.Append("<html><head><title>mtDNA Report for " + GKUtilLib.getKitName(kit) + " (" + kit + ")</title></head><body>");
-            report.Append("<h1>mtDNA Report for " + GKUtilLib.getKitName(kit) + " (" + kit + ")</h2>");
+            report.Append("<html><head><title>mtDNA Report for " + GKSqlFuncs.getKitName(kit) + " (" + kit + ")</title></head><body>");
+            report.Append("<h1>mtDNA Report for " + GKSqlFuncs.getKitName(kit) + " (" + kit + ")</h2>");
             report.Append("<b>User Entered Markers: </b>" + my_marker);
 
             sorted_report_array.Clear();
@@ -488,7 +488,7 @@ namespace GenetixKit.Forms
                 report.Append("<i>Note: The mutations 309.1C(C), 315.1C, AC indels at 515-522, 16182C, 16183C, 16193.1C(C) and 16519 were not considered for phylogenetic reconstruction and are therefore excluded from the tree.</i><br><br>");
                 report.Append("<i>Generated on " + DateTime.Now.ToLongDateString() + " at " + DateTime.Now.ToLongTimeString() + " by <a href='http://www.y-str.org/'>Genetic Genealogy Kit (GGK)</a></i></body></html>");
                 File.WriteAllText(saveFileDialog1.FileName, report.ToString(), Encoding.UTF8);
-                GKUtilLib.setStatus("mtDNA Report Saved.");
+                GKUIFuncs.setStatus("mtDNA Report Saved.");
                 if (MessageBox.Show("mtDNA Report Saved. Do you want to open it?", "Open Report", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                     Process.Start(saveFileDialog1.FileName);
             }
@@ -499,7 +499,7 @@ namespace GenetixKit.Forms
             if (MessageBox.Show("Genetic Genealogy Kit (GGK) will try to use the internet and connect to mtdnacommunity.org to fetch the latest Human mtDNA Phylogeny XML. Are you sure you want to do this?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
                 try {
                     string url = GKSettings.getParameterValue("Phylogeny.mtDNA.URL");
-                    GKUtilLib.setStatus("Fetching.. " + url);
+                    GKUIFuncs.setStatus("Fetching.. " + url);
 
 
                     backgroundWorker1.RunWorkerAsync(url);
@@ -523,7 +523,7 @@ namespace GenetixKit.Forms
             lblyhg.Text = "";
             mutations_map.Clear();
             match_map.Clear();
-            GKUtilLib.setStatus("Done.");
+            GKUIFuncs.setStatus("Done.");
             timer1.Enabled = true;
         }
 

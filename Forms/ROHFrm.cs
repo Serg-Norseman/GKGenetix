@@ -30,15 +30,15 @@ namespace GenetixKit.Forms
 
         private void ROHFrm_Load(object sender, EventArgs e)
         {
-            GKUtilLib.setStatus("Calculating ROH ...");
-            this.Text = "Runs of Homozygosity - " + kit + " (" + GKUtilLib.getKitName(kit) + ")";
+            GKUIFuncs.setStatus("Calculating ROH ...");
+            this.Text = "Runs of Homozygosity - " + kit + " (" + GKSqlFuncs.getKitName(kit) + ")";
             bwROH.RunWorkerAsync(kit);
         }
 
         private void bwROH_DoWork(object sender, DoWorkEventArgs e)
         {
             string kit = e.Argument.ToString();
-            object[] roh_results = GKUtilLib.ROH(kit);
+            object[] roh_results = GKSqlFuncs.ROH(kit);
             segment_idx = (DataTable)roh_results[0];
             segments = (List<DataTable>)roh_results[1];
         }
@@ -125,7 +125,7 @@ namespace GenetixKit.Forms
 
 
             }
-            GKUtilLib.setStatus("Done.");
+            GKUIFuncs.setStatus("Done.");
         }
 
         private void dgvSegmentIdx_SelectionChanged(object sender, EventArgs e)

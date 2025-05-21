@@ -37,27 +37,27 @@ namespace GenetixKit.Forms
             //
             this.kit1 = kit1;
             this.kit2 = kit2;
-            this.name1 = GKUtilLib.getKitName(kit1);
-            this.name2 = GKUtilLib.getKitName(kit2);
+            this.name1 = GKSqlFuncs.getKitName(kit1);
+            this.name2 = GKSqlFuncs.getKitName(kit2);
             dgvMatching.Columns[3].HeaderText = name1;
             dgvMatching.Columns[4].HeaderText = name2;
-            GKUtilLib.setStatus("Comparing kits " + kit1 + " and " + kit2 + " ...");
+            GKUIFuncs.setStatus("Comparing kits " + kit1 + " and " + kit2 + " ...");
             bwCompare.RunWorkerAsync();
         }
 
         private void bwCompare_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (GKUtilLib.isPhased(kit1)) {
+            if (GKSqlFuncs.isPhased(kit1)) {
                 phased_kit = kit1;
                 unphased_kit = kit2;
                 phased = true;
-            } else if (GKUtilLib.isPhased(kit2)) {
+            } else if (GKSqlFuncs.isPhased(kit2)) {
                 phased_kit = kit2;
                 unphased_kit = kit1;
                 phased = true;
             } else
                 phased = false;
-            object[] cmp_results = GKUtilLib.compareOneToOne(kit1, kit2);
+            object[] cmp_results = GKSqlFuncs.compareOneToOne(kit1, kit2);
             segment_idx = (DataTable)cmp_results[0];
             segments = (List<DataTable>)cmp_results[1];
         }
@@ -141,7 +141,7 @@ namespace GenetixKit.Forms
                     }
                 }
             }
-            GKUtilLib.setStatus("Done.");
+            GKUIFuncs.setStatus("Done.");
         }
 
         private void dgvSegmentIdx_SelectionChanged(object sender, EventArgs e)
@@ -194,7 +194,7 @@ namespace GenetixKit.Forms
 
         private void OneToOneCmpFrm_Load(object sender, EventArgs e)
         {
-            GKUtilLib.enableSave();
+            GKUIFuncs.enableSave();
         }
 
         public void Save()
@@ -215,13 +215,13 @@ namespace GenetixKit.Forms
                     }
                 File.WriteAllText(saveFileDlg.FileName, sb.ToString());
                 sb.Length = 0;
-                GKUtilLib.setStatus("CA Profile saved.");
+                GKUIFuncs.setStatus("CA Profile saved.");
             }
         }
 
         private void OneToOneCmpFrm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            GKUtilLib.disableSave();
+            GKUIFuncs.disableSave();
         }
 
         private void dgvSegmentIdx_CellDoubleClick(object sender, DataGridViewCellEventArgs e)

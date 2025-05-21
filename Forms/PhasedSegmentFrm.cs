@@ -46,7 +46,7 @@ namespace GenetixKit.Forms
 
         private void bwPhaseVisualizer_DoWork(object sender, DoWorkEventArgs e)
         {
-            DataTable dt_existing = GKUtilLib.QueryDB("select segment_image,segment_xml from cmp_phased where phased_kit='" + phased_kit + "' and match_kit='" + unphased_kit + "' and chromosome='" + chromosome + "' and start_position=" + start_position + " and end_position=" + end_position);
+            DataTable dt_existing = GKSqlFuncs.QueryDB("select segment_image,segment_xml from cmp_phased where phased_kit='" + phased_kit + "' and match_kit='" + unphased_kit + "' and chromosome='" + chromosome + "' and start_position=" + start_position + " and end_position=" + end_position);
             if (dt_existing.Rows.Count > 0) {
                 object[] o = dt_existing.Rows[0].ItemArray;
                 string xml = o[1].ToString();
@@ -59,9 +59,9 @@ namespace GenetixKit.Forms
                     dgvSegment.DataSource = dt;
 
                     dgvSegment.Columns[0].HeaderText = "Position";
-                    dgvSegment.Columns[1].HeaderText = GKUtilLib.sqlSafe(GKUtilLib.getKitName(unphased_kit));
-                    dgvSegment.Columns[2].HeaderText = GKUtilLib.sqlSafe(GKUtilLib.getKitName(phased_kit)) + " (Paternal)";
-                    dgvSegment.Columns[3].HeaderText = GKUtilLib.sqlSafe(GKUtilLib.getKitName(phased_kit)) + " (Maternal)";
+                    dgvSegment.Columns[1].HeaderText = GKUIFuncs.sqlSafe(GKSqlFuncs.getKitName(unphased_kit));
+                    dgvSegment.Columns[2].HeaderText = GKUIFuncs.sqlSafe(GKSqlFuncs.getKitName(phased_kit)) + " (Paternal)";
+                    dgvSegment.Columns[3].HeaderText = GKUIFuncs.sqlSafe(GKSqlFuncs.getKitName(phased_kit)) + " (Maternal)";
 
                     dgvSegment.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     dgvSegment.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
@@ -75,22 +75,22 @@ namespace GenetixKit.Forms
                 }));
 
                 byte[] image_array = (byte[])o[0];
-                Image img = GKUtilLib.byteArrayToImage(image_array);
+                Image img = GKUIFuncs.byteArrayToImage(image_array);
                 this.Invoke(new MethodInvoker(delegate {
                     original = new Bitmap(img, 600, 150);
                     pbSegment.Image = original;
                 }));
             } else {
-                dt = GKUtilLib.QueryDB("select a.position,a.genotype,p.paternal_genotype,p.maternal_genotype from kit_autosomal a,kit_phased p where a.kit_no='" + unphased_kit + "' and a.position>" + start_position + " and a.position<" + end_position + " and a.chromosome='" + chromosome + "' and p.rsid=a.rsid and p.kit_no='" + phased_kit + "' order by a.position");
+                dt = GKSqlFuncs.QueryDB("select a.position,a.genotype,p.paternal_genotype,p.maternal_genotype from kit_autosomal a,kit_phased p where a.kit_no='" + unphased_kit + "' and a.position>" + start_position + " and a.position<" + end_position + " and a.chromosome='" + chromosome + "' and p.rsid=a.rsid and p.kit_no='" + phased_kit + "' order by a.position");
                 if (dt.Rows.Count > 0) {
                     if (this.IsHandleCreated) {
                         this.Invoke(new MethodInvoker(delegate {
                             dgvSegment.DataSource = dt;
 
                             dgvSegment.Columns[0].HeaderText = "Position";
-                            dgvSegment.Columns[1].HeaderText = GKUtilLib.sqlSafe(GKUtilLib.getKitName(unphased_kit));
-                            dgvSegment.Columns[2].HeaderText = GKUtilLib.sqlSafe(GKUtilLib.getKitName(phased_kit)) + " (Paternal)";
-                            dgvSegment.Columns[3].HeaderText = GKUtilLib.sqlSafe(GKUtilLib.getKitName(phased_kit)) + " (Maternal)";
+                            dgvSegment.Columns[1].HeaderText = GKUIFuncs.sqlSafe(GKSqlFuncs.getKitName(unphased_kit));
+                            dgvSegment.Columns[2].HeaderText = GKUIFuncs.sqlSafe(GKSqlFuncs.getKitName(phased_kit)) + " (Paternal)";
+                            dgvSegment.Columns[3].HeaderText = GKUIFuncs.sqlSafe(GKSqlFuncs.getKitName(phased_kit)) + " (Maternal)";
 
                             dgvSegment.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                             dgvSegment.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
@@ -102,7 +102,7 @@ namespace GenetixKit.Forms
                             dgvSegment.Columns[2].ReadOnly = true;
                             dgvSegment.Columns[3].ReadOnly = true;
                         }));
-                        Image img = GKUtilLib.getPhasedSegmentImage(dt, chromosome);
+                        Image img = GKSqlFuncs.getPhasedSegmentImage(dt, chromosome);
                         this.Invoke(new MethodInvoker(delegate {
                             original = img;
                             pbSegment.Image = img;
@@ -115,14 +115,14 @@ namespace GenetixKit.Forms
                     dt.WriteXml(w, XmlWriteMode.WriteSchema);
                     string segment_xml = sb.ToString();
 
-                    SQLiteConnection conn = GKUtilLib.getDBConnection();
+                    SQLiteConnection conn = GKSqlFuncs.getDBConnection();
                     SQLiteCommand cmd = new SQLiteCommand("INSERT INTO cmp_phased(phased_kit,match_kit,chromosome,start_position,end_position,segment_image,segment_xml) VALUES (@phased_kit,@match_kit,@chromosome,@start_position,@end_position,@segment_image,@segment_xml)", conn);
                     cmd.Parameters.AddWithValue("@phased_kit", phased_kit);
                     cmd.Parameters.AddWithValue("@match_kit", unphased_kit);
                     cmd.Parameters.AddWithValue("@chromosome", chromosome);
                     cmd.Parameters.AddWithValue("@start_position", start_position);
                     cmd.Parameters.AddWithValue("@end_position", end_position);
-                    byte[] image_bytes = GKUtilLib.imageToByteArray(original);
+                    byte[] image_bytes = GKUIFuncs.imageToByteArray(original);
                     cmd.Parameters.Add("@segment_image", DbType.Binary, image_bytes.Length).Value = image_bytes;
                     cmd.Parameters.AddWithValue("@segment_xml", segment_xml);
                     cmd.ExecuteNonQuery();
