@@ -49,6 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\GKUIFuncs.cs" />
+    <Compile Include="Core\GKUtils.cs" />
     <Compile Include="Forms\AdmixtureFrm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -62,7 +64,7 @@
       <DependentUpon>GKMainFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\GKSettings.cs" />
-    <Compile Include="Core\GKUtilLib.cs" />
+    <Compile Include="Core\GKSqlFuncs.cs" />
     <Compile Include="Forms\LocationSelectFrm.cs">
       <SubType>Form</SubType>
     </Compile>

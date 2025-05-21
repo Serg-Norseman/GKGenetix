@@ -4,3 +4,7 @@
 *.suo
 *.userprefs
 *.user
+
+/appdata/
+/temp/
+prepare.cmd

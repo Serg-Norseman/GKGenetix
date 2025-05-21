@@ -38,9 +38,9 @@ namespace GenetixKit.Forms
         private void timer1_Tick(object sender, EventArgs e)
         {
             timer1.Enabled = false;
-            label2.Text = GKUtilLib.getKitName(kit);
-            txtSNPs.Text = GKUtilLib.queryValue("kit_ysnps", new string[] { "ysnps" }, "where kit_no='" + kit + "'");
-            GKUtilLib.setStatus("Plotting on ISOGG Y-Tree ...");
+            label2.Text = GKSqlFuncs.getKitName(kit);
+            txtSNPs.Text = GKSqlFuncs.queryValue("kit_ysnps", new string[] { "ysnps" }, "where kit_no='" + kit + "'");
+            GKUIFuncs.setStatus("Plotting on ISOGG Y-Tree ...");
             //
             XDocument doc = XDocument.Parse(GenetixKit.Properties.Resources.ytree);
 
@@ -237,7 +237,7 @@ namespace GenetixKit.Forms
         {
             timer2.Enabled = false;
             markOnTree();
-            GKUtilLib.setStatus("Done.");
+            GKUIFuncs.setStatus("Done.");
         }
 
         private void timer3_Tick(object sender, EventArgs e)

@@ -13,17 +13,15 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
-using GenetixKit.Forms;
 
 namespace GenetixKit.Core
 {
-    class GKUtilLib
+    class GKSqlFuncs
     {
 
         public const int AUTOSOMAL_FTDNA = 0;
@@ -83,7 +81,7 @@ namespace GenetixKit.Core
         {
             if (File.Exists(SQLITE_DB))
                 File.Move(SQLITE_DB, SQLITE_DB + "-" + DateTime.Now.Ticks.ToString("X"));
-            SQLiteConnection connection = new SQLiteConnection(@"Data Source=" + GKUtilLib.SQLITE_DB + @";Version=3; Compress=True; New=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;");
+            SQLiteConnection connection = new SQLiteConnection(@"Data Source=" + GKSqlFuncs.SQLITE_DB + @";Version=3; Compress=True; New=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;");
             connection.Open();
             Dictionary<string, string> pragma = new Dictionary<string, string>();
 
@@ -108,8 +106,8 @@ namespace GenetixKit.Core
 
         public static SQLiteConnection getDBConnection()
         {
-            if (File.Exists(GKUtilLib.SQLITE_DB)) {
-                SQLiteConnection connection = new SQLiteConnection(@"Data Source=" + GKUtilLib.SQLITE_DB + @";Version=3; Compress=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;");
+            if (File.Exists(GKSqlFuncs.SQLITE_DB)) {
+                SQLiteConnection connection = new SQLiteConnection(@"Data Source=" + GKSqlFuncs.SQLITE_DB + @";Version=3; Compress=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;");
                 connection.Open();
                 Dictionary<string, string> pragma = new Dictionary<string, string>();
 
@@ -406,7 +404,7 @@ namespace GenetixKit.Core
             // required for cM calculation
             if (map == null)
                 map = new Dictionary<int, double>[23];
-            using (MemoryStream ms = new MemoryStream(GUnzip(GenetixKit.Properties.Resources.map_csv))) {
+            using (MemoryStream ms = new MemoryStream(GKUtils.GUnzip(GenetixKit.Properties.Resources.map_csv))) {
                 StreamReader reader = new StreamReader(ms);
                 string line = reader.ReadLine(); //header
                 string[] data = null;
@@ -486,71 +484,10 @@ namespace GenetixKit.Core
             return cm;
         }
 
-        public static void setStatus(string message)
-        {
-            Program.GGKitFrmMainInst.setStatusMessage(message);
-        }
-
-        public static void setProgress(int percent)
-        {
-            Program.GGKitFrmMainInst.setProgress(percent);
-        }
-
-        public static void enableSave()
-        {
-            Program.GGKitFrmMainInst.enableSave();
-        }
-
-        public static void disableSave()
-        {
-            Program.GGKitFrmMainInst.disableSave();
-        }
-
-        public static void enableMenu()
-        {
-            Program.GGKitFrmMainInst.MainMenuStrip.Enabled = true;
-        }
-
-        public static void disableMenu()
-        {
-            Program.GGKitFrmMainInst.MainMenuStrip.Enabled = false;
-        }
-
-
-        public static void enableToolbar()
-        {
-            Program.GGKitFrmMainInst.enableToolbar();
-        }
-
-        public static void disableToolbar()
-        {
-            Program.GGKitFrmMainInst.disableToolbar();
-        }
-
-        public static void hideAllMdiChildren()
-        {
-            Program.GGKitFrmMainInst.hideAllChildren("");
-        }
-
-        public static void SaveInfoFromActiveMdiChild()
-        {
-            Form mdifrm = Program.GGKitFrmMainInst.ActiveMdiChild;
-            if (mdifrm.Name == "NewEditKitFrm")
-                ((NewEditKitFrm)mdifrm).Save();
-            else if (mdifrm.Name == "SettingsFrm")
-                ((SettingsFrm)mdifrm).Save();
-            else if (mdifrm.Name == "OneToOneCmpFrm")
-                ((OneToOneCmpFrm)mdifrm).Save();
-            else if (mdifrm.Name == "QuickEditKit")
-                ((QuickEditKit)mdifrm).Save();
-            else if (mdifrm.Name == "MtPhylogenyFrm")
-                ((MtPhylogenyFrm)mdifrm).Save();
-        }
-
         public static char[] getRSRS()
         {
             if (RSRS == null)
-                RSRS = Encoding.ASCII.GetString(GUnzip(GenetixKit.Properties.Resources.RSRS)).ToCharArray();
+                RSRS = Encoding.ASCII.GetString(GKUtils.GUnzip(GenetixKit.Properties.Resources.RSRS)).ToCharArray();
             return RSRS;
         }
 
@@ -558,7 +495,7 @@ namespace GenetixKit.Core
         {
             if (ymap == null) {
                 ymap = new Dictionary<string, string[]>();
-                string csv = Encoding.UTF8.GetString(GKUtilLib.GUnzip(GenetixKit.Properties.Resources.ysnp_hg19));
+                string csv = Encoding.UTF8.GetString(GKUtils.GUnzip(GenetixKit.Properties.Resources.ysnp_hg19));
                 StringReader reader = new StringReader(csv);
                 string l = null;
                 string[] d = null;
@@ -573,63 +510,6 @@ namespace GenetixKit.Core
             return ymap;
         }
 
-        public static byte[] GZip(byte[] bytes)
-        {
-            using (var msi = new MemoryStream(bytes))
-            using (var mso = new MemoryStream()) {
-                using (var gs = new GZipStream(mso, CompressionMode.Compress)) {
-                    CopyTo(msi, gs);
-                }
-
-                return mso.ToArray();
-            }
-        }
-        public static void GZipFile(string infile, string outfile)
-        {
-            using (var msi = new FileStream(infile, FileMode.Open))
-            using (var mso = new FileStream(outfile, FileMode.Create)) {
-                using (var gs = new GZipStream(mso, CompressionMode.Compress)) {
-                    CopyTo(msi, gs);
-                }
-                mso.Close();
-            }
-        }
-
-        public static byte[] GUnzip(byte[] bytes)
-        {
-            using (var msi = new MemoryStream(bytes))
-            using (var mso = new MemoryStream()) {
-                using (var gs = new GZipStream(msi, CompressionMode.Decompress)) {
-                    CopyTo(gs, mso);
-                }
-
-                return mso.ToArray();
-            }
-        }
-
-        public static void GUnzipFile(string infile, string outfile)
-        {
-            using (var msi = new FileStream(infile, FileMode.Open))
-            using (var mso = new FileStream(outfile, FileMode.Create)) {
-                using (var gs = new GZipStream(msi, CompressionMode.Decompress)) {
-                    CopyTo(gs, mso);
-                }
-
-                mso.Close();
-            }
-        }
-
-        private static void CopyTo(Stream src, Stream dest)
-        {
-            byte[] bytes = new byte[4096];
-
-            int cnt;
-
-            while ((cnt = src.Read(bytes, 0, bytes.Length)) != 0) {
-                dest.Write(bytes, 0, cnt);
-            }
-        }
-
         public static Object[] getAutosomalDNAList(string file)
         {
             Object[] dnaout = new Object[3];
@@ -638,7 +518,7 @@ namespace GenetixKit.Core
             string tmp = null;
             char[] rsrs = getRSRS();
             if (file.EndsWith(".gz")) {
-                tmp = Encoding.UTF8.GetString(GUnzip(File.ReadAllBytes(file)));
+                tmp = Encoding.UTF8.GetString(GKUtils.GUnzip(File.ReadAllBytes(file)));
                 // ugly but required 
                 tmp = tmp.Replace("\r\n", "\r");
                 tmp = tmp.Replace("\n", "\r");
@@ -742,7 +622,7 @@ namespace GenetixKit.Core
                     //
                     if (chr == "Y") {
                         if (ymap.ContainsKey(pos)) {
-                            snp = GKUtilLib.getYSNP(pos, genotype);
+                            snp = GKSqlFuncs.getYSNP(pos, genotype);
                             if (snp[0].IndexOf(";") == -1)
                                 ysnp.Add(snp[0] + snp[1]);
                             else
@@ -821,7 +701,7 @@ namespace GenetixKit.Core
             File.WriteAllText(diff_work_dir + "user.txt", user);
 
             File.WriteAllBytes(diff_work_dir + "diff.exe", GenetixKit.Properties.Resources.diff);
-            Process p = execute(diff_work_dir + "rsrs.txt", diff_work_dir + "user.txt", diff_work_dir);
+            Process p = GKUIFuncs.execute(diff_work_dir + "rsrs.txt", diff_work_dir + "user.txt", diff_work_dir);
             StringBuilder sb = new StringBuilder();
             string line = null;
             //int op = -1;
@@ -898,19 +778,6 @@ namespace GenetixKit.Core
                 }
             } catch (Exception) { }
             return sb.ToString().Trim().Replace(" ", ", ");
-        }
-
-        private static Process execute(string file1, string file2, string diff_work_dir)
-        {
-            Process p = new Process();
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.WorkingDirectory = diff_work_dir;
-            p.StartInfo.FileName = diff_work_dir + "diff.exe";
-            p.StartInfo.Arguments = file1 + " " + file2;
-            p.Start();
-            return p;
         }
 
         private static string FastaSeq(string file)
@@ -1040,68 +907,12 @@ namespace GenetixKit.Core
             return markers_str;
         }
 
-        public static void enable_EnableKitToolbarBtn()
-        {
-            Program.GGKitFrmMainInst.enable_EnableKitToolbarBtn();
-        }
-
-        public static void disable_EnableKitToolbarBtn()
-        {
-            Program.GGKitFrmMainInst.disable_EnableKitToolbarBtn();
-        }
-
-        public static void enableDeleteKitToolbarBtn()
-        {
-            Program.GGKitFrmMainInst.enableDeleteKitToolbarBtn();
-        }
-
-        public static void disableDeleteKitToolbarBtn()
-        {
-            Program.GGKitFrmMainInst.disableDeleteKitToolbarBtn();
-        }
-
-
-        public static void enable_DisableKitToolbarBtn()
-        {
-            Program.GGKitFrmMainInst.enable_DisableKitToolbarBtn();
-        }
-
-        public static void disable_DisableKitToolbarBtn()
-        {
-            Program.GGKitFrmMainInst.disable_DisableKitToolbarBtn();
-        }
-        ///
-        public static void disableKit()
-        {
-            Form mdifrm = Program.GGKitFrmMainInst.ActiveMdiChild;
-            if (mdifrm.Name == "NewEditKitFrm")
-                ((NewEditKitFrm)mdifrm).Disable();
-            else if (mdifrm.Name == "QuickEditKit")
-                ((QuickEditKit)mdifrm).Disable();
-        }
-        public static void enableKit()
-        {
-            Form mdifrm = Program.GGKitFrmMainInst.ActiveMdiChild;
-            if (mdifrm.Name == "NewEditKitFrm")
-                ((NewEditKitFrm)mdifrm).Enable();
-            else if (mdifrm.Name == "QuickEditKit")
-                ((QuickEditKit)mdifrm).Enable();
-        }
-        public static void deleteKit()
-        {
-            Form mdifrm = Program.GGKitFrmMainInst.ActiveMdiChild;
-            if (mdifrm.Name == "NewEditKitFrm")
-                ((NewEditKitFrm)mdifrm).Delete();
-            else if (mdifrm.Name == "QuickEditKit")
-                ((QuickEditKit)mdifrm).Delete();
-        }
-
         public static void exportKit(string kit, string filename, int option)
         {
             string name = null;
 
             name = getKitName(kit);
-            SQLiteConnection cnn = GKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKSqlFuncs.getDBConnection();
             // kit autosomal - RSID,Chromosome,Position,Genotypoe
             SQLiteCommand query = new SQLiteCommand(@"SELECT kit_no,rsid,chromosome,position,genotype from kit_autosomal where kit_no=@kit_no order by chromosome,position", cnn);
             query.Parameters.AddWithValue("@kit_no", kit);
@@ -1196,7 +1007,7 @@ namespace GenetixKit.Core
 
                     File.AppendAllText(temp_file, "\r\n@AUTOSOMAL-SCHEMA@\r\n" + autosomal_schema.Replace("\r\n", "").Replace("\r", "").Replace("\n", "").Trim());
                     File.AppendAllText(temp_file, "\r\n@YSNPS@\r\n" + ysnps + "\r\n@YSTR@\r\n" + ystr + "\r\n@MTDNA@\r\n" + mtdna + "\r\n@FASTA@\r\n" + Convert.ToBase64String(Encoding.UTF8.GetBytes(fasta)) + "\r\n");
-                    GZipFile(temp_file, filename);
+                    GKUtils.GZipFile(temp_file, filename);
                     File.Delete(autosomal_file);
                     File.Delete(temp_file);
                     break;
@@ -1240,7 +1051,7 @@ namespace GenetixKit.Core
             string fasta = null;
             StringBuilder sb = new StringBuilder();
             int count = 0;
-            GUnzipFile(filename, temp_file);
+            GKUtils.GUnzipFile(filename, temp_file);
             StreamReader reader = File.OpenText(temp_file);
             string line = null;
             while ((line = reader.ReadLine()) != null) {
@@ -1274,11 +1085,11 @@ namespace GenetixKit.Core
             // now insert into db...
 
             Program.GGKitFrmMainInst.Invoke(new MethodInvoker(delegate {
-                setStatus("20% complete.");
-                setProgress(20);
+                GKUIFuncs.setStatus("20% complete.");
+                GKUIFuncs.setProgress(20);
             }));
 
-            SQLiteConnection cnn = GKUtilLib.getDBConnection();
+            SQLiteConnection cnn = GKSqlFuncs.getDBConnection();
 
             try {
                 //remove existing - on delete cascade...
@@ -1316,8 +1127,8 @@ namespace GenetixKit.Core
                     upCmd.Dispose();
                 }
                 Program.GGKitFrmMainInst.Invoke(new MethodInvoker(delegate {
-                    setStatus("80% complete.");
-                    setProgress(80);
+                    GKUIFuncs.setStatus("80% complete.");
+                    GKUIFuncs.setProgress(80);
                 }));
 
                 //kit ystr
@@ -1355,13 +1166,6 @@ namespace GenetixKit.Core
             cnn.Dispose();
             File.Delete(temp_file);
             File.Delete(temp_autosomal);
-        }
-
-        public static string Reverse(string s)
-        {
-            char[] charArray = s.ToCharArray();
-            Array.Reverse(charArray);
-            return new string(charArray);
         }
 
         public static object[] compareOneToOne(string kit1, string kit2)
@@ -1472,7 +1276,7 @@ namespace GenetixKit.Core
                                 start_pos = position;
                         } else if (reader.GetInt32(5) == 2) {
                             // match 1 allele
-                            if (gt1 == Reverse(gt2)) {
+                            if (gt1 == GKUtils.Reverse(gt2)) {
                                 tmp.Rows.Add(new object[] { rsid, chromosome, position.ToString(), gt1, gt2, gt1 });
                                 if (start_pos == 0)
                                     start_pos = position;
@@ -1553,7 +1357,7 @@ namespace GenetixKit.Core
                 cnn.Close();
                 //
                 //save
-                GKUtilLib.addAutosomalCmp(kit1, kit2, segments_idx, segments, reference);
+                GKSqlFuncs.addAutosomalCmp(kit1, kit2, segments_idx, segments, reference);
 
             }
             return new object[] { segments_idx, segments };
@@ -1628,7 +1432,7 @@ namespace GenetixKit.Core
             if (kit_name.ContainsKey(kit))
                 return kit_name[kit];
             else {
-                DataTable dt = GKUtilLib.queryDatabase("kit_master", new string[] { "name" }, "where kit_no='" + kit + "'");
+                DataTable dt = GKSqlFuncs.queryDatabase("kit_master", new string[] { "name" }, "where kit_no='" + kit + "'");
                 if (dt.Rows.Count > 0) {
                     kit_name.Add(kit, dt.Rows[0].ItemArray[0].ToString());
                     return dt.Rows[0].ItemArray[0].ToString();
@@ -2034,28 +1838,5 @@ namespace GenetixKit.Core
                 }
             return false;
         }
-
-        public static string sqlSafe(string text)
-        {
-            text = Regex.Replace(text, "[^A-Za-z0-9 ]", " ");
-            return text;
-        }
-
-        public static byte[] imageToByteArray(System.Drawing.Image imageIn)
-        {
-            using (var ms = new MemoryStream()) {
-                imageIn.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                return ms.ToArray();
-            }
-        }
-
-        public static Image byteArrayToImage(byte[] byteArrayIn)
-        {
-            using (var ms = new MemoryStream(byteArrayIn)) {
-                Image returnImage = Image.FromStream(ms);
-                return returnImage;
-            }
-        }
-
     }
 }

@@ -34,11 +34,11 @@ namespace GenetixKit.Forms
         private void bwPhasing_DoWork(object sender, DoWorkEventArgs e)
         {
             if (father_kit != "Unknown" && mother_kit != "Unknown")
-                dt = GKUtilLib.QueryDB("SELECT c.[rsid]'RSID',c.[chromosome]'Chromosome',c.[position]'Position',c.[genotype]\"Child\",COALESCE(f.[genotype],'--')\"Father\",COALESCE(m.[genotype],'--')\"Mother\",''\"Phased Paternal\",''\"Phased Maternal\"  FROM kit_autosomal c left outer join kit_autosomal f,kit_autosomal m on f.rsid=c.rsid AND m.rsid=c.rsid WHERE c.kit_no='" + child_kit + "' AND f.kit_no='" + father_kit + "' AND m.[kit_no]='" + mother_kit + "' ORDER BY cast(c.chromosome as integer),c.position");
+                dt = GKSqlFuncs.QueryDB("SELECT c.[rsid]'RSID',c.[chromosome]'Chromosome',c.[position]'Position',c.[genotype]\"Child\",COALESCE(f.[genotype],'--')\"Father\",COALESCE(m.[genotype],'--')\"Mother\",''\"Phased Paternal\",''\"Phased Maternal\"  FROM kit_autosomal c left outer join kit_autosomal f,kit_autosomal m on f.rsid=c.rsid AND m.rsid=c.rsid WHERE c.kit_no='" + child_kit + "' AND f.kit_no='" + father_kit + "' AND m.[kit_no]='" + mother_kit + "' ORDER BY cast(c.chromosome as integer),c.position");
             else if (father_kit != "Unknown" && mother_kit == "Unknown")
-                dt = GKUtilLib.QueryDB("SELECT c.[rsid]'RSID',c.[chromosome]'Chromosome',c.[position]'Position',c.[genotype]\"Child\",COALESCE(f.[genotype],'--')\"Father\",'--'\"Mother\",''\"Phased Paternal\",''\"Phased Maternal\"  FROM kit_autosomal c left outer join kit_autosomal f on f.rsid=c.rsid  WHERE c.kit_no='" + child_kit + "' AND f.kit_no='" + father_kit + "' ORDER BY cast(c.chromosome as integer),c.position");
+                dt = GKSqlFuncs.QueryDB("SELECT c.[rsid]'RSID',c.[chromosome]'Chromosome',c.[position]'Position',c.[genotype]\"Child\",COALESCE(f.[genotype],'--')\"Father\",'--'\"Mother\",''\"Phased Paternal\",''\"Phased Maternal\"  FROM kit_autosomal c left outer join kit_autosomal f on f.rsid=c.rsid  WHERE c.kit_no='" + child_kit + "' AND f.kit_no='" + father_kit + "' ORDER BY cast(c.chromosome as integer),c.position");
             else if (father_kit == "Unknown" && mother_kit != "Unknown")
-                dt = GKUtilLib.QueryDB("SELECT c.[rsid]'RSID',c.[chromosome]'Chromosome',c.[position]'Position',c.[genotype]\"Child\",'--'\"Father\",COALESCE(m.[genotype],'--')\"Mother\" ,''\"Phased Paternal\",''\"Phased Maternal\"  FROM kit_autosomal c left outer join kit_autosomal m on m.rsid=c.rsid WHERE c.kit_no='" + child_kit + "' AND m.kit_no='" + mother_kit + "' ORDER BY cast(c.chromosome as integer),c.position");
+                dt = GKSqlFuncs.QueryDB("SELECT c.[rsid]'RSID',c.[chromosome]'Chromosome',c.[position]'Position',c.[genotype]\"Child\",'--'\"Father\",COALESCE(m.[genotype],'--')\"Mother\" ,''\"Phased Paternal\",''\"Phased Maternal\"  FROM kit_autosomal c left outer join kit_autosomal m on m.rsid=c.rsid WHERE c.kit_no='" + child_kit + "' AND m.kit_no='" + mother_kit + "' ORDER BY cast(c.chromosome as integer),c.position");
 
             // after phasing...
             string child = null;
@@ -149,7 +149,7 @@ namespace GenetixKit.Forms
             string chromosome = null;
             string position = null;
             bwPhasing.ReportProgress(-1, "Saving Phased Kit " + child_kit + " ...");
-            SQLiteConnection conn = GKUtilLib.getDBConnection();
+            SQLiteConnection conn = GKSqlFuncs.getDBConnection();
 
             SQLiteCommand cmd = new SQLiteCommand("DELETE FROM kit_phased where kit_no=@kit_no", conn);
             cmd.Parameters.AddWithValue("@kit_no", child_kit);
@@ -238,7 +238,7 @@ namespace GenetixKit.Forms
         private void bwPhasing_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
 
-            GKUtilLib.setStatus("Done.");
+            GKUIFuncs.setStatus("Done.");
             dgvPhasing.Columns.Clear();
             dgvPhasing.DataSource = dt;
             dgvPhasing.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
@@ -277,7 +277,7 @@ namespace GenetixKit.Forms
             SelectKitFrm open = new SelectKitFrm(SelectKitFrm.SELECT_KIT);
             open.ShowDialog(this);
             father_kit = open.getSelectedKit();
-            btnFather.Text = GKUtilLib.getKitName(father_kit);
+            btnFather.Text = GKSqlFuncs.getKitName(father_kit);
             if ((father_kit != "Unknown" || mother_kit != "Unknown") && child_kit != "Unknown")
                 btnPhasing.Enabled = true;
         }
@@ -287,7 +287,7 @@ namespace GenetixKit.Forms
             SelectKitFrm open = new SelectKitFrm(SelectKitFrm.SELECT_KIT);
             open.ShowDialog(this);
             mother_kit = open.getSelectedKit();
-            btnMother.Text = GKUtilLib.getKitName(mother_kit);
+            btnMother.Text = GKSqlFuncs.getKitName(mother_kit);
             if ((father_kit != "Unknown" || mother_kit != "Unknown") && child_kit != "Unknown")
                 btnPhasing.Enabled = true;
         }
@@ -297,7 +297,7 @@ namespace GenetixKit.Forms
             SelectKitFrm open = new SelectKitFrm(SelectKitFrm.SELECT_KIT);
             open.ShowDialog(this);
             child_kit = open.getSelectedKit();
-            btnChild.Text = GKUtilLib.getKitName(child_kit);
+            btnChild.Text = GKSqlFuncs.getKitName(child_kit);
             if ((father_kit != "Unknown" || mother_kit != "Unknown") && child_kit != "Unknown")
                 btnPhasing.Enabled = true;
         }
@@ -310,14 +310,14 @@ namespace GenetixKit.Forms
             btnMother.Enabled = false;
             rbMale.Enabled = false;
             rbFemale.Enabled = false;
-            GKUtilLib.setStatus("Phasing...");
+            GKUIFuncs.setStatus("Phasing...");
             male = rbMale.Checked;
             bwPhasing.RunWorkerAsync();
         }
 
         private void bwPhasing_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            GKUtilLib.setStatus(e.UserState.ToString());
+            GKUIFuncs.setStatus(e.UserState.ToString());
         }
 
         private void rbMale_CheckedChanged(object sender, EventArgs e)

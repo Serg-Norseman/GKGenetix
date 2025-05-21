@@ -32,7 +32,7 @@ namespace GenetixKit.Forms
         {
             InitializeComponent();
             this.kit = kit;
-            label1.Text = " " + kit + " (" + GKUtilLib.getKitName(kit) + ")";
+            label1.Text = " " + kit + " (" + GKSqlFuncs.getKitName(kit) + ")";
         }
 
         private void MitoMapFrm_Load(object sender, EventArgs e)
@@ -57,12 +57,12 @@ namespace GenetixKit.Forms
             }
             reader.Close();
             //
-            RSRS = GKUtilLib.getRSRS();
+            RSRS = GKSqlFuncs.getRSRS();
             for (int i = 0; i < RSRS.Length; i++)
                 nucleotides.Add(i + 1, new string[] { (i + 1).ToString(), RSRS[i].ToString(), RSRS[i].ToString() });
 
-            mutations = GKUtilLib.queryValue("kit_mtdna", new string[] { "mutations" }, "where kit_no='" + kit + "'");
-            dgvNucleotides.Columns[2].HeaderText = GKUtilLib.getKitName(kit) + " (" + kit + ")";
+            mutations = GKSqlFuncs.queryValue("kit_mtdna", new string[] { "mutations" }, "where kit_no='" + kit + "'");
+            dgvNucleotides.Columns[2].HeaderText = GKSqlFuncs.getKitName(kit) + " (" + kit + ")";
 
             dgvmtdna.Columns[3].Visible = false;
 
@@ -235,7 +235,7 @@ namespace GenetixKit.Forms
 
                 DataPoint dp = (DataPoint)result.Object;
                 dp.LabelBackColor = Color.LightBlue;
-                GKUtilLib.setStatus("Selected " + dp.Label);
+                GKUIFuncs.setStatus("Selected " + dp.Label);
 
                 foreach (DataGridViewRow row in dgvmtdna.Rows) {
                     if (row.Cells[0].Value.ToString() == dp.Label) {
