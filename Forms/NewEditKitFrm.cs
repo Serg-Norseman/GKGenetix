@@ -29,7 +29,7 @@ namespace GenetixKit.Forms
 
         bool save_success = false;
 
-        Dictionary<string, string[]> ymap = GKSqlFuncs.getYMap();
+        Dictionary<string, string[]> ymap = GKGenFuncs.getYMap();
         string ysnps = null;
         string mtdna = null;
         bool kit_disabled = false;
@@ -85,7 +85,7 @@ namespace GenetixKit.Forms
                 string[] filePaths = (string[])e.Argument;
 
                 foreach (string file_path in filePaths) {
-                    Object[] dnaout = GKSqlFuncs.getAutosomalDNAList(file_path);
+                    Object[] dnaout = GKGenFuncs.getAutosomalDNAList(file_path);
                     ArrayList rows = (ArrayList)dnaout[0];
                     List<string> ysnps_arr = (List<string>)dnaout[1];
                     ArrayList mtdna_arr = (ArrayList)dnaout[2];
@@ -224,7 +224,7 @@ namespace GenetixKit.Forms
                         }
                     } else if (data[0] == "Novel Variant") {
                         if (ymap.ContainsKey(data[1])) {
-                            snp = GKSqlFuncs.getYSNP(data[1], data[6]);
+                            snp = GKGenFuncs.getYSNP(data[1], data[6]);
                             if (snp[0].IndexOf(";") == -1)
                                 sb.Append(snp[0] + snp[1] + ", ");
                             else
@@ -267,7 +267,7 @@ namespace GenetixKit.Forms
                 //
                 try {
                     tbFASTA.Text = File.ReadAllText(fasta_file);
-                    textBoxMtDNA.Text = GKSqlFuncs.getMtDNAMarkers(fasta_file);
+                    textBoxMtDNA.Text = GKGenFuncs.getMtDNAMarkers(fasta_file);
                 } catch (Exception) {
                     MessageBox.Show("Unable to extract mtDNA mutations from " + fasta_file);
                 }
@@ -916,7 +916,7 @@ namespace GenetixKit.Forms
                 //
                 try {
                     tbFASTA.Text = File.ReadAllText(fasta_file);
-                    textBoxMtDNA.Text = GKSqlFuncs.getMtDNAMarkers(fasta_file);
+                    textBoxMtDNA.Text = GKGenFuncs.getMtDNAMarkers(fasta_file);
                 } catch (Exception) {
                     MessageBox.Show("Unable to extract mtDNA mutations from " + fasta_file);
                 }
