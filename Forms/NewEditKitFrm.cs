@@ -20,16 +20,9 @@ namespace GenetixKit.Forms
 {
     public partial class NewEditKitFrm : Form
     {
-
-        string[] ydna12 = new string[] { "DYS393", "DYS390", "DYS19", "DYS391", "DYS385", "DYS426", "DYS388", "DYS439", "DYS389I", "DYS392", "DYS389II" };
-        string[] ydna25 = new string[] { "DYS458", "DYS459", "DYS455", "DYS454", "DYS447", "DYS437", "DYS448", "DYS449", "DYS464" };
-        string[] ydna37 = new string[] { "DYS460", "Y-GATA-H4", "YCAII", "DYS456", "DYS607", "DYS576", "DYS570", "CDY", "DYS442", "DYS438" };
-        string[] ydna67 = new string[] { "DYS531", "DYS578", "DYF395S1", "DYS590", "DYS537", "DYS641", "DYS472", "DYF406S1", "DYS511", "DYS425", "DYS413", "DYS557", "DYS594", "DYS436", "DYS490", "DYS534", "DYS450", "DYS444", "DYS481", "DYS520", "DYS446", "DYS617", "DYS568", "DYS487", "DYS572", "DYS640", "DYS492", "DYS565" };
-        string[] ydna111 = new string[] { "DYS710", "DYS485", "DYS632", "DYS495", "DYS540", "DYS714", "DYS716", "DYS717", "DYS505", "DYS556", "DYS549", "DYS589", "DYS522", "DYS494", "DYS533", "DYS636", "DYS575", "DYS638", "DYS462", "DYS452", "DYS445", "Y-GATA-A10", "DYS463", "DYS441", "Y-GGAAT-1B07", "DYS525", "DYS712", "DYS593", "DYS650", "DYS532", "DYS715", "DYS504", "DYS513", "DYS561", "DYS552", "DYS726", "DYS635", "DYS587", "DYS643", "DYS497", "DYS510", "DYS434", "DYS461", "DYS435" };
-
         bool save_success = false;
 
-        Dictionary<string, string[]> ymap = GKGenFuncs.getYMap();
+        Dictionary<string, string[]> ymap = GKData.getYMap();
         string ysnps = null;
         string mtdna = null;
         bool kit_disabled = false;
@@ -168,19 +161,19 @@ namespace GenetixKit.Forms
         private void NewKitFrm_Load(object sender, EventArgs e)
         {
             //YDNA12
-            foreach (string marker in ydna12)
+            foreach (string marker in GKData.ydna12)
                 dgvy12.Rows.Add(new string[] { marker, "" });
             //YDNA25
-            foreach (string marker in ydna25)
+            foreach (string marker in GKData.ydna25)
                 dgvy25.Rows.Add(new string[] { marker, "" });
             //YDNA37
-            foreach (string marker in ydna37)
+            foreach (string marker in GKData.ydna37)
                 dgvy37.Rows.Add(new string[] { marker, "" });
             //YDNA67
-            foreach (string marker in ydna67)
+            foreach (string marker in GKData.ydna67)
                 dgvy67.Rows.Add(new string[] { marker, "" });
             //YDNA111
-            foreach (string marker in ydna111)
+            foreach (string marker in GKData.ydna111)
                 dgvy111.Rows.Add(new string[] { marker, "" });
 
             cbSex.SelectedIndex = 0;
@@ -302,39 +295,39 @@ namespace GenetixKit.Forms
                 string[] ystr = (Clipboard.GetText(TextDataFormat.Text) + stab).TrimStart().Split(new char[] { '\t' });
 
                 //YDNA12
-                for (int i = 0; i < ydna12.Length; i++)
+                for (int i = 0; i < GKData.ydna12.Length; i++)
                     dgvy12.Rows[i].Cells[1].Value = ystr[i];
                 //YDNA25
-                for (int i = 0; i < ydna25.Length; i++)
-                    dgvy25.Rows[i].Cells[1].Value = ystr[i + ydna12.Length];
+                for (int i = 0; i < GKData.ydna25.Length; i++)
+                    dgvy25.Rows[i].Cells[1].Value = ystr[i + GKData.ydna12.Length];
                 //YDNA37
-                for (int i = 0; i < ydna37.Length; i++)
-                    dgvy37.Rows[i].Cells[1].Value = ystr[i + ydna12.Length + ydna25.Length];
+                for (int i = 0; i < GKData.ydna37.Length; i++)
+                    dgvy37.Rows[i].Cells[1].Value = ystr[i + GKData.ydna12.Length + GKData.ydna25.Length];
                 //YDNA67
-                for (int i = 0; i < ydna67.Length; i++)
-                    dgvy67.Rows[i].Cells[1].Value = ystr[i + ydna12.Length + ydna25.Length + ydna37.Length];
+                for (int i = 0; i < GKData.ydna67.Length; i++)
+                    dgvy67.Rows[i].Cells[1].Value = ystr[i + GKData.ydna12.Length + GKData.ydna25.Length + GKData.ydna37.Length];
                 //YDNA111
-                for (int i = 0; i < ydna111.Length; i++)
-                    dgvy111.Rows[i].Cells[1].Value = ystr[i + ydna12.Length + ydna25.Length + ydna37.Length + ydna67.Length];
+                for (int i = 0; i < GKData.ydna111.Length; i++)
+                    dgvy111.Rows[i].Cells[1].Value = ystr[i + GKData.ydna12.Length + GKData.ydna25.Length + GKData.ydna37.Length + GKData.ydna67.Length];
             }
         }
 
         private void btnClear_Click(object sender, EventArgs e)
         {
             //YDNA12
-            for (int i = 0; i < ydna12.Length; i++)
+            for (int i = 0; i < GKData.ydna12.Length; i++)
                 dgvy12.Rows[i].Cells[1].Value = "";
             //YDNA25
-            for (int i = 0; i < ydna25.Length; i++)
+            for (int i = 0; i < GKData.ydna25.Length; i++)
                 dgvy25.Rows[i].Cells[1].Value = "";
             //YDNA37
-            for (int i = 0; i < ydna37.Length; i++)
+            for (int i = 0; i < GKData.ydna37.Length; i++)
                 dgvy37.Rows[i].Cells[1].Value = "";
             //YDNA67
-            for (int i = 0; i < ydna67.Length; i++)
+            for (int i = 0; i < GKData.ydna67.Length; i++)
                 dgvy67.Rows[i].Cells[1].Value = "";
             //YDNA111
-            for (int i = 0; i < ydna111.Length; i++)
+            for (int i = 0; i < GKData.ydna111.Length; i++)
                 dgvy111.Rows[i].Cells[1].Value = "";
             //YDNA MISC
             dgvymisc.Rows.Clear();
@@ -643,38 +636,38 @@ namespace GenetixKit.Forms
             this.Invoke(new MethodInvoker(delegate {
                 //
                 //YDNA12
-                for (int i = 0; i < ydna12.Length; i++) {
-                    if (ystr_dict.ContainsKey(ydna12[i])) {
-                        dgvy12.Rows[i].Cells[1].Value = ystr_dict[ydna12[i]];
-                        ystr_dict.Remove(ydna12[i]);
+                for (int i = 0; i < GKData.ydna12.Length; i++) {
+                    if (ystr_dict.ContainsKey(GKData.ydna12[i])) {
+                        dgvy12.Rows[i].Cells[1].Value = ystr_dict[GKData.ydna12[i]];
+                        ystr_dict.Remove(GKData.ydna12[i]);
                     }
                 }
                 //YDNA25
-                for (int i = 0; i < ydna25.Length; i++) {
-                    if (ystr_dict.ContainsKey(ydna25[i])) {
-                        dgvy25.Rows[i].Cells[1].Value = ystr_dict[ydna25[i]];
-                        ystr_dict.Remove(ydna25[i]);
+                for (int i = 0; i < GKData.ydna25.Length; i++) {
+                    if (ystr_dict.ContainsKey(GKData.ydna25[i])) {
+                        dgvy25.Rows[i].Cells[1].Value = ystr_dict[GKData.ydna25[i]];
+                        ystr_dict.Remove(GKData.ydna25[i]);
                     }
                 }
                 //YDNA37
-                for (int i = 0; i < ydna37.Length; i++) {
-                    if (ystr_dict.ContainsKey(ydna37[i])) {
-                        dgvy37.Rows[i].Cells[1].Value = ystr_dict[ydna37[i]];
-                        ystr_dict.Remove(ydna37[i]);
+                for (int i = 0; i < GKData.ydna37.Length; i++) {
+                    if (ystr_dict.ContainsKey(GKData.ydna37[i])) {
+                        dgvy37.Rows[i].Cells[1].Value = ystr_dict[GKData.ydna37[i]];
+                        ystr_dict.Remove(GKData.ydna37[i]);
                     }
                 }
                 //YDNA67
-                for (int i = 0; i < ydna67.Length; i++) {
-                    if (ystr_dict.ContainsKey(ydna67[i])) {
-                        dgvy67.Rows[i].Cells[1].Value = ystr_dict[ydna67[i]];
-                        ystr_dict.Remove(ydna67[i]);
+                for (int i = 0; i < GKData.ydna67.Length; i++) {
+                    if (ystr_dict.ContainsKey(GKData.ydna67[i])) {
+                        dgvy67.Rows[i].Cells[1].Value = ystr_dict[GKData.ydna67[i]];
+                        ystr_dict.Remove(GKData.ydna67[i]);
                     }
                 }
                 //YDNA111
-                for (int i = 0; i < ydna111.Length; i++) {
-                    if (ystr_dict.ContainsKey(ydna111[i])) {
-                        dgvy111.Rows[i].Cells[1].Value = ystr_dict[ydna111[i]];
-                        ystr_dict.Remove(ydna111[i]);
+                for (int i = 0; i < GKData.ydna111.Length; i++) {
+                    if (ystr_dict.ContainsKey(GKData.ydna111[i])) {
+                        dgvy111.Rows[i].Cells[1].Value = ystr_dict[GKData.ydna111[i]];
+                        ystr_dict.Remove(GKData.ydna111[i]);
                     }
                 }
                 //YDNA MISC

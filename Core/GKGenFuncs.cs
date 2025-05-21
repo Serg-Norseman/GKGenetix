@@ -33,10 +33,6 @@ namespace GenetixKit.Core
         public const double MB_THRESHOLD = 0.5; // mandatory
 
 
-        private static Dictionary<int, double>[] map = null;
-        private static Dictionary<string, string[]> ymap = null;
-        private static char[] RSRS = null;
-
         private static List<string> markers_new = new List<string>();
 
         public static double getLength_in_cM(string chr, int start_pos, int end_pos)
@@ -47,15 +43,13 @@ namespace GenetixKit.Core
         public static double getPosition_in_cM(string chr, int pos)
         {
             double cm = 0.0;
-            if (map == null)
-                loadMap();
             int chr_int = -1;
             if (chr == "X")
                 chr_int = 23;
             else
                 chr_int = int.Parse(chr);
 
-            Dictionary<int, double> tmap = map[chr_int - 1];
+            Dictionary<int, double> tmap = GKData.getcM_Map()[chr_int - 1];
 
             if (!tmap.ContainsKey(pos)) {
                 var prev_pos = from p in tmap.Keys where p <= pos select p;
@@ -99,39 +93,13 @@ namespace GenetixKit.Core
             return cm;
         }
 
-        public static char[] getRSRS()
-        {
-            if (RSRS == null)
-                RSRS = Encoding.ASCII.GetString(GKUtils.GUnzip(GenetixKit.Properties.Resources.RSRS)).ToCharArray();
-            return RSRS;
-        }
-
-        public static Dictionary<string, string[]> getYMap()
-        {
-            if (ymap == null) {
-                ymap = new Dictionary<string, string[]>();
-                string csv = Encoding.UTF8.GetString(GKUtils.GUnzip(GenetixKit.Properties.Resources.ysnp_hg19));
-                StringReader reader = new StringReader(csv);
-                string l = null;
-                string[] d = null;
-                l = reader.ReadLine(); // header
-                //snp;snp,pos,mutation
-                while ((l = reader.ReadLine()) != null) {
-                    d = l.Split(new char[] { ',' });
-                    if (!ymap.ContainsKey(d[1]))
-                        ymap.Add(d[1], new string[] { d[0], d[2] });
-                }
-            }
-            return ymap;
-        }
-
         public static Object[] getAutosomalDNAList(string file)
         {
             Object[] dnaout = new Object[3];
             ArrayList rows = new ArrayList();
             string[] lines = null;
             string tmp = null;
-            char[] rsrs = getRSRS();
+            char[] rsrs = GKData.getRSRS();
             if (file.EndsWith(".gz")) {
                 tmp = Encoding.UTF8.GetString(GKUtils.GUnzip(File.ReadAllBytes(file)));
                 // ugly but required 
@@ -236,7 +204,7 @@ namespace GenetixKit.Core
                 } else {
                     //
                     if (chr == "Y") {
-                        if (ymap.ContainsKey(pos)) {
+                        if (GKData.getYMap().ContainsKey(pos)) {
                             snp = GKGenFuncs.getYSNP(pos, genotype);
                             if (snp[0].IndexOf(";") == -1)
                                 ysnp.Add(snp[0] + snp[1]);
@@ -259,7 +227,7 @@ namespace GenetixKit.Core
 
         public static string[] getYSNP(string pos, string gt)
         {
-            string[] data = ymap[pos];
+            string[] data = GKData.getYMap()[pos];
 
             if (data[1].EndsWith("->" + gt))
                 data[1] = "+";
@@ -308,7 +276,7 @@ namespace GenetixKit.Core
 
         public static string getMarkers(string file, string diff_work_dir)
         {
-            string rsrs = new String(getRSRS()).ToUpper();
+            string rsrs = new String(GKData.getRSRS()).ToUpper();
             string user = FastaSeq(file).ToUpper();
             rsrs = Regex.Replace(rsrs, "(.)", "$1\r\n");
             user = Regex.Replace(user, "(.)", "$1\r\n");
@@ -410,7 +378,7 @@ namespace GenetixKit.Core
 
         private static string convertInsDelToMod(List<string> markers, string file)
         {
-            string rsrs = new String(getRSRS()).ToUpper();
+            string rsrs = new String(GKData.getRSRS()).ToUpper();
             string user = FastaSeq(file).ToUpper();
             int start = 0;
             int end = 0;
@@ -520,31 +488,6 @@ namespace GenetixKit.Core
             string markers_str = convertInsDelToMod(markers, fasta_file);
             Directory.Delete(diff_work_dir, true);
             return markers_str;
-        }
-
-        public static void loadMap()
-        {
-            // required for cM calculation
-            if (map == null)
-                map = new Dictionary<int, double>[23];
-            using (MemoryStream ms = new MemoryStream(GKUtils.GUnzip(GenetixKit.Properties.Resources.map_csv))) {
-                StreamReader reader = new StreamReader(ms);
-                string line = reader.ReadLine(); //header
-                string[] data = null;
-                int chr = -1;
-                int pos = -1;
-                double cm = 0.0;
-                while ((line = reader.ReadLine()) != null) {
-                    data = line.Split(new char[] { ',' });
-                    chr = int.Parse(data[1]);
-                    pos = int.Parse(data[2]);
-                    cm = double.Parse(data[3]);
-                    if (map[chr - 1] == null)
-                        map[chr - 1] = new Dictionary<int, double>();
-                    map[chr - 1].Add(pos, cm);
-                }
-                reader.Close();
-            }
         }
 
         public static bool isPhasedMatch(string gt1, string gt2)

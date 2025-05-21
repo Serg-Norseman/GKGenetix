@@ -57,7 +57,7 @@ namespace GenetixKit.Forms
             }
             reader.Close();
             //
-            RSRS = GKGenFuncs.getRSRS();
+            RSRS = GKData.getRSRS();
             for (int i = 0; i < RSRS.Length; i++)
                 nucleotides.Add(i + 1, new string[] { (i + 1).ToString(), RSRS[i].ToString(), RSRS[i].ToString() });
 
