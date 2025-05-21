@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\GKGenFuncs.cs" />
     <Compile Include="Core\GKUIFuncs.cs" />
     <Compile Include="Core\GKUtils.cs" />
     <Compile Include="Forms\AdmixtureFrm.cs">
