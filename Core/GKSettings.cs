@@ -1,4 +1,10 @@
-﻿using System.Collections.Generic;
+﻿/*
+ * Genetic Genealogy Kit (GGK), v1.2
+ * Copyright © 2014 by Felix Chandrakumar
+ * License: MIT License (http://opensource.org/licenses/MIT)
+ */
+
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 
