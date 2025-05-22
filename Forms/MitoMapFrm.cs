@@ -17,56 +17,68 @@ namespace GenetixKit.Forms
 {
     public partial class MitoMapFrm : Form
     {
-        char[] RSRS = null;
-        string kit = null;
-        Dictionary<int, string[]> nucleotides = new Dictionary<int, string[]>();
-
-        SortedDictionary<int, List<string>> kit_mutations = new SortedDictionary<int, List<string>>();
-        SortedDictionary<int, List<string>> kit_insertions = new SortedDictionary<int, List<string>>();
-
-        string mutations = null;
-
-        int initial_value = -1;
+        private char[] RSRS = null;
+        private readonly string kit = null;
+        private readonly Dictionary<int, string[]> nucleotides = new Dictionary<int, string[]>();
+        private readonly SortedDictionary<int, List<string>> kitMutations = new SortedDictionary<int, List<string>>();
+        private readonly SortedDictionary<int, List<string>> kitInsertions = new SortedDictionary<int, List<string>>();
+        private string mutations = null;
+        private int initialValue = -1;
 
         public MitoMapFrm(string kit)
         {
             InitializeComponent();
+
+            GKUIFuncs.FixGridView(dgvmtdna);
+            dgvmtdna.AddColumn("map_locus", "Map Locus");
+            dgvmtdna.AddColumn("start", "Start Position");
+            dgvmtdna.AddColumn("end", "End Position");
+            dgvmtdna.AddColumn("total", "Total Nucleotides");
+            dgvmtdna.AddColumn("shorthand", "Shorthand");
+            dgvmtdna.AddColumn("description", "Description");
+
+            GKUIFuncs.FixGridView(dgvNucleotides);
+            dgvNucleotides.AddColumn("pos", "Position");
+            dgvNucleotides.AddColumn("rsrsname", "RSRS");
+            dgvNucleotides.AddColumn("ckit", "Kit");
+
             this.kit = kit;
-            label1.Text = " " + kit + " (" + GKSqlFuncs.getKitName(kit) + ")";
+            label1.Text = " " + kit + " (" + GKSqlFuncs.GetKitName(kit) + ")";
         }
 
         private void MitoMapFrm_Load(object sender, EventArgs e)
         {
-            string csv = GenetixKit.Properties.Resources.mtdna_map;
+            string csv = Properties.Resources.mtdna_map;
             StreamReader reader = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(csv)));
-            string line = null;
-            string[] data = null;
-            Series series = series = mtdna_chart.Series[0];
+            Series series = mtdna_chart.Series[0];
             //Map Locus	 Starting	 Ending	bp Length	 Shorthand	 Description
             dgvmtdna.Rows.Clear();
+
+            string line;
             while ((line = reader.ReadLine()) != null) {
-                data = line.Split(new char[] { ',' });
+                string[] data = line.Split(new char[] { ',' });
+
                 DataPoint dp = new DataPoint();
                 dp.IsVisibleInLegend = false;
                 dp.Label = data[0];
                 dp.YValues = new double[] { int.Parse(data[3]) };
                 dp.CustomProperties = "PieLineColor=Black, PieLabelStyle=Outside, Exploded=True";
                 series.Points.Add(dp);
-                //
+
                 dgvmtdna.Rows.Add(new object[] { data[0], data[1], data[2], data[3], data[4], data[5] });
             }
             reader.Close();
-            //
-            RSRS = GKData.getRSRS();
+
+            RSRS = GKData.RSRS;
             for (int i = 0; i < RSRS.Length; i++)
                 nucleotides.Add(i + 1, new string[] { (i + 1).ToString(), RSRS[i].ToString(), RSRS[i].ToString() });
 
-            mutations = GKSqlFuncs.queryValue("kit_mtdna", new string[] { "mutations" }, "where kit_no='" + kit + "'");
-            dgvNucleotides.Columns[2].HeaderText = GKSqlFuncs.getKitName(kit) + " (" + kit + ")";
+            mutations = GKSqlFuncs.QueryValue("kit_mtdna", new string[] { "mutations" }, "where kit_no='" + kit + "'");
+            dgvNucleotides.Columns[2].HeaderText = GKSqlFuncs.GetKitName(kit) + " (" + kit + ")";
 
             dgvmtdna.Columns[3].Visible = false;
 
-            loadKitMutations();
+            LoadKitMutations();
         }
 
         private void dgvmtdna_SelectionChanged(object sender, EventArgs e)
@@ -96,18 +108,14 @@ namespace GenetixKit.Forms
 
             DataGridViewRowCollection dgvrc = dgvNucleotides.Rows;
 
-            DataGridViewCellStyle style_point = new DataGridViewCellStyle();
-            style_point.BackColor = Color.Blue;
-            style_point.ForeColor = Color.White;
-            DataGridViewCellStyle style_insert = new DataGridViewCellStyle();
-            style_insert.BackColor = Color.Green;
-            style_insert.ForeColor = Color.White;
+            DataGridViewCellStyle style_point = new DataGridViewCellStyle { BackColor = Color.Blue, ForeColor = Color.White };
+            DataGridViewCellStyle style_insert = new DataGridViewCellStyle { BackColor = Color.Green, ForeColor = Color.White };
 
             end_tmp = end;
             if (end < start)
                 end_tmp = 16569;
 
-            foreach (KeyValuePair<int, List<string>> a in kit_mutations) {
+            foreach (KeyValuePair<int, List<string>> a in kitMutations) {
                 if ((a.Key >= start && a.Key <= end_tmp) || (end < start && a.Key <= end)) {
                     for (int i = 0; i < dgvrc.Count; i++) {
                         if (int.Parse(dgvrc[i].Cells[0].Value.ToString()) == a.Key) {
@@ -118,7 +126,7 @@ namespace GenetixKit.Forms
                 }
             }
 
-            foreach (KeyValuePair<int, List<string>> a in kit_insertions) {
+            foreach (KeyValuePair<int, List<string>> a in kitInsertions) {
                 if ((a.Key >= start && a.Key <= end_tmp) || (end < start && a.Key <= end)) {
                     dgvrc = dgvNucleotides.Rows;
                     for (int i = 0; i < dgvrc.Count; i++) {
@@ -132,56 +140,54 @@ namespace GenetixKit.Forms
                     }
                 }
             }
-            populateFASTA(title, start, end);
+            PopulateFASTA(title, start, end);
         }
 
-        private void loadKitMutations()
+        private void LoadKitMutations()
         {
-            string mut = null;
-            string allele = null;
-            int pos = -1;
-            List<string> alleles = null;
             foreach (string mutation in mutations.Split(new char[] { ',' })) {
-                mut = mutation.Trim();
+                string mut = mutation.Trim();
+                string allele;
+                List<string> alleles;
                 if (mut.IndexOf(".") != -1) {
                     // insert
                     allele = mut[mut.Length - 1].ToString();
-                    pos = int.Parse(mut.Substring(0, mut.IndexOf(".")));
-                    if (!kit_insertions.ContainsKey(pos))
+                    int pos = int.Parse(mut.Substring(0, mut.IndexOf(".")));
+                    if (!kitInsertions.ContainsKey(pos))
                         alleles = new List<string>();
                     else
-                        alleles = kit_insertions[pos];
+                        alleles = kitInsertions[pos];
                     alleles.Add(allele);
-                    kit_insertions.Remove(pos);
-                    kit_insertions.Add(pos, alleles);
+                    kitInsertions.Remove(pos);
+                    kitInsertions.Add(pos, alleles);
                 } else {
                     allele = mut[mut.Length - 1].ToString();
-                    pos = int.Parse(mut.Substring(1, mut.Length - 2));
-                    if (!kit_mutations.ContainsKey(pos))
+                    int pos = int.Parse(mut.Substring(1, mut.Length - 2));
+                    if (!kitMutations.ContainsKey(pos))
                         alleles = new List<string>();
                     else
-                        alleles = kit_mutations[pos];
+                        alleles = kitMutations[pos];
                     alleles.Add(allele);
-                    kit_mutations.Remove(pos);
-                    kit_mutations.Add(pos, alleles);
+                    kitMutations.Remove(pos);
+                    kitMutations.Add(pos, alleles);
                 }
             }
         }
 
         private void mtdna_chart_MouseDown(object sender, MouseEventArgs e)
         {
-            initial_value = e.Y;
+            initialValue = e.Y;
         }
 
         private void mtdna_chart_MouseMove(object sender, MouseEventArgs e)
         {
-            if (initial_value != -1) {
+            if (initialValue != -1) {
                 if (e.Button == MouseButtons.Left) {
-                    int new_y = e.Y - initial_value;
+                    int new_y = e.Y - initialValue;
 
                     int new_degree = new_y * (90) / 1200;
 
-                    new_degree = new_degree + mtdna_chart.ChartAreas[0].Area3DStyle.Inclination;
+                    new_degree += mtdna_chart.ChartAreas[0].Area3DStyle.Inclination;
 
                     if (new_degree < -90)
                         new_degree = 90 + (new_degree + 90);
@@ -192,7 +198,7 @@ namespace GenetixKit.Forms
                     mtdna_chart.ChartAreas[0].Area3DStyle.Inclination = new_degree;
                 }
                 if (e.Button == MouseButtons.Right) {
-                    int new_y = e.Y - initial_value;
+                    int new_y = e.Y - initialValue;
 
                     int new_degree = new_y * 180 / 1200;
 
@@ -204,7 +210,7 @@ namespace GenetixKit.Forms
                         tmp = tmp.Substring(0, start_pos);
                     int angle = int.Parse(tmp.Trim());
 
-                    new_degree = new_degree + angle;
+                    new_degree += angle;
 
                     if (new_degree < -180)
                         new_degree = 180 + (new_degree + 180);
@@ -219,7 +225,7 @@ namespace GenetixKit.Forms
 
         private void mtdna_chart_MouseUp(object sender, MouseEventArgs e)
         {
-            initial_value = -1;
+            initialValue = -1;
         }
 
         private void mtdna_chart_MouseClick(object sender, MouseEventArgs e)
@@ -235,7 +241,7 @@ namespace GenetixKit.Forms
 
                 DataPoint dp = (DataPoint)result.Object;
                 dp.LabelBackColor = Color.LightBlue;
-                GKUIFuncs.setStatus("Selected " + dp.Label);
+                Program.KitInstance.SetStatus("Selected " + dp.Label);
 
                 foreach (DataGridViewRow row in dgvmtdna.Rows) {
                     if (row.Cells[0].Value.ToString() == dp.Label) {
@@ -246,7 +252,7 @@ namespace GenetixKit.Forms
             }
         }
 
-        private void populateFASTA(string locus, int start, int end)
+        private void PopulateFASTA(string locus, int start, int end)
         {
             StringBuilder sb = new StringBuilder();
             int width = 0;

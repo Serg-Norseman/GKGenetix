@@ -7,13 +7,10 @@
         private System.Windows.Forms.Label kitLbl;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage3;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.DataGridView dgv_Admixture;
-        private System.Windows.Forms.DataGridViewTextBoxColumn population;
-        private System.Windows.Forms.DataGridViewTextBoxColumn location;
-        private System.Windows.Forms.DataGridViewTextBoxColumn percent;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tabOrigins;
+        private System.Windows.Forms.TabPage tabAdmixTable;
+        private System.Windows.Forms.DataGridView dgvAdmixture;
+        private System.Windows.Forms.TabPage tabChart;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.Windows.Forms.PictureBox pbWorldMap;
 
@@ -25,25 +22,22 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AdmixtureFrm));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.tabOrigins = new System.Windows.Forms.TabPage();
             this.pbWorldMap = new System.Windows.Forms.PictureBox();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.dgv_Admixture = new System.Windows.Forms.DataGridView();
-            this.population = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.location = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.percent = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tabAdmixTable = new System.Windows.Forms.TabPage();
+            this.dgvAdmixture = new System.Windows.Forms.DataGridView();
+            this.tabChart = new System.Windows.Forms.TabPage();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.panel1 = new System.Windows.Forms.Panel();
             this.kitLbl = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
-            this.tabPage3.SuspendLayout();
+            this.tabOrigins.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbWorldMap)).BeginInit();
-            this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgv_Admixture)).BeginInit();
-            this.tabPage2.SuspendLayout();
+            this.tabAdmixTable.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvAdmixture)).BeginInit();
+            this.tabChart.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -65,9 +59,9 @@
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabOrigins);
+            this.tabControl1.Controls.Add(this.tabChart);
+            this.tabControl1.Controls.Add(this.tabAdmixTable);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(3, 63);
             this.tabControl1.Name = "tabControl1";
@@ -75,88 +69,56 @@
             this.tabControl1.Size = new System.Drawing.Size(778, 496);
             this.tabControl1.TabIndex = 2;
             // 
-            // tabPage3
+            // tabOrigins
             // 
-            this.tabPage3.Controls.Add(this.pbWorldMap);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(770, 470);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Ethnic Origins";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            this.tabOrigins.Controls.Add(this.pbWorldMap);
+            this.tabOrigins.Location = new System.Drawing.Point(4, 22);
+            this.tabOrigins.Name = "tabOrigins";
+            this.tabOrigins.Padding = new System.Windows.Forms.Padding(3);
+            this.tabOrigins.Size = new System.Drawing.Size(770, 470);
+            this.tabOrigins.TabIndex = 2;
+            this.tabOrigins.Text = "Ethnic Origins";
+            this.tabOrigins.UseVisualStyleBackColor = true;
             // 
             // pbWorldMap
             // 
             this.pbWorldMap.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pbWorldMap.Image = global::GenetixKit.Properties.Resources.world_map;
             this.pbWorldMap.Location = new System.Drawing.Point(3, 3);
             this.pbWorldMap.Name = "pbWorldMap";
             this.pbWorldMap.Size = new System.Drawing.Size(764, 464);
             this.pbWorldMap.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbWorldMap.TabIndex = 0;
             this.pbWorldMap.TabStop = false;
-            this.pbWorldMap.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pbWorldMap_MouseMove);
             // 
-            // tabPage1
+            // tabAdmixTable
             // 
-            this.tabPage1.Controls.Add(this.dgv_Admixture);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(770, 470);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Admixture Table";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.tabAdmixTable.Controls.Add(this.dgvAdmixture);
+            this.tabAdmixTable.Location = new System.Drawing.Point(4, 22);
+            this.tabAdmixTable.Name = "tabAdmixTable";
+            this.tabAdmixTable.Padding = new System.Windows.Forms.Padding(3);
+            this.tabAdmixTable.Size = new System.Drawing.Size(770, 470);
+            this.tabAdmixTable.TabIndex = 0;
+            this.tabAdmixTable.Text = "Admixture Table";
+            this.tabAdmixTable.UseVisualStyleBackColor = true;
             // 
-            // dgv_Admixture
+            // dgvAdmixture
             // 
-            this.dgv_Admixture.AllowUserToAddRows = false;
-            this.dgv_Admixture.AllowUserToDeleteRows = false;
-            this.dgv_Admixture.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgv_Admixture.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.population,
-            this.location,
-            this.percent});
-            this.dgv_Admixture.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgv_Admixture.Location = new System.Drawing.Point(3, 3);
-            this.dgv_Admixture.Name = "dgv_Admixture";
-            this.dgv_Admixture.ReadOnly = true;
-            this.dgv_Admixture.RowHeadersVisible = false;
-            this.dgv_Admixture.Size = new System.Drawing.Size(764, 464);
-            this.dgv_Admixture.TabIndex = 0;
+            this.dgvAdmixture.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvAdmixture.Location = new System.Drawing.Point(3, 3);
+            this.dgvAdmixture.Name = "dgvAdmixture";
+            this.dgvAdmixture.Size = new System.Drawing.Size(764, 464);
+            this.dgvAdmixture.TabIndex = 0;
             // 
-            // population
+            // tabChart
             // 
-            this.population.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.population.HeaderText = "Population";
-            this.population.Name = "population";
-            this.population.ReadOnly = true;
-            // 
-            // location
-            // 
-            this.location.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.location.HeaderText = "Geographic Location";
-            this.location.Name = "location";
-            this.location.ReadOnly = true;
-            // 
-            // percent
-            // 
-            this.percent.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.percent.HeaderText = "Percentage";
-            this.percent.Name = "percent";
-            this.percent.ReadOnly = true;
-            // 
-            // tabPage2
-            // 
-            this.tabPage2.Controls.Add(this.chart1);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(770, 470);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Chart View";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.tabChart.Controls.Add(this.chart1);
+            this.tabChart.Location = new System.Drawing.Point(4, 22);
+            this.tabChart.Name = "tabChart";
+            this.tabChart.Padding = new System.Windows.Forms.Padding(3);
+            this.tabChart.Size = new System.Drawing.Size(770, 470);
+            this.tabChart.TabIndex = 1;
+            this.tabChart.Text = "Chart View";
+            this.tabChart.UseVisualStyleBackColor = true;
             // 
             // chart1
             // 
@@ -213,7 +175,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "AdmixtureFrm";
@@ -222,11 +183,11 @@
             this.Load += new System.EventHandler(this.AdmixtureFrm_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
-            this.tabPage3.ResumeLayout(false);
+            this.tabOrigins.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbWorldMap)).EndInit();
-            this.tabPage1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dgv_Admixture)).EndInit();
-            this.tabPage2.ResumeLayout(false);
+            this.tabAdmixTable.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvAdmixture)).EndInit();
+            this.tabChart.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();

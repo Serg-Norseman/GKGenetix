@@ -2,30 +2,18 @@
 {
     partial class SelectKitFrm
     {
-        private System.ComponentModel.IContainer components = null;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null)) {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        private System.Windows.Forms.Button btnOpen;
+        private System.Windows.Forms.DataGridView dgvKits;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label kitLbl;
 
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.btnOpen = new System.Windows.Forms.Button();
-            this.dataGridViewOpenKit = new System.Windows.Forms.DataGridView();
-            this.kit_no = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.last_modified = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dgvKits = new System.Windows.Forms.DataGridView();
             this.label1 = new System.Windows.Forms.Label();
             this.kitLbl = new System.Windows.Forms.Label();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.bwExport = new System.ComponentModel.BackgroundWorker();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOpenKit)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvKits)).BeginInit();
             this.SuspendLayout();
             // 
             // btnOpen
@@ -38,52 +26,15 @@
             this.btnOpen.UseVisualStyleBackColor = true;
             this.btnOpen.Click += new System.EventHandler(this.btnOpen_Click);
             // 
-            // dataGridViewOpenKit
+            // dgvKits
             // 
-            this.dataGridViewOpenKit.AllowUserToAddRows = false;
-            this.dataGridViewOpenKit.AllowUserToDeleteRows = false;
-            this.dataGridViewOpenKit.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dataGridViewOpenKit.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.kit_no,
-            this.name,
-            this.last_modified});
-            this.dataGridViewOpenKit.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this.dataGridViewOpenKit.Location = new System.Drawing.Point(13, 13);
-            this.dataGridViewOpenKit.MultiSelect = false;
-            this.dataGridViewOpenKit.Name = "dataGridViewOpenKit";
-            this.dataGridViewOpenKit.ReadOnly = true;
-            this.dataGridViewOpenKit.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewOpenKit.ShowCellErrors = false;
-            this.dataGridViewOpenKit.ShowCellToolTips = false;
-            this.dataGridViewOpenKit.ShowEditingIcon = false;
-            this.dataGridViewOpenKit.ShowRowErrors = false;
-            this.dataGridViewOpenKit.Size = new System.Drawing.Size(439, 259);
-            this.dataGridViewOpenKit.TabIndex = 2;
-            this.dataGridViewOpenKit.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewOpenKit_CellContentDoubleClick);
-            this.dataGridViewOpenKit.SelectionChanged += new System.EventHandler(this.dataGridViewOpenKit_SelectionChanged);
-            // 
-            // kit_no
-            // 
-            this.kit_no.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.kit_no.HeaderText = "Kit #";
-            this.kit_no.Name = "kit_no";
-            this.kit_no.ReadOnly = true;
-            this.kit_no.Width = 54;
-            // 
-            // name
-            // 
-            this.name.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.name.HeaderText = "Name";
-            this.name.Name = "name";
-            this.name.ReadOnly = true;
-            // 
-            // last_modified
-            // 
-            this.last_modified.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.last_modified.HeaderText = "Last Modified";
-            this.last_modified.Name = "last_modified";
-            this.last_modified.ReadOnly = true;
-            this.last_modified.Width = 95;
+            this.dgvKits.Location = new System.Drawing.Point(13, 13);
+            this.dgvKits.Name = "dgvKits";
+            this.dgvKits.Size = new System.Drawing.Size(439, 259);
+            this.dgvKits.TabIndex = 2;
+            this.dgvKits.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvKits_CellContentDoubleClick);
+            this.dgvKits.SelectionChanged += new System.EventHandler(this.dgvKits_SelectionChanged);
+            this.dgvKits.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(dgvKits_CellFormatting);
             // 
             // label1
             // 
@@ -104,22 +55,6 @@
             this.kitLbl.TabIndex = 4;
             this.kitLbl.Text = ".";
             // 
-            // timer1
-            // 
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // saveFileDialog
-            // 
-            this.saveFileDialog.Filter = "Genetic Genealogy Kit|*.ggk|FTDNA Format (Autosomal and X Only)|*.csv|23andMe For" +
-    "mat (Autosomal and X Only)|*.txt";
-            this.saveFileDialog.Title = "Export As";
-            // 
-            // bwExport
-            // 
-            this.bwExport.WorkerSupportsCancellation = true;
-            this.bwExport.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwExport_DoWork);
-            this.bwExport.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwExport_RunWorkerCompleted);
-            // 
             // SelectKitFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -127,7 +62,7 @@
             this.ClientSize = new System.Drawing.Size(464, 326);
             this.Controls.Add(this.kitLbl);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.dataGridViewOpenKit);
+            this.Controls.Add(this.dgvKits);
             this.Controls.Add(this.btnOpen);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MaximizeBox = false;
@@ -137,22 +72,10 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Select Kit";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SelectKitFrm_FormClosing);
             this.Load += new System.EventHandler(this.OpenKitFrm_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOpenKit)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvKits)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
-
-        private System.Windows.Forms.Button btnOpen;
-        private System.Windows.Forms.DataGridView dataGridViewOpenKit;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label kitLbl;
-        private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn kit_no;
-        private System.Windows.Forms.DataGridViewTextBoxColumn name;
-        private System.Windows.Forms.DataGridViewTextBoxColumn last_modified;
-        private System.Windows.Forms.SaveFileDialog saveFileDialog;
-        private System.ComponentModel.BackgroundWorker bwExport;
     }
 }

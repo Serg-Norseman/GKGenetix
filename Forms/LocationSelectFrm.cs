@@ -12,50 +12,60 @@ namespace GenetixKit.Forms
 {
     public partial class LocationSelectFrm : Form
     {
-        private Image origial = null;
-
         public int X = 0;
         public int Y = 0;
 
-        public LocationSelectFrm(int X, int Y)
+        private bool preInit = false;
+        private Pen pen1;
+        private Pen pen2;
+        private int mX, mY;
+
+        public LocationSelectFrm(int x, int y)
         {
             InitializeComponent();
-            this.X = X;
-            this.Y = Y;
-        }
 
-        private void pbWorldMap_MouseMove(object sender, MouseEventArgs e)
-        {
-            Image img = (Image)origial.Clone();
-            Graphics g = Graphics.FromImage(img);
-            int size = 10;
-            Pen pen1 = new Pen(Color.Red, 3);
-            g.DrawRectangle(pen1, new Rectangle(e.X * 2 - size, e.Y * 2 - size, size * 2, size * 2));
-            Pen pen2 = new Pen(Color.Red, 1);
-            g.DrawLine(pen2, 0, e.Y * 2, 1357, e.Y * 2);
-            g.DrawLine(pen2, e.X * 2, 0, e.X * 2, 628);
-            g.Save();
-            pbWorldMap.Image = img;
+            pbWorldMap.Image = Properties.Resources.world_map;
+            pen1 = new Pen(Color.Red, 3);
+            pen2 = new Pen(Color.Red, 1);
+
+            X = x;
+            Y = y;
+            if (X != 0 && Y != 0) {
+                mX = X / 2;
+                mY = Y / 2;
+                preInit = true;
+            }
         }
 
         private void LocationSelectFrm_Load(object sender, EventArgs e)
         {
-            if (X != 0 && Y != 0) {
-                Image img = pbWorldMap.Image;
-                int green = 0;
-                int blue = 0;
-                Graphics g = Graphics.FromImage(img);
+        }
 
+        private void pbWorldMap_Paint(object sender, PaintEventArgs e)
+        {
+            var g = e.Graphics;
+
+            if (preInit) {
                 for (int i = 0; i < 30; i++) {
-                    green = i * 255 / 30;
-                    blue = green;
-                    Pen pen1 = new Pen(Color.FromArgb(255, green, blue), 3);
-                    g.DrawEllipse(pen1, new Rectangle(X - i, Y - i, i * 2, i * 2));
+                    int green = i * 255 / 30;
+                    int blue = green;
+                    using (var pen1x = new Pen(Color.FromArgb(255, green, blue), 3))
+                        g.DrawEllipse(pen1x, new Rectangle(mX - i, mY - i, i * 2, i * 2));
                 }
-                g.Save();
-                pbWorldMap.Image = img;
+            } else {
+                int size = 6;
+                g.DrawRectangle(pen1, new Rectangle(mX - size, mY - size, size * 2 - 1, size * 2 - 1));
+                g.DrawLine(pen2, 0, mY, 1357, mY);
+                g.DrawLine(pen2, mX, 0, mX, 628);
             }
-            origial = (Image)pbWorldMap.Image.Clone();
+        }
+
+        private void pbWorldMap_MouseMove(object sender, MouseEventArgs e)
+        {
+            preInit = false;
+            mX = e.X;
+            mY = e.Y;
+            pbWorldMap.Invalidate(false);
         }
 
         private void pbWorldMap_MouseClick(object sender, MouseEventArgs e)

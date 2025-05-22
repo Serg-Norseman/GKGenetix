@@ -2,15 +2,11 @@
 {
     partial class PhasedSegmentFrm
     {
-        private System.ComponentModel.IContainer components = null;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null)) {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        private System.Windows.Forms.PictureBox pbSegment;
+        private System.Windows.Forms.DataGridView dgvSegment;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel statusLbl;
+        private System.ComponentModel.BackgroundWorker bwPhaseVisualizer;
 
         private void InitializeComponent()
         {
@@ -26,18 +22,8 @@
             // 
             // dgvSegment
             // 
-            this.dgvSegment.AllowUserToAddRows = false;
-            this.dgvSegment.AllowUserToDeleteRows = false;
-            this.dgvSegment.AllowUserToResizeColumns = false;
-            this.dgvSegment.AllowUserToResizeRows = false;
-            this.dgvSegment.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dgvSegment.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvSegment.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dgvSegment.Location = new System.Drawing.Point(12, 168);
-            this.dgvSegment.MultiSelect = false;
             this.dgvSegment.Name = "dgvSegment";
-            this.dgvSegment.ReadOnly = true;
-            this.dgvSegment.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvSegment.Size = new System.Drawing.Size(600, 232);
             this.dgvSegment.TabIndex = 1;
             this.dgvSegment.SelectionChanged += new System.EventHandler(this.dgvSegment_SelectionChanged);
@@ -88,7 +74,7 @@
             this.Name = "PhasedSegmentVisualizerFrm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Phased Segment Visualizer";
-            this.Load += new System.EventHandler(this.SegmentVisualizerFrm_Load);
+            this.Load += new System.EventHandler(this.PhasedSegmentFrm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvSegment)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbSegment)).EndInit();
             this.statusStrip1.ResumeLayout(false);
@@ -96,11 +82,5 @@
             this.ResumeLayout(false);
             this.PerformLayout();
         }
-
-        private System.Windows.Forms.PictureBox pbSegment;
-        private System.Windows.Forms.DataGridView dgvSegment;
-        private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel statusLbl;
-        private System.ComponentModel.BackgroundWorker bwPhaseVisualizer;
     }
 }
