@@ -6,8 +6,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.SQLite;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using GenetixKit.Core;
@@ -16,156 +15,107 @@ namespace GenetixKit.Forms
 {
     public partial class SelectKitFrm : Form
     {
-        List<string> disabled = new List<string>();
+        private readonly List<string> disabled = new List<string>();
+        private readonly UIOperation selectedOperation = 0;
+        private string kit = "Unknown";
 
-        public const int OPEN_KIT = 0;
-        public const int EXPORT_KIT = 1;
-        public const int SELECT_ONE_TO_MANY = 2;
-        public const int SELECT_ADMIXTURE = 3;
-        public const int SELECT_ROH = 4;
-        public const int SELECT_KIT = 5;
-        public const int SELECT_MTPHYLOGENY = 6;
-        public const int SELECT_MITOMAP = 7;
-        public const int SELECT_ISOGGYTREE = 8;
-
-        int selected_operation = 0;
-        string kit = "Unknown";
-        string select_sql = null;
-
-        public string getSelectedKit()
+        public string GetSelectedKit()
         {
             return kit;
         }
 
-        public SelectKitFrm(int operation)
+        public SelectKitFrm(UIOperation operation)
         {
             InitializeComponent();
-            //
-            selected_operation = operation;
-            string hide_ref = GKSettings.getParameterValue("Admixture.ReferencePopulations.Hide");
-            switch (selected_operation) {
-                case OPEN_KIT:
-                    btnOpen.Text = "Open";
-                    if (hide_ref == "1")
-                        select_sql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master WHERE reference=0 order by last_modified DESC";
-                    else
-                        select_sql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master order by last_modified DESC";
-                    break;
-                case EXPORT_KIT:
-                    btnOpen.Text = "Export";
-                    if (hide_ref == "1")
-                        select_sql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master WHERE reference=0 order by last_modified DESC";
-                    else
-                        select_sql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master order by last_modified DESC";
-                    break;
-                case SELECT_ONE_TO_MANY:
-                    //hide parameter has no effect.
-                    btnOpen.Text = "Select";
-                    select_sql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master WHERE reference=0 order by last_modified DESC";
-                    break;
-                case SELECT_ADMIXTURE:
-                    //hide parameter has no effect.
-                    btnOpen.Text = "Select";
-                    select_sql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master WHERE reference=0 order by last_modified DESC";
-                    break;
-                case SELECT_ROH:
-                    //hide parameter has no effect.
-                    btnOpen.Text = "Select";
-                    select_sql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master WHERE reference=0  order by last_modified DESC";
-                    break;
-                case SELECT_KIT:
-                    btnOpen.Text = "Select";
-                    if (hide_ref == "1")
-                        select_sql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master WHERE reference=0 order by last_modified DESC";
-                    else
-                        select_sql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master order by last_modified DESC";
-                    break;
-                case SELECT_MTPHYLOGENY:
-                    btnOpen.Text = "Select";
-                    if (hide_ref == "1")
-                        select_sql = @"select kit_no,name,disabled,last_modified from kit_master where kit_no in (select distinct kit_no from kit_mtdna) and reference=0 order by last_modified DESC";
-                    else
-                        select_sql = @"select kit_no,name,disabled,last_modified from kit_master where kit_no in (select distinct kit_no from kit_mtdna) order by last_modified DESC";
-                    break;
-                case SELECT_MITOMAP:
-                    btnOpen.Text = "Select";
-                    if (hide_ref == "1")
-                        select_sql = @"select kit_no,name,disabled,last_modified from kit_master where kit_no in (select distinct kit_no from kit_mtdna) and reference=0 order by last_modified DESC";
-                    else
-                        select_sql = @"select kit_no,name,disabled,last_modified from kit_master where kit_no in (select distinct kit_no from kit_mtdna) order by last_modified DESC";
-                    break;
-                case SELECT_ISOGGYTREE:
-                    btnOpen.Text = "Select";
-                    if (hide_ref == "1")
-                        select_sql = @"select kit_no,name,disabled,last_modified from kit_master where kit_no in (select distinct kit_no from kit_ysnps) and reference=0 order by last_modified DESC";
-                    else
-                        select_sql = @"select kit_no,name,disabled,last_modified from kit_master where kit_no in (select distinct kit_no from kit_ysnps) order by last_modified DESC";
-                    break;
-                default:
-                    if (hide_ref == "1")
-                        select_sql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master WHERE reference=0 order by last_modified DESC";
-                    else
-                        select_sql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master order by last_modified DESC";
-                    break;
-            }
+
+            GKUIFuncs.FixGridView(dgvKits);
+            dgvKits.AddColumn("kit_no", "Kit #");
+            dgvKits.AddColumn("name", "Name");
+            dgvKits.AddCheckedColumn("disabled", "Disabled");
+            dgvKits.AddColumn("last_modified", "Last Modified");
+
+            selectedOperation = operation;
         }
 
         private void OpenKitFrm_Load(object sender, EventArgs e)
         {
-            timer1.Enabled = true;
+            const string defaultSql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master order by last_modified DESC";
 
-        }
-
-        private void dataGridViewOpenKit_SelectionChanged(object sender, EventArgs e)
-        {
-            try {
-                if (dataGridViewOpenKit.SelectedRows.Count > 0)
-                    kitLbl.Text = dataGridViewOpenKit.SelectedRows[0].Cells[0].Value.ToString();
-            } catch (Exception) {
-                //ignore               
+            string selectSql;
+            switch (selectedOperation) {
+                case UIOperation.OPEN_KIT:
+                    btnOpen.Text = "Open";
+                    selectSql = defaultSql;
+                    break;
+                case UIOperation.SELECT_ONE_TO_MANY:
+                    btnOpen.Text = "Select";
+                    selectSql = defaultSql;
+                    break;
+                case UIOperation.SELECT_ADMIXTURE:
+                    btnOpen.Text = "Select";
+                    selectSql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master WHERE reference=0 order by last_modified DESC";
+                    break;
+                case UIOperation.SELECT_ROH:
+                    btnOpen.Text = "Select";
+                    selectSql = defaultSql;
+                    break;
+                case UIOperation.SELECT_KIT:
+                    btnOpen.Text = "Select";
+                    selectSql = defaultSql;
+                    break;
+                case UIOperation.SELECT_MTPHYLOGENY:
+                    btnOpen.Text = "Select";
+                    selectSql = @"select kit_no,name,disabled,last_modified from kit_master where kit_no in (select distinct kit_no from kit_mtdna) order by last_modified DESC";
+                    break;
+                case UIOperation.SELECT_MITOMAP:
+                    btnOpen.Text = "Select";
+                    selectSql = @"select kit_no,name,disabled,last_modified from kit_master where kit_no in (select distinct kit_no from kit_mtdna) order by last_modified DESC";
+                    break;
+                case UIOperation.SELECT_ISOGGYTREE:
+                    btnOpen.Text = "Select";
+                    selectSql = @"select kit_no,name,disabled,last_modified from kit_master where kit_no in (select distinct kit_no from kit_ysnps) order by last_modified DESC";
+                    break;
+                default:
+                    selectSql = defaultSql;
+                    break;
             }
 
-        }
+            var tbl = GKSqlFuncs.QueryTable(selectSql);
+            dgvKits.DataSource = tbl;
 
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            timer1.Enabled = false;
             disabled.Clear();
-            DataGridViewCellStyle gray = new DataGridViewCellStyle();
-            gray.ForeColor = Color.LightGray;
-
-            SQLiteConnection cnn = GKSqlFuncs.getDBConnection();
-            dataGridViewOpenKit.Rows.Clear();
-            string hide = GKSettings.getParameterValue("Admixture.ReferencePopulations.Hide");
-            SQLiteCommand query = new SQLiteCommand(select_sql, cnn);
-            SQLiteDataReader reader = query.ExecuteReader();
-            while (reader.Read()) {
-                int new_idx = dataGridViewOpenKit.Rows.Add();
-                DataGridViewRow row = dataGridViewOpenKit.Rows[new_idx];
-                row.Cells[0].Value = reader.GetString(0);
-                row.Cells[1].Value = reader.GetString(1);
-                row.Cells[2].Value = reader.GetString(3);
-                if (reader.GetInt16(2) == 1) {
-                    row.DefaultCellStyle = gray;
-                    disabled.Add(reader.GetString(0));
+            foreach (DataRow row in tbl.Rows) {
+                if (Convert.ToInt16(row[2]) == 1) {
+                    disabled.Add(Convert.ToString(row[0]));
                 }
-
             }
-            query.Dispose();
-            cnn.Dispose();
 
-            if (dataGridViewOpenKit.Rows.Count > 0) {
-                dataGridViewOpenKit.CurrentCell = dataGridViewOpenKit.Rows[0].Cells[0];
-                kitLbl.Text = dataGridViewOpenKit.SelectedRows[0].Cells[0].Value.ToString();
-            }
-            if (dataGridViewOpenKit.Rows.Count == 0) {
+            if (dgvKits.Rows.Count == 0) {
                 MessageBox.Show("There are no kits available to open.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 this.Close();
             }
-
         }
 
-        private void dataGridViewOpenKit_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
+        private void dgvKits_SelectionChanged(object sender, EventArgs e)
+        {
+            try {
+                if (dgvKits.SelectedRows.Count > 0) {
+                    var value = dgvKits.SelectedRows[0].Cells[0].Value;
+                    kitLbl.Text = value != null ? value.ToString() : string.Empty;
+                }
+            } catch (Exception) {
+                // ignore
+            }
+        }
+
+        private void dgvKits_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            var row = ((DataTable)dgvKits.DataSource).Rows[e.RowIndex];
+            short val = Convert.ToInt16(row[2]);
+            e.CellStyle.ForeColor = (val != 1) ? Color.Black : Color.LightGray;
+        }
+
+        private void dgvKits_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             SelectKit(kitLbl.Text);
         }
@@ -177,104 +127,36 @@ namespace GenetixKit.Forms
 
         private void SelectKit(string kit)
         {
-            switch (selected_operation) {
-                case OPEN_KIT:
-                    GKUIFuncs.hideAllMdiChildren();
-                    NewEditKitFrm newKitFrm = Program.GGKitFrmMainInst.getNewEditKitFrm();
-                    if (newKitFrm == null)
-                        newKitFrm = new NewEditKitFrm(kit, disabled.Contains(kit));
-                    if (newKitFrm.IsDisposed)
-                        newKitFrm = new NewEditKitFrm(kit, disabled.Contains(kit));
-                    newKitFrm.MdiParent = Program.GGKitFrmMainInst;
-                    newKitFrm.Visible = true;
-                    newKitFrm.WindowState = FormWindowState.Maximized;
+            switch (selectedOperation) {
+                case UIOperation.OPEN_KIT:
+                    Program.KitInstance.NewKit(kit, disabled.Contains(kit));
                     break;
-                case EXPORT_KIT:
-                    //ToDo:
-                    GKUIFuncs.hideAllMdiChildren();
-                    if (saveFileDialog.ShowDialog(this) == DialogResult.OK) {
-                        btnOpen.Text = "Exporting ...";
-                        btnOpen.Enabled = false;
-                        GKUIFuncs.setStatus("Exporting. Please wait ...");
-                        bwExport.RunWorkerAsync(new string[] { kit, saveFileDialog.FileName, saveFileDialog.FilterIndex.ToString() });
-                    }
-                    return;
-                case SELECT_ONE_TO_MANY:
-                    GKUIFuncs.hideAllMdiChildren();
-                    MatchingKitsFrm frm = new MatchingKitsFrm(kit);
-                    frm.MdiParent = Program.GGKitFrmMainInst;
-                    frm.Visible = true;
-                    frm.WindowState = FormWindowState.Maximized;
+                case UIOperation.SELECT_ONE_TO_MANY:
+                    Program.KitInstance.ShowMatchingKits(kit);
                     break;
-                case SELECT_ADMIXTURE:
-                    GKUIFuncs.hideAllMdiChildren();
-                    AdmixtureFrm afrm = new AdmixtureFrm(kit);
-                    afrm.MdiParent = Program.GGKitFrmMainInst;
-                    afrm.Visible = true;
-                    afrm.WindowState = FormWindowState.Maximized;
+                case UIOperation.SELECT_ADMIXTURE:
+                    Program.KitInstance.ShowAdmixture(kit);
                     break;
-                case SELECT_ROH:
-                    GKUIFuncs.hideAllMdiChildren();
-                    ROHFrm rohfrm = new ROHFrm(kit);
-                    rohfrm.MdiParent = Program.GGKitFrmMainInst;
-                    rohfrm.Visible = true;
-                    rohfrm.WindowState = FormWindowState.Maximized;
+                case UIOperation.SELECT_ROH:
+                    Program.KitInstance.ShowROH(kit);
                     break;
-                case SELECT_KIT:
+                case UIOperation.SELECT_KIT:
                     this.kit = kit;
                     this.Visible = false;
                     return;
-                case SELECT_MTPHYLOGENY:
-                    GKUIFuncs.hideAllMdiChildren();
-                    MtPhylogenyFrm mtFrm = new MtPhylogenyFrm(kit);
-                    mtFrm.MdiParent = Program.GGKitFrmMainInst;
-                    mtFrm.Visible = true;
-                    mtFrm.WindowState = FormWindowState.Maximized;
+                case UIOperation.SELECT_MTPHYLOGENY:
+                    Program.KitInstance.ShowMtPhylogeny(kit);
                     break;
-                case SELECT_MITOMAP:
-                    GKUIFuncs.hideAllMdiChildren();
-                    MitoMapFrm mpFrm = new MitoMapFrm(kit);
-                    mpFrm.MdiParent = Program.GGKitFrmMainInst;
-                    mpFrm.Visible = true;
-                    mpFrm.WindowState = FormWindowState.Maximized;
+                case UIOperation.SELECT_MITOMAP:
+                    Program.KitInstance.ShowMitoMap(kit);
                     break;
-                case SELECT_ISOGGYTREE:
-                    GKUIFuncs.hideAllMdiChildren();
-                    IsoggYTreeFrm yFrm = new IsoggYTreeFrm(kit);
-                    yFrm.MdiParent = Program.GGKitFrmMainInst;
-                    yFrm.Visible = true;
-                    yFrm.WindowState = FormWindowState.Maximized;
+                case UIOperation.SELECT_ISOGGYTREE:
+                    Program.KitInstance.ShowIsoggYTree(kit);
                     break;
                 default:
                     break;
             }
             this.Close();
-        }
-
-        private void bwExport_DoWork(object sender, DoWorkEventArgs e)
-        {
-            string kit_no = ((string[])e.Argument)[0];
-            string filename = ((string[])e.Argument)[1];
-            int option = int.Parse(((string[])e.Argument)[2]);
-            //
-            GKSqlFuncs.exportKit(kit_no, filename, option);
-        }
-
-        private void bwExport_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            GKUIFuncs.setStatus("Done.");
-            this.Close();
-        }
-
-        private void SelectKitFrm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (bwExport.IsBusy) {
-                if (MessageBox.Show("Exporting kit .. Do you want to cancel it and close this window?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-                    GKUIFuncs.setStatus("Export Cancelled.");
-                    bwExport.CancelAsync();
-                } else
-                    e.Cancel = true;
-            }
         }
     }
 }

@@ -127,9 +127,6 @@
   <data name="map_csv" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\map.csv.gz;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="enable" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Images\enable.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="paste" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Images\paste.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -139,14 +136,11 @@
   <data name="diff" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\diff.exe;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="disable" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Images\disable.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="world_map" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Images\world_map.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="mtdna_map" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\mtdna_map.csv;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+    <value>..\Resources\mtdna_map.csv;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;iso-8859-1</value>
   </data>
   <data name="RSRS" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\RSRS.txt.gz;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
@@ -158,7 +152,7 @@
     <value>..\Resources\Images\refresh.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="snps_on_tree" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\snps_on_tree.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+    <value>..\Resources\snps_on_tree.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;iso-8859-1</value>
   </data>
   <data name="ytree" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ytree.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>

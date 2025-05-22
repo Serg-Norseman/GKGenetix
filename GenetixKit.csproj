@@ -35,27 +35,38 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\Images\icon.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data.SQLite, Version=1.0.92.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Forms.DataVisualization" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\GKData.cs" />
-    <Compile Include="Core\GKGenFuncs.cs" />
-    <Compile Include="Core\GKUIFuncs.cs" />
     <Compile Include="Core\GKUtils.cs" />
+    <Compile Include="Core\IKitHost.cs" />
+    <Compile Include="Core\Model\AdmixtureRec.cs" />
+    <Compile Include="Core\Model\CmpSegment.cs" />
+    <Compile Include="Core\Model\DNARec.cs" />
+    <Compile Include="Core\Model\ISNPHeader.cs" />
+    <Compile Include="Core\Model\ISNPSegment.cs" />
+    <Compile Include="Core\Model\KitDTO.cs" />
+    <Compile Include="Core\Model\OTORow.cs" />
+    <Compile Include="Core\Model\PhaseSegment.cs" />
+    <Compile Include="Core\Model\ROHSegment.cs" />
+    <Compile Include="Core\Model\SegmentStats.cs" />
+    <Compile Include="Core\Model\SingleSNP.cs" />
+    <Compile Include="Core\Model\YSTR.cs" />
     <Compile Include="Forms\AdmixtureFrm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -68,19 +79,22 @@
     <Compile Include="Forms\GKMainFrm.Designer.cs">
       <DependentUpon>GKMainFrm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Core\GKData.cs" />
     <Compile Include="Core\GKSettings.cs" />
     <Compile Include="Core\GKSqlFuncs.cs" />
-    <Compile Include="Forms\LocationSelectFrm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\LocationSelectFrm.Designer.cs">
-      <DependentUpon>LocationSelectFrm.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Core\GKUIFuncs.cs" />
+    <Compile Include="Core\GKGenFuncs.cs" />
     <Compile Include="Forms\IsoggYTreeFrm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\IsoggYTreeFrm.designer.cs">
       <DependentUpon>IsoggYTreeFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\LocationSelectFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\LocationSelectFrm.Designer.cs">
+      <DependentUpon>LocationSelectFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\MitoMapFrm.cs">
       <SubType>Form</SubType>
@@ -88,6 +102,7 @@
     <Compile Include="Forms\MitoMapFrm.Designer.cs">
       <DependentUpon>MitoMapFrm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Core\UIOperation.cs" />
     <Compile Include="Forms\MtPhylogenyFrm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -156,58 +171,33 @@
     <Compile Include="Forms\SelectTwoKitsFrm.Designer.cs">
       <DependentUpon>SelectTwoKitsFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\SettingsFrm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\SettingsFrm.Designer.cs">
-      <DependentUpon>SettingsFrm.cs</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="Forms\GKMainFrm.resx">
-      <DependentUpon>GKMainFrm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
-    <None Include="app.config" />
-    <None Include="Resources\map.csv.gz" />
-    <None Include="Resources\mtdna_map.csv" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <None Include="Resources\RSRS.txt.gz" />
-    <None Include="Resources\ysnp_hg19.txt.gz" />
+    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\map.csv.gz" />
+    <None Include="Resources\mtdna_map.csv" />
+    <None Include="Resources\RSRS.txt.gz" />
+    <None Include="Resources\ysnp_hg19.txt.gz" />
     <Content Include="Resources\snps_on_tree.txt" />
     <Content Include="Resources\ytree.xml" />
     <Content Include="Resources\Images\delete.png" />
     <Content Include="Resources\diff.exe" />
-    <Content Include="Resources\Images\disable.png" />
-    <Content Include="Resources\Images\enable.png" />
     <Content Include="Resources\Images\eraser.png" />
-    <Content Include="Resources\Images\icon.ico" />
-    <Content Include="Resources\Images\logo.png" />
     <None Include="Resources\mtDNAPhylogeny.xml" />
     <Content Include="Resources\Images\paste.png" />
     <None Include="Resources\Images\refresh.png" />
     <Content Include="System.Data.SQLite.dll" />
-    <Content Include="Resources\Images\tree.ico" />
-    <Content Include="Resources\Images\world_map.png" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

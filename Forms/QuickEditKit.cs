@@ -7,209 +7,103 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.SQLite;
-using System.Drawing;
 using System.Windows.Forms;
 using GenetixKit.Core;
+using GenetixKit.Core.Model;
 
 namespace GenetixKit.Forms
 {
     public partial class QuickEditKit : Form
     {
+        private IList<KitDTO> tblKits;
+
         public QuickEditKit()
         {
             InitializeComponent();
+
+            dgvEditKit.AutoGenerateColumns = false;
+            dgvEditKit.AddColumn("KitNo", "Kit#");
+            dgvEditKit.AddColumn("Name", "Name", "", true, false);
+            dgvEditKit.AddComboColumn("Sex", "Sex", new object[] { "Unknown", "Male", "Female" });
+            dgvEditKit.AddCheckedColumn("Disabled", "Disabled");
+            dgvEditKit.AddButtonColumn("Location", "Location");
         }
 
         private void QuickEditKit_Load(object sender, EventArgs e)
         {
-            GKUIFuncs.enableSave();
-            GKUIFuncs.enableDeleteKitToolbarBtn();
-            GKUIFuncs.enable_DisableKitToolbarBtn();
-            GKUIFuncs.enable_EnableKitToolbarBtn();
-            timer1.Enabled = true;
-        }
+            Program.KitInstance.EnableSave();
+            Program.KitInstance.EnableDelete();
 
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            timer1.Enabled = false;
-            DataGridViewCellStyle gray = new DataGridViewCellStyle();
-            gray.ForeColor = Color.LightGray;
-
-            SQLiteConnection cnn = GKSqlFuncs.getDBConnection();
-            dgvEditKit.Rows.Clear();
-            SQLiteCommand query = new SQLiteCommand(@"SELECT kit_no,name,sex,disabled,coalesce(x,0),coalesce(y,0),last_modified FROM kit_master WHERE reference=0 order by last_modified DESC", cnn);
-            SQLiteDataReader reader = query.ExecuteReader();
-            string sex = "U";
-            string xy = null;
-            while (reader.Read()) {
-                int new_idx = dgvEditKit.Rows.Add();
-                DataGridViewRow row = dgvEditKit.Rows[new_idx];
-                row.Cells[0].Value = reader.GetString(0);
-                row.Cells[1].Value = reader.GetString(1);
-
-                sex = reader.GetString(2);
-                if (sex == "U")
-                    row.Cells[2].Value = "Unknown";
-                else if (sex == "M")
-                    row.Cells[2].Value = "Male";
-                else if (sex == "F")
-                    row.Cells[2].Value = "Female";
-
-                if (reader.GetInt16(3) == 1)
-                    row.Cells[3].Value = true;
-                else
-                    row.Cells[3].Value = false;
-
-                xy = reader.GetInt16(4).ToString() + ":" + reader.GetInt16(5).ToString();
-                if (xy == "0:0")
-                    xy = "Unknown";
-                row.Cells[4].Value = xy;
-            }
-            query.Dispose();
-            cnn.Dispose();
+            tblKits = GKSqlFuncs.QueryKits();
+            dgvEditKit.DataSource = tblKits;
         }
 
         private void QuickEditKit_FormClosing(object sender, FormClosingEventArgs e)
         {
-            GKUIFuncs.disableSave();
-            GKUIFuncs.disableDeleteKitToolbarBtn();
-            GKUIFuncs.disable_DisableKitToolbarBtn();
-            GKUIFuncs.disable_EnableKitToolbarBtn();
+            Program.KitInstance.DisableSave();
+            Program.KitInstance.DisableDelete();
         }
 
         public void Save()
         {
-            GKUIFuncs.setStatus("Saving ...");
-            SQLiteConnection conn = GKSqlFuncs.getDBConnection();
-            string sex = "";
-            string location = "";
-            using (SQLiteTransaction trans = conn.BeginTransaction()) {
-                foreach (DataGridViewRow row in dgvEditKit.Rows) {
-                    SQLiteCommand upCmd = new SQLiteCommand("UPDATE kit_master set name=@name, sex=@sex, disabled=@disabled, x=@x, y=@y WHERE kit_no=@kit_no", conn);
-                    upCmd.Parameters.AddWithValue("@name", row.Cells[1].Value.ToString());
+            Program.KitInstance.SetStatus("Saving ...");
 
-                    sex = row.Cells[2].Value.ToString();
-                    if (sex == "Unknown")
-                        upCmd.Parameters.AddWithValue("@sex", "U");
-                    else if (sex == "Male")
-                        upCmd.Parameters.AddWithValue("@sex", "M");
-                    else if (sex == "Female")
-                        upCmd.Parameters.AddWithValue("@sex", "F");
-
-                    if (((bool)row.Cells[3].Value))
-                        upCmd.Parameters.AddWithValue("@disabled", "1");
-                    else
-                        upCmd.Parameters.AddWithValue("@disabled", "0");
-
-                    location = row.Cells[4].Value.ToString();
-                    if (location == "Unknown") {
-                        upCmd.Parameters.AddWithValue("@x", "0");
-                        upCmd.Parameters.AddWithValue("@y", "0");
-                    } else {
-                        upCmd.Parameters.AddWithValue("@x", location.Split(new char[] { ':' })[0]);
-                        upCmd.Parameters.AddWithValue("@y", location.Split(new char[] { ':' })[1]);
-                    }
-
-                    upCmd.Parameters.AddWithValue("@kit_no", row.Cells[0].Value.ToString());
-                    upCmd.ExecuteNonQuery();
+            foreach (var row in tblKits) {
+                string location = row.Location;
+                string x, y;
+                if (location == "Unknown") {
+                    x = "0";
+                    y = "0";
+                } else {
+                    x = location.Split(new char[] { ':' })[0];
+                    y = location.Split(new char[] { ':' })[1];
                 }
-                //
-                trans.Commit();
+
+                GKSqlFuncs.SaveKit(row.KitNo, row.Name, row.Sex, row.Disabled, x, y);
             }
 
-            GKUIFuncs.setStatus("Saved.");
+            Program.KitInstance.SetStatus("Saved.");
         }
 
         public void Delete()
         {
-            if (MessageBox.Show("You had selected " + dgvEditKit.SelectedRows.Count.ToString() + " kits to be deleted. Are you sure?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-                GKUIFuncs.setStatus("Deleting " + dgvEditKit.SelectedRows.Count.ToString() + " kit(s) and all it's associated data ...");
+            string selRowsCount = dgvEditKit.SelectedRows.Count.ToString();
+            if (MessageBox.Show("You had selected " + selRowsCount + " kits to be deleted. Are you sure?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+                Program.KitInstance.SetStatus("Deleting " + selRowsCount + " kit(s) and all it's associated data ...");
                 this.Enabled = false;
-                GKUIFuncs.disableMenu();
-                GKUIFuncs.disableToolbar();
+                Program.KitInstance.DisableToolbar();
                 bwDelete.RunWorkerAsync(dgvEditKit);
             }
-        }
-
-        public void Enable()
-        {
-            GKUIFuncs.setStatus("Enabling ...");
-            SQLiteConnection conn = GKSqlFuncs.getDBConnection();
-            using (SQLiteTransaction trans = conn.BeginTransaction()) {
-                foreach (DataGridViewRow row in dgvEditKit.SelectedRows) {
-                    SQLiteCommand upCmd = new SQLiteCommand("UPDATE kit_master set disabled=@disabled WHERE kit_no=@kit_no", conn);
-                    upCmd.Parameters.AddWithValue("@name", row.Cells[1].Value.ToString());
-                    upCmd.Parameters.AddWithValue("@disabled", "0");
-                    upCmd.Parameters.AddWithValue("@kit_no", row.Cells[0].Value.ToString());
-                    upCmd.ExecuteNonQuery();
-                    row.Cells[3].Value = false;
-                }
-                //
-                trans.Commit();
-            }
-
-            GKUIFuncs.setStatus("Enabled.");
-        }
-
-        public void Disable()
-        {
-            GKUIFuncs.setStatus("Disabling ...");
-            SQLiteConnection conn = GKSqlFuncs.getDBConnection();
-            using (SQLiteTransaction trans = conn.BeginTransaction()) {
-                foreach (DataGridViewRow row in dgvEditKit.SelectedRows) {
-                    SQLiteCommand upCmd = new SQLiteCommand("UPDATE kit_master set disabled=@disabled WHERE kit_no=@kit_no", conn);
-                    upCmd.Parameters.AddWithValue("@name", row.Cells[1].Value.ToString());
-                    upCmd.Parameters.AddWithValue("@disabled", "1");
-                    upCmd.Parameters.AddWithValue("@kit_no", row.Cells[0].Value.ToString());
-                    upCmd.ExecuteNonQuery();
-                    row.Cells[3].Value = true;
-                }
-                //
-                trans.Commit();
-            }
-
-            GKUIFuncs.setStatus("Disabled.");
         }
 
         private void dgvEditKit_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             var senderGrid = (DataGridView)sender;
-
             if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0) {
-                string location = dgvEditKit.Rows[e.RowIndex].Cells[4].Value.ToString();
+                var kitRow = tblKits[e.RowIndex];
+                string location = kitRow.Location;
                 int x = 0;
                 int y = 0;
                 if (location != "Unknown") {
-                    x = int.Parse(location.Split(new char[] { ':' })[0]);
-                    y = int.Parse(location.Split(new char[] { ':' })[1]);
+                    var parts = location.Split(new char[] { ':' });
+                    x = int.Parse(parts[0]);
+                    y = int.Parse(parts[1]);
                 }
-                LocationSelectFrm frm = new LocationSelectFrm(x, y);
-                frm.ShowDialog(Program.GGKitFrmMainInst);
-                x = frm.X;
-                y = frm.Y;
-                frm.Dispose();
-                dgvEditKit.Rows[e.RowIndex].Cells[4].Value = x.ToString() + ":" + y.ToString();
+                Program.KitInstance.SelectLocation(ref x, ref y);
+                kitRow.Location = x.ToString() + ":" + y.ToString();
+
+                senderGrid.Invalidate();
             }
         }
 
         private void bwDelete_DoWork(object sender, DoWorkEventArgs e)
         {
             DataGridView dgv = (DataGridView)e.Argument;
-            SQLiteConnection conn = GKSqlFuncs.getDBConnection();
             List<DataGridViewRow> rows = new List<DataGridViewRow>();
-            using (SQLiteTransaction trans = conn.BeginTransaction()) {
-
-                foreach (DataGridViewRow row in dgv.SelectedRows) {
-                    SQLiteCommand upCmd = new SQLiteCommand("DELETE FROM kit_master WHERE kit_no=@kit_no", conn);
-                    upCmd.Parameters.AddWithValue("@kit_no", row.Cells[0].Value.ToString());
-                    upCmd.ExecuteNonQuery();
-                    rows.Add(row);
-                }
-                //
-                trans.Commit();
+            foreach (DataGridViewRow row in dgv.SelectedRows) {
+                GKSqlFuncs.DeleteKit(row.Cells[0].Value.ToString());
+                rows.Add(row);
             }
-
 
             this.Invoke(new MethodInvoker(delegate {
                 foreach (DataGridViewRow row in rows)
@@ -219,12 +113,9 @@ namespace GenetixKit.Forms
 
         private void bwDelete_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-
-            GKUIFuncs.setStatus("Deleted.");
-
+            Program.KitInstance.SetStatus("Deleted.");
             this.Enabled = true;
-            GKUIFuncs.enableMenu();
-            GKUIFuncs.enableToolbar();
+            Program.KitInstance.EnableToolbar();
         }
     }
 }

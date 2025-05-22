@@ -2,15 +2,20 @@
 {
     partial class MatchingKitsFrm
     {
-        private System.ComponentModel.IContainer components = null;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null)) {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblName;
+        private System.Windows.Forms.DataGridView dgvMatches;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.DataGridView dgvSegments;
+        private System.Windows.Forms.DataGridView dgvAlleles;
+        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.Label lblSegLabel;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button lblKit;
 
         private void InitializeComponent()
         {
@@ -23,26 +28,8 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.dgvMatches = new System.Windows.Forms.DataGridView();
-            this.cmp_id = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.kit_no = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.name = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.at_longest = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.at_total = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.x_longest = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.x_total = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.mrca = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dgvSegments = new System.Windows.Forms.DataGridView();
-            this.chr = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.start_pos = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.end_pos = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.seg_len = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.snp_count = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dgvAlleles = new System.Windows.Forms.DataGridView();
-            this.rsid = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.position = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.kit1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.kit2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.match = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.label4 = new System.Windows.Forms.Label();
@@ -141,211 +128,31 @@
             // 
             // dgvMatches
             // 
-            this.dgvMatches.AllowUserToAddRows = false;
-            this.dgvMatches.AllowUserToDeleteRows = false;
-            this.dgvMatches.AllowUserToResizeRows = false;
-            this.dgvMatches.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dgvMatches.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvMatches.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.cmp_id,
-            this.kit_no,
-            this.name,
-            this.at_longest,
-            this.at_total,
-            this.x_longest,
-            this.x_total,
-            this.mrca});
             this.dgvMatches.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvMatches.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dgvMatches.Location = new System.Drawing.Point(3, 113);
-            this.dgvMatches.MultiSelect = false;
             this.dgvMatches.Name = "dgvMatches";
-            this.dgvMatches.ReadOnly = true;
-            this.dgvMatches.RowHeadersVisible = false;
-            this.dgvMatches.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            this.dgvMatches.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvMatches.ShowEditingIcon = false;
             this.dgvMatches.Size = new System.Drawing.Size(778, 165);
             this.dgvMatches.TabIndex = 1;
             this.dgvMatches.SelectionChanged += new System.EventHandler(this.dgvMatches_SelectionChanged);
             // 
-            // cmp_id
-            // 
-            this.cmp_id.HeaderText = "ID";
-            this.cmp_id.Name = "cmp_id";
-            this.cmp_id.ReadOnly = true;
-            this.cmp_id.Visible = false;
-            // 
-            // kit_no
-            // 
-            this.kit_no.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.kit_no.HeaderText = "Kit No";
-            this.kit_no.Name = "kit_no";
-            this.kit_no.ReadOnly = true;
-            // 
-            // name
-            // 
-            this.name.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.name.HeaderText = "Name";
-            this.name.Name = "name";
-            this.name.ReadOnly = true;
-            // 
-            // at_longest
-            // 
-            this.at_longest.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.at_longest.HeaderText = "Autosomal Longest";
-            this.at_longest.Name = "at_longest";
-            this.at_longest.ReadOnly = true;
-            // 
-            // at_total
-            // 
-            this.at_total.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.at_total.HeaderText = "Autosomal Total";
-            this.at_total.Name = "at_total";
-            this.at_total.ReadOnly = true;
-            // 
-            // x_longest
-            // 
-            this.x_longest.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.x_longest.HeaderText = "X Longest";
-            this.x_longest.Name = "x_longest";
-            this.x_longest.ReadOnly = true;
-            // 
-            // x_total
-            // 
-            this.x_total.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.x_total.HeaderText = "X Total";
-            this.x_total.Name = "x_total";
-            this.x_total.ReadOnly = true;
-            // 
-            // mrca
-            // 
-            this.mrca.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.mrca.HeaderText = "MRCA";
-            this.mrca.Name = "mrca";
-            this.mrca.ReadOnly = true;
-            // 
             // dgvSegments
             // 
-            this.dgvSegments.AllowUserToAddRows = false;
-            this.dgvSegments.AllowUserToDeleteRows = false;
-            this.dgvSegments.AllowUserToResizeColumns = false;
-            this.dgvSegments.AllowUserToResizeRows = false;
-            this.dgvSegments.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dgvSegments.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvSegments.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.chr,
-            this.start_pos,
-            this.end_pos,
-            this.seg_len,
-            this.snp_count});
             this.dgvSegments.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvSegments.Location = new System.Drawing.Point(3, 33);
-            this.dgvSegments.MultiSelect = false;
             this.dgvSegments.Name = "dgvSegments";
-            this.dgvSegments.ReadOnly = true;
-            this.dgvSegments.RowHeadersVisible = false;
-            this.dgvSegments.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            this.dgvSegments.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvSegments.Size = new System.Drawing.Size(386, 241);
             this.dgvSegments.TabIndex = 6;
             this.dgvSegments.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvSegments_CellDoubleClick);
             this.dgvSegments.SelectionChanged += new System.EventHandler(this.dgvSegments_SelectionChanged);
             // 
-            // chr
-            // 
-            this.chr.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.chr.HeaderText = "Chromosome";
-            this.chr.Name = "chr";
-            this.chr.ReadOnly = true;
-            // 
-            // start_pos
-            // 
-            this.start_pos.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.start_pos.HeaderText = "Start Position";
-            this.start_pos.Name = "start_pos";
-            this.start_pos.ReadOnly = true;
-            // 
-            // end_pos
-            // 
-            this.end_pos.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.end_pos.HeaderText = "End Position";
-            this.end_pos.Name = "end_pos";
-            this.end_pos.ReadOnly = true;
-            // 
-            // seg_len
-            // 
-            this.seg_len.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.seg_len.HeaderText = "Segment Length (cM)";
-            this.seg_len.Name = "seg_len";
-            this.seg_len.ReadOnly = true;
-            // 
-            // snp_count
-            // 
-            this.snp_count.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.snp_count.HeaderText = "SNP Count";
-            this.snp_count.Name = "snp_count";
-            this.snp_count.ReadOnly = true;
-            // 
             // dgvAlleles
             // 
-            this.dgvAlleles.AllowUserToAddRows = false;
-            this.dgvAlleles.AllowUserToDeleteRows = false;
-            this.dgvAlleles.AllowUserToResizeColumns = false;
-            this.dgvAlleles.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dgvAlleles.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvAlleles.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.rsid,
-            this.position,
-            this.kit1,
-            this.kit2,
-            this.match});
             this.dgvAlleles.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvAlleles.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dgvAlleles.Location = new System.Drawing.Point(395, 33);
-            this.dgvAlleles.MultiSelect = false;
             this.dgvAlleles.Name = "dgvAlleles";
-            this.dgvAlleles.ReadOnly = true;
-            this.dgvAlleles.RowHeadersVisible = false;
-            this.dgvAlleles.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            this.dgvAlleles.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvAlleles.ShowEditingIcon = false;
             this.dgvAlleles.Size = new System.Drawing.Size(386, 241);
             this.dgvAlleles.TabIndex = 7;
-            // 
-            // rsid
-            // 
-            this.rsid.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.rsid.HeaderText = "RSID";
-            this.rsid.Name = "rsid";
-            this.rsid.ReadOnly = true;
-            // 
-            // position
-            // 
-            this.position.HeaderText = "Position";
-            this.position.Name = "position";
-            this.position.ReadOnly = true;
-            // 
-            // kit1
-            // 
-            this.kit1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.kit1.HeaderText = "Kit1";
-            this.kit1.Name = "kit1";
-            this.kit1.ReadOnly = true;
-            // 
-            // kit2
-            // 
-            this.kit2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.kit2.HeaderText = "Kit2";
-            this.kit2.Name = "kit2";
-            this.kit2.ReadOnly = true;
-            // 
-            // match
-            // 
-            this.match.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.match.HeaderText = "Match";
-            this.match.Name = "match";
-            this.match.ReadOnly = true;
+            this.dgvAlleles.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(dgvAlleles_CellFormatting);
             // 
             // splitContainer1
             // 
@@ -411,7 +218,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.splitContainer1);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "MatchingKitsFrm";
@@ -430,38 +236,5 @@
             this.tableLayoutPanel3.ResumeLayout(false);
             this.ResumeLayout(false);
         }
-
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label lblName;
-        private System.Windows.Forms.DataGridView dgvMatches;
-        private System.Windows.Forms.DataGridViewTextBoxColumn cmp_id;
-        private System.Windows.Forms.DataGridViewTextBoxColumn kit_no;
-        private System.Windows.Forms.DataGridViewTextBoxColumn name;
-        private System.Windows.Forms.DataGridViewTextBoxColumn at_longest;
-        private System.Windows.Forms.DataGridViewTextBoxColumn at_total;
-        private System.Windows.Forms.DataGridViewTextBoxColumn x_longest;
-        private System.Windows.Forms.DataGridViewTextBoxColumn x_total;
-        private System.Windows.Forms.DataGridViewTextBoxColumn mrca;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.DataGridView dgvSegments;
-        private System.Windows.Forms.DataGridViewTextBoxColumn chr;
-        private System.Windows.Forms.DataGridViewTextBoxColumn start_pos;
-        private System.Windows.Forms.DataGridViewTextBoxColumn end_pos;
-        private System.Windows.Forms.DataGridViewTextBoxColumn seg_len;
-        private System.Windows.Forms.DataGridViewTextBoxColumn snp_count;
-        private System.Windows.Forms.DataGridView dgvAlleles;
-        private System.Windows.Forms.DataGridViewTextBoxColumn rsid;
-        private System.Windows.Forms.DataGridViewTextBoxColumn position;
-        private System.Windows.Forms.DataGridViewTextBoxColumn kit1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn kit2;
-        private System.Windows.Forms.DataGridViewTextBoxColumn match;
-        private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
-        private System.Windows.Forms.Label lblSegLabel;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button lblKit;
     }
 }

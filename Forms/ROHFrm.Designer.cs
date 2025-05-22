@@ -2,21 +2,27 @@
 {
     partial class ROHFrm
     {
-        private System.ComponentModel.IContainer components = null;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null)) {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        private System.ComponentModel.BackgroundWorker bwROH;
+        private System.Windows.Forms.Label lblLongestXSegment;
+        private System.Windows.Forms.Label lblTotalXSegments;
+        private System.Windows.Forms.Label lblMRCA;
+        private System.Windows.Forms.Label lblLongestSegment;
+        private System.Windows.Forms.Label lblTotalSegments;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.DataGridView dgvSegmentIdx;
+        private System.Windows.Forms.DataGridView dgvMatching;
 
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ROHFrm));
             this.bwROH = new System.ComponentModel.BackgroundWorker();
-            this.saveFileDlg = new System.Windows.Forms.SaveFileDialog();
             this.lblLongestXSegment = new System.Windows.Forms.Label();
             this.lblTotalXSegments = new System.Windows.Forms.Label();
             this.lblMRCA = new System.Windows.Forms.Label();
@@ -31,16 +37,7 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.dgvSegmentIdx = new System.Windows.Forms.DataGridView();
-            this.chromosome = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.start = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.end_pos = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.seg_len = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.snp_count = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dgvMatching = new System.Windows.Forms.DataGridView();
-            this.rsid = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.chr = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.pos = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.genotype = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -57,11 +54,6 @@
             this.bwROH.WorkerSupportsCancellation = true;
             this.bwROH.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwROH_DoWork);
             this.bwROH.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwROH_RunWorkerCompleted);
-            // 
-            // saveFileDlg
-            // 
-            this.saveFileDlg.Filter = "CSV Files|*.csv";
-            this.saveFileDlg.Title = "Save Common Ancestor Profile";
             // 
             // lblLongestXSegment
             // 
@@ -205,107 +197,21 @@
             // 
             // dgvSegmentIdx
             // 
-            this.dgvSegmentIdx.AllowUserToAddRows = false;
-            this.dgvSegmentIdx.AllowUserToDeleteRows = false;
-            this.dgvSegmentIdx.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvSegmentIdx.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.chromosome,
-            this.start,
-            this.end_pos,
-            this.seg_len,
-            this.snp_count});
             this.dgvSegmentIdx.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvSegmentIdx.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dgvSegmentIdx.Location = new System.Drawing.Point(0, 0);
             this.dgvSegmentIdx.Name = "dgvSegmentIdx";
-            this.dgvSegmentIdx.ReadOnly = true;
-            this.dgvSegmentIdx.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvSegmentIdx.ShowEditingIcon = false;
             this.dgvSegmentIdx.Size = new System.Drawing.Size(387, 456);
             this.dgvSegmentIdx.TabIndex = 0;
             this.dgvSegmentIdx.SelectionChanged += new System.EventHandler(this.dgvSegmentIdx_SelectionChanged);
             // 
-            // chromosome
-            // 
-            this.chromosome.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.chromosome.HeaderText = "Chromosome";
-            this.chromosome.Name = "chromosome";
-            this.chromosome.ReadOnly = true;
-            // 
-            // start
-            // 
-            this.start.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.start.HeaderText = "Start Position";
-            this.start.Name = "start";
-            this.start.ReadOnly = true;
-            // 
-            // end_pos
-            // 
-            this.end_pos.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.end_pos.HeaderText = "End Position";
-            this.end_pos.Name = "end_pos";
-            this.end_pos.ReadOnly = true;
-            // 
-            // seg_len
-            // 
-            this.seg_len.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.seg_len.HeaderText = "Segment Length (cM)";
-            this.seg_len.Name = "seg_len";
-            this.seg_len.ReadOnly = true;
-            // 
-            // snp_count
-            // 
-            this.snp_count.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.snp_count.HeaderText = "SNP Count";
-            this.snp_count.Name = "snp_count";
-            this.snp_count.ReadOnly = true;
-            // 
             // dgvMatching
             // 
-            this.dgvMatching.AllowUserToAddRows = false;
-            this.dgvMatching.AllowUserToDeleteRows = false;
-            this.dgvMatching.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvMatching.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.rsid,
-            this.chr,
-            this.pos,
-            this.genotype});
             this.dgvMatching.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvMatching.Location = new System.Drawing.Point(0, 0);
             this.dgvMatching.Name = "dgvMatching";
-            this.dgvMatching.ReadOnly = true;
-            this.dgvMatching.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvMatching.ShowEditingIcon = false;
             this.dgvMatching.Size = new System.Drawing.Size(387, 456);
             this.dgvMatching.TabIndex = 0;
-            // 
-            // rsid
-            // 
-            this.rsid.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.rsid.HeaderText = "RSID";
-            this.rsid.Name = "rsid";
-            this.rsid.ReadOnly = true;
-            // 
-            // chr
-            // 
-            this.chr.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.chr.HeaderText = "Chromosome";
-            this.chr.Name = "chr";
-            this.chr.ReadOnly = true;
-            // 
-            // pos
-            // 
-            this.pos.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.pos.HeaderText = "Position";
-            this.pos.Name = "pos";
-            this.pos.ReadOnly = true;
-            // 
-            // genotype
-            // 
-            this.genotype.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.genotype.HeaderText = "Genotype";
-            this.genotype.Name = "genotype";
-            this.genotype.ReadOnly = true;
+            this.dgvMatching.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(this.dgvMatching_CellFormatting);
             // 
             // ROHFrm
             // 
@@ -313,7 +219,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ROHFrm";
@@ -331,32 +236,5 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvMatching)).EndInit();
             this.ResumeLayout(false);
         }
-
-        private System.ComponentModel.BackgroundWorker bwROH;
-        private System.Windows.Forms.SaveFileDialog saveFileDlg;
-        private System.Windows.Forms.Label lblLongestXSegment;
-        private System.Windows.Forms.Label lblTotalXSegments;
-        private System.Windows.Forms.Label lblMRCA;
-        private System.Windows.Forms.Label lblLongestSegment;
-        private System.Windows.Forms.Label lblTotalSegments;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.DataGridView dgvSegmentIdx;
-        private System.Windows.Forms.DataGridViewTextBoxColumn chromosome;
-        private System.Windows.Forms.DataGridViewTextBoxColumn start;
-        private System.Windows.Forms.DataGridViewTextBoxColumn end_pos;
-        private System.Windows.Forms.DataGridViewTextBoxColumn seg_len;
-        private System.Windows.Forms.DataGridViewTextBoxColumn snp_count;
-        private System.Windows.Forms.DataGridView dgvMatching;
-        private System.Windows.Forms.DataGridViewTextBoxColumn rsid;
-        private System.Windows.Forms.DataGridViewTextBoxColumn chr;
-        private System.Windows.Forms.DataGridViewTextBoxColumn pos;
-        private System.Windows.Forms.DataGridViewTextBoxColumn genotype;
     }
 }

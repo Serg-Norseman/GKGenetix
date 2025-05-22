@@ -6,21 +6,27 @@
 
 using System;
 using System.Windows.Forms;
+using GenetixKit.Core;
 using GenetixKit.Forms;
 
 namespace GenetixKit
 {
     static class Program
     {
-        public static GKMainFrm GGKitFrmMainInst = null;
+        private static GKMainFrm mainInstance = null;
+
+        public static IKitHost KitInstance
+        {
+            get { return mainInstance; }
+        }
 
         [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            GGKitFrmMainInst = new GKMainFrm();
-            Application.Run(GGKitFrmMainInst);
+            mainInstance = new GKMainFrm();
+            Application.Run(mainInstance);
         }
     }
 }

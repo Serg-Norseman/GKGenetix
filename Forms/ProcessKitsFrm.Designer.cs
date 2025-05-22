@@ -2,19 +2,19 @@
 {
     partial class ProcessKitsFrm
     {
-        private System.ComponentModel.IContainer components = null;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null)) {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        private System.Windows.Forms.Button btnStart;
+        private System.ComponentModel.BackgroundWorker bwCompare;
+        private System.Windows.Forms.Label lblComparing;
+        private System.Windows.Forms.ProgressBar progressBar;
+        private System.Windows.Forms.TextBox tbStatus;
+        private System.Windows.Forms.CheckBox cbDontSkip;
+        private System.Windows.Forms.Label label1;
+        private System.ComponentModel.BackgroundWorker bwROH;
+        private System.ComponentModel.BackgroundWorker bwPhaseVisualizer;
+        private System.Windows.Forms.CheckBox cbRedoVisual;
 
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProcessKitsFrm));
             this.btnStart = new System.Windows.Forms.Button();
             this.bwCompare = new System.ComponentModel.BackgroundWorker();
@@ -23,8 +23,6 @@
             this.tbStatus = new System.Windows.Forms.TextBox();
             this.cbDontSkip = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.cbNoAdmixture = new System.Windows.Forms.CheckBox();
             this.bwROH = new System.ComponentModel.BackgroundWorker();
             this.bwPhaseVisualizer = new System.ComponentModel.BackgroundWorker();
             this.cbRedoVisual = new System.Windows.Forms.CheckBox();
@@ -89,7 +87,7 @@
             this.cbDontSkip.Name = "cbDontSkip";
             this.cbDontSkip.Size = new System.Drawing.Size(164, 17);
             this.cbDontSkip.TabIndex = 4;
-            this.cbDontSkip.Text = "Delete Existing Comparisions.";
+            this.cbDontSkip.Text = "Delete Existing Comparisons.";
             this.cbDontSkip.UseVisualStyleBackColor = true;
             // 
             // label1
@@ -100,21 +98,6 @@
             this.label1.Size = new System.Drawing.Size(40, 13);
             this.label1.TabIndex = 5;
             this.label1.Text = "Status:";
-            // 
-            // timer1
-            // 
-            this.timer1.Interval = 1000;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // cbNoAdmixture
-            // 
-            this.cbNoAdmixture.AutoSize = true;
-            this.cbNoAdmixture.Location = new System.Drawing.Point(182, 12);
-            this.cbNoAdmixture.Name = "cbNoAdmixture";
-            this.cbNoAdmixture.Size = new System.Drawing.Size(144, 17);
-            this.cbNoAdmixture.TabIndex = 6;
-            this.cbNoAdmixture.Text = "No Admixture Calculation";
-            this.cbNoAdmixture.UseVisualStyleBackColor = true;
             // 
             // bwROH
             // 
@@ -148,14 +131,12 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.cbRedoVisual);
-            this.Controls.Add(this.cbNoAdmixture);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cbDontSkip);
             this.Controls.Add(this.tbStatus);
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.lblComparing);
             this.Controls.Add(this.btnStart);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ProcessKitsFrm";
@@ -165,18 +146,5 @@
             this.ResumeLayout(false);
             this.PerformLayout();
         }
-
-        private System.Windows.Forms.Button btnStart;
-        private System.ComponentModel.BackgroundWorker bwCompare;
-        private System.Windows.Forms.Label lblComparing;
-        private System.Windows.Forms.ProgressBar progressBar;
-        private System.Windows.Forms.TextBox tbStatus;
-        private System.Windows.Forms.CheckBox cbDontSkip;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.CheckBox cbNoAdmixture;
-        private System.ComponentModel.BackgroundWorker bwROH;
-        private System.ComponentModel.BackgroundWorker bwPhaseVisualizer;
-        private System.Windows.Forms.CheckBox cbRedoVisual;
     }
 }

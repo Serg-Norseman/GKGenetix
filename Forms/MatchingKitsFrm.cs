@@ -15,52 +15,62 @@ namespace GenetixKit.Forms
 {
     public partial class MatchingKitsFrm : Form
     {
-        string kit = null;
-        string phased_kit = null;
-        string unphased_kit = null;
-        bool phased = false;
-        DataTable segment_dt = null;
-        DataTable dt_alleles = null;
+        private readonly string kit = null;
+        private string phasedKit = null;
+        private string unphasedKit = null;
+        private bool phased = false;
+        private DataTable tblSegments = null;
+        private DataTable tblAlleles = null;
 
         public MatchingKitsFrm(string kit)
         {
             InitializeComponent();
+
+            GKUIFuncs.FixGridView(dgvMatches);
+            dgvMatches.AddColumn("kit", "Kit No");
+            dgvMatches.AddColumn("name", "Name");
+            dgvMatches.AddColumn("at_longest", "Autosomal Longest", "N2");
+            dgvMatches.AddColumn("at_total", "Autosomal Total", "N2");
+            dgvMatches.AddColumn("x_longest", "X Longest", "N2");
+            dgvMatches.AddColumn("x_total", "X Total", "N2");
+            dgvMatches.AddColumn("mrca", "MRCA");
+
+            GKUIFuncs.FixGridView(dgvSegments);
+            dgvSegments.AddColumn("chromosome", "Chromosome");
+            dgvSegments.AddColumn("start_position", "Start Position");
+            dgvSegments.AddColumn("end_position", "End Position");
+            dgvSegments.AddColumn("segment_length_cm", "Segment Length (cM)", "N2");
+            dgvSegments.AddColumn("snp_count", "SNP Count");
+            dgvSegments.AddColumn("segment_id", "segment_id", "", false);
+
+            GKUIFuncs.FixGridView(dgvAlleles);
+            dgvAlleles.AddColumn("rsid", "RSID");
+            dgvAlleles.AddColumn("position", "Position");
+            dgvAlleles.AddColumn("kit1_genotype", "");
+            dgvAlleles.AddColumn("kit2_genotype", "");
+            dgvAlleles.AddColumn("match", "Match");
+
             this.kit = kit;
         }
 
         private void MatchingKitsFrm_Load(object sender, EventArgs e)
         {
             lblKit.Text = kit;
-            lblName.Text = GKSqlFuncs.queryDatabase("kit_master", new string[] { "name" }, "WHERE kit_no='" + kit + "'").Rows[0].ItemArray[0].ToString();
-            DataTable dt = GKSqlFuncs.QueryDB("SELECT cmp_id,kit'Kit No',name'Name',at_longest'Autosomal Longest',at_total'Autosomal Total',x_longest'X Longest',x_total'X Total',mrca'MRCA' FROM (SELECT a.cmp_id,a.kit1'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca FROM cmp_status a,kit_master b WHERE a.at_total!=0 AND a.kit1!='" + kit + "' AND a.kit2='" + kit + "' AND a.status_autosomal=1 AND b.kit_no=a.kit1 AND b.disabled=0 UNION SELECT a.cmp_id,a.kit2'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca FROM cmp_status a,kit_master b WHERE a.at_total!=0 AND a.kit2!='" + kit + "' AND a.kit1='" + kit + "' AND a.status_autosomal=1 AND b.kit_no=a.kit2 AND b.disabled=0) ORDER BY at_longest DESC,at_total DESC");
-            dgvMatches.Columns.Clear();
+            lblName.Text = GKSqlFuncs.GetKitName(kit);
+
+            DataTable dt = GKSqlFuncs.QueryTable("SELECT cmp_id, kit, name, at_longest, at_total, x_longest, x_total, mrca FROM (SELECT a.cmp_id,a.kit1'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca FROM cmp_status a,kit_master b WHERE a.at_total!=0 AND a.kit1!='" + kit + "' AND a.kit2='" + kit + "' AND a.status_autosomal=1 AND b.kit_no=a.kit1 AND b.disabled=0 UNION SELECT a.cmp_id,a.kit2'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca FROM cmp_status a,kit_master b WHERE a.at_total!=0 AND a.kit2!='" + kit + "' AND a.kit1='" + kit + "' AND a.status_autosomal=1 AND b.kit_no=a.kit2 AND b.disabled=0) ORDER BY at_longest DESC,at_total DESC");
             dgvMatches.DataSource = dt;
-            dgvMatches.Columns[0].Visible = false;
-
-            dgvMatches.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dgvMatches.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dgvMatches.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dgvMatches.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dgvMatches.Columns[5].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dgvMatches.Columns[6].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dgvMatches.Columns[7].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-
-            DataGridViewCellStyle style = new DataGridViewCellStyle();
-            style.Format = "N2";
-
-            dgvMatches.Columns[3].DefaultCellStyle = style;
-            dgvMatches.Columns[4].DefaultCellStyle = style;
-            dgvMatches.Columns[5].DefaultCellStyle = style;
-            dgvMatches.Columns[6].DefaultCellStyle = style;
-
         }
 
         private void dgvMatches_SelectionChanged(object sender, EventArgs e)
         {
             if (dgvMatches.SelectedRows.Count > 0) {
-                string cmp_id = dgvMatches.SelectedRows[0].Cells[0].Value.ToString();
-                string kit2 = dgvMatches.SelectedRows[0].Cells[1].Value.ToString();
-                string name2 = dgvMatches.SelectedRows[0].Cells[2].Value.ToString();
+                var selRowCells = dgvMatches.SelectedRows[0].Cells;
+
+                string cmp_id = selRowCells[0].Value.ToString();
+                string kit2 = selRowCells[1].Value.ToString();
+                string name2 = selRowCells[2].Value.ToString();
+
                 BackgroundWorker bWorker = new BackgroundWorker();
                 bWorker.DoWork += bWorker_DoWork;
                 bWorker.RunWorkerCompleted += bWorker_RunWorkerCompleted;
@@ -68,50 +78,36 @@ namespace GenetixKit.Forms
             }
         }
 
-        void bWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void bWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             string[] o = (string[])e.Argument;
             string cmp_id = o[0];
             string kit2 = o[1];
             string name2 = o[2];
-            segment_dt = GKSqlFuncs.QueryDB("select chromosome'Chromosome',start_position'Start Position',end_position'End Position',segment_length_cm'Segment Length (cM)',snp_count'SNP Count',segment_id from cmp_autosomal where cmp_id='" + cmp_id + "'");
+            tblSegments = GKSqlFuncs.QueryTable("select chromosome, start_position, end_position, segment_length_cm, snp_count, segment_id from cmp_autosomal where cmp_id='" + cmp_id + "'");
 
-            if (GKSqlFuncs.isPhased(kit)) {
-                phased_kit = kit;
-                unphased_kit = kit2;
+            if (GKSqlFuncs.IsPhased(kit)) {
+                phasedKit = kit;
+                unphasedKit = kit2;
                 phased = true;
-            } else if (GKSqlFuncs.isPhased(kit2)) {
-                phased_kit = kit2;
-                unphased_kit = kit;
+            } else if (GKSqlFuncs.IsPhased(kit2)) {
+                phasedKit = kit2;
+                unphasedKit = kit;
                 phased = true;
             } else
                 phased = false;
             e.Result = new string[] { kit2, name2 };
         }
 
-        void bWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void bWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (segment_dt != null) {
+            if (tblSegments != null) {
                 string[] o = (string[])e.Result;
                 lblSegLabel.Text = "List of matching segments for kit " + o[0] + " (" + o[1] + ")";
-                dgvSegments.Columns.Clear();
-                dgvSegments.DataSource = segment_dt;
-                segment_dt = null;
-                DataGridViewCellStyle style = new DataGridViewCellStyle();
-                style.Format = "N2";
 
-                dgvSegments.Columns[3].DefaultCellStyle = style;
-
-                dgvSegments.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                dgvSegments.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                dgvSegments.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                dgvSegments.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                dgvSegments.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-
-                dgvSegments.Columns[5].Visible = false;
-
+                dgvSegments.DataSource = tblSegments;
+                tblSegments = null;
             }
-
         }
 
         private void dgvSegments_SelectionChanged(object sender, EventArgs e)
@@ -120,56 +116,56 @@ namespace GenetixKit.Forms
                 BackgroundWorker bWorker2 = new BackgroundWorker();
                 bWorker2.DoWork += bWorker2_DoWork;
                 bWorker2.RunWorkerCompleted += bWorker2_RunWorkerCompleted;
-                string segment_id = dgvSegments.SelectedRows[0].Cells[5].Value.ToString();
 
-                //lblSegLabel.Text = "List of matching segments for kit " + dgvMatches.SelectedRows[0].Cells[1].Value.ToString() + " (" + dgvMatches.SelectedRows[0].Cells[2].Value.ToString() + ")";
-                dgvAlleles.Columns.Clear();
-                bWorker2.RunWorkerAsync(new string[] { kit, lblName.Text, dgvMatches.SelectedRows[0].Cells[1].Value.ToString(), dgvMatches.SelectedRows[0].Cells[2].Value.ToString(), segment_id });
+                string segmentId = dgvSegments.SelectedRows[0].Cells[5].Value.ToString();
+
+                DataGridViewCellCollection selRowCells = dgvMatches.SelectedRows[0].Cells;
+                dgvAlleles.Columns[2].HeaderText = kit + " (" + lblName.Text + ")";
+                dgvAlleles.Columns[3].HeaderText = selRowCells[0].Value.ToString() + " (" + selRowCells[1].Value.ToString() + ")";
+
+                bWorker2.RunWorkerAsync(segmentId);
             }
         }
 
-        void bWorker2_DoWork(object sender, DoWorkEventArgs e)
+        private void bWorker2_DoWork(object sender, DoWorkEventArgs e)
         {
-            object[] o = (object[])e.Argument;
-            dt_alleles = GKSqlFuncs.QueryDB("select rsid'RSID',position'Position',kit1_genotype'" + o[0] + " (" + o[1] + ")',kit2_genotype'" + o[2] + " (" + o[3] + ")',match'Match' from cmp_mrca where segment_id='" + o[4] + "'");
+            string sId = (string)e.Argument;
+            tblAlleles = GKSqlFuncs.QueryTable("select rsid, position, kit1_genotype, kit2_genotype, match from cmp_mrca where segment_id='" + sId + "'");
         }
 
-        void bWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void bWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (dt_alleles != null) {
-                dgvAlleles.Columns.Clear();
-                dgvAlleles.DataSource = dt_alleles;
-
-                dgvAlleles.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                dgvAlleles.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                dgvAlleles.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                dgvAlleles.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                dgvAlleles.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-
-                foreach (DataGridViewRow row in dgvAlleles.Rows) {
-                    if (row.Cells[4].Value.ToString() == "-")
-                        row.DefaultCellStyle.BackColor = Color.LightGray;
-                    else if (row.Cells[4].Value.ToString() == "")
-                        row.DefaultCellStyle.BackColor = Color.OrangeRed;
-                }
+            if (tblAlleles != null) {
+                dgvAlleles.DataSource = tblAlleles;
             }
+        }
+
+        private void dgvAlleles_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            var row = tblAlleles.Rows[e.RowIndex];
+            var cellVal = row["match"].ToString();
+
+            if (cellVal == "-")
+                e.CellStyle.BackColor = Color.LightGray;
+            else if (cellVal == "")
+                e.CellStyle.BackColor = Color.OrangeRed;
         }
 
         private void lblKit_Click(object sender, EventArgs e)
         {
-            SelectKitFrm open = new SelectKitFrm(SelectKitFrm.SELECT_ONE_TO_MANY);
-            open.ShowDialog(this);
+            Program.KitInstance.SelectOper(UIOperation.SELECT_ONE_TO_MANY);
         }
 
         private void dgvSegments_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (phased) {
-                string chr = dgvSegments.SelectedRows[0].Cells[0].Value.ToString();
-                string start_pos = dgvSegments.SelectedRows[0].Cells[1].Value.ToString();
-                string end_pos = dgvSegments.SelectedRows[0].Cells[2].Value.ToString();
-                PhasedSegmentFrm frm = new PhasedSegmentFrm(phased_kit, unphased_kit, chr, start_pos, end_pos);
-                frm.ShowDialog(Program.GGKitFrmMainInst);
-                frm.Dispose();
+                DataGridViewRow selRow = dgvSegments.SelectedRows[0];
+
+                string chr = selRow.Cells[0].Value.ToString();
+                string startPos = selRow.Cells[1].Value.ToString();
+                string endPos = selRow.Cells[2].Value.ToString();
+
+                Program.KitInstance.ShowPhasedSegmentVisualizer(phasedKit, unphasedKit, chr, startPos, endPos);
             }
         }
     }

@@ -2,15 +2,20 @@
 {
     partial class PhasingFrm
     {
-        private System.ComponentModel.IContainer components = null;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null)) {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.ComponentModel.BackgroundWorker bwPhasing;
+        private System.Windows.Forms.Button btnFather;
+        private System.Windows.Forms.Button btnMother;
+        private System.Windows.Forms.Button btnChild;
+        private System.Windows.Forms.Button btnPhasing;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.RadioButton rbFemale;
+        private System.Windows.Forms.RadioButton rbMale;
+        private System.Windows.Forms.DataGridView dgvPhasing;
 
         private void InitializeComponent()
         {
@@ -28,24 +33,10 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.rbMale = new System.Windows.Forms.RadioButton();
             this.rbFemale = new System.Windows.Forms.RadioButton();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.pbChild = new System.Windows.Forms.PictureBox();
             this.dgvPhasing = new System.Windows.Forms.DataGridView();
-            this.rsid = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.chromosome = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.position = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.child = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.father = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.mother = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.phased_paternal = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.phased_maternal = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbChild)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPhasing)).BeginInit();
             this.SuspendLayout();
             // 
@@ -90,12 +81,9 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 5F));
-            this.tableLayoutPanel1.Controls.Add(this.pictureBox1, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.pictureBox2, 3, 2);
             this.tableLayoutPanel1.Controls.Add(this.label1, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.label2, 3, 1);
             this.tableLayoutPanel1.Controls.Add(this.label3, 2, 3);
-            this.tableLayoutPanel1.Controls.Add(this.pbChild, 2, 4);
             this.tableLayoutPanel1.Controls.Add(this.btnFather, 1, 3);
             this.tableLayoutPanel1.Controls.Add(this.btnMother, 3, 3);
             this.tableLayoutPanel1.Controls.Add(this.btnChild, 2, 5);
@@ -205,7 +193,6 @@
             this.rbMale.TabIndex = 0;
             this.rbMale.Text = "Male";
             this.rbMale.UseVisualStyleBackColor = true;
-            this.rbMale.CheckedChanged += new System.EventHandler(this.rbMale_CheckedChanged);
             // 
             // rbFemale
             // 
@@ -217,117 +204,14 @@
             this.rbFemale.Text = "Female";
             this.rbFemale.UseVisualStyleBackColor = true;
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Location = new System.Drawing.Point(14, 63);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(62, 87);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            // 
-            // pictureBox2
-            // 
-            this.pictureBox2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox2.Location = new System.Drawing.Point(150, 63);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(62, 87);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox2.TabIndex = 1;
-            this.pictureBox2.TabStop = false;
-            // 
-            // pbChild
-            // 
-            this.pbChild.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pbChild.Location = new System.Drawing.Point(82, 225);
-            this.pbChild.Name = "pbChild";
-            this.pbChild.Size = new System.Drawing.Size(62, 87);
-            this.pbChild.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pbChild.TabIndex = 6;
-            this.pbChild.TabStop = false;
-            // 
             // dgvPhasing
             // 
-            this.dgvPhasing.AllowUserToAddRows = false;
-            this.dgvPhasing.AllowUserToDeleteRows = false;
-            this.dgvPhasing.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dgvPhasing.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dgvPhasing.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvPhasing.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.rsid,
-            this.chromosome,
-            this.position,
-            this.child,
-            this.father,
-            this.mother,
-            this.phased_paternal,
-            this.phased_maternal});
             this.dgvPhasing.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvPhasing.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dgvPhasing.Location = new System.Drawing.Point(238, 3);
             this.dgvPhasing.Name = "dgvPhasing";
-            this.dgvPhasing.ReadOnly = true;
-            this.dgvPhasing.RowHeadersVisible = false;
-            this.dgvPhasing.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvPhasing.Size = new System.Drawing.Size(543, 556);
             this.dgvPhasing.TabIndex = 1;
-            // 
-            // rsid
-            // 
-            this.rsid.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.rsid.HeaderText = "RSID";
-            this.rsid.Name = "rsid";
-            this.rsid.ReadOnly = true;
-            // 
-            // chromosome
-            // 
-            this.chromosome.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.chromosome.HeaderText = "Chromosome";
-            this.chromosome.Name = "chromosome";
-            this.chromosome.ReadOnly = true;
-            // 
-            // position
-            // 
-            this.position.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.position.HeaderText = "Position";
-            this.position.Name = "position";
-            this.position.ReadOnly = true;
-            // 
-            // child
-            // 
-            this.child.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.child.HeaderText = "Child";
-            this.child.Name = "child";
-            this.child.ReadOnly = true;
-            // 
-            // father
-            // 
-            this.father.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.father.HeaderText = "Father";
-            this.father.Name = "father";
-            this.father.ReadOnly = true;
-            // 
-            // mother
-            // 
-            this.mother.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.mother.HeaderText = "Mother";
-            this.mother.Name = "mother";
-            this.mother.ReadOnly = true;
-            // 
-            // phased_paternal
-            // 
-            this.phased_paternal.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.phased_paternal.HeaderText = "Phased Paternal";
-            this.phased_paternal.Name = "phased_paternal";
-            this.phased_paternal.ReadOnly = true;
-            // 
-            // phased_maternal
-            // 
-            this.phased_maternal.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.phased_maternal.HeaderText = "Phased Maternal";
-            this.phased_maternal.Name = "phased_maternal";
-            this.phased_maternal.ReadOnly = true;
+            this.dgvPhasing.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(dgvPhasing_CellFormatting);
             // 
             // PhasingFrm
             // 
@@ -335,7 +219,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.tableLayoutPanel2);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "PhasingFrm";
@@ -346,37 +229,8 @@
             this.tableLayoutPanel2.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbChild)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPhasing)).EndInit();
             this.ResumeLayout(false);
         }
-
-        private System.Windows.Forms.PictureBox pbChild;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.ComponentModel.BackgroundWorker bwPhasing;
-        private System.Windows.Forms.Button btnFather;
-        private System.Windows.Forms.Button btnMother;
-        private System.Windows.Forms.Button btnChild;
-        private System.Windows.Forms.Button btnPhasing;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.RadioButton rbFemale;
-        private System.Windows.Forms.RadioButton rbMale;
-        private System.Windows.Forms.DataGridView dgvPhasing;
-        private System.Windows.Forms.DataGridViewTextBoxColumn rsid;
-        private System.Windows.Forms.DataGridViewTextBoxColumn chromosome;
-        private System.Windows.Forms.DataGridViewTextBoxColumn position;
-        private System.Windows.Forms.DataGridViewTextBoxColumn child;
-        private System.Windows.Forms.DataGridViewTextBoxColumn father;
-        private System.Windows.Forms.DataGridViewTextBoxColumn mother;
-        private System.Windows.Forms.DataGridViewTextBoxColumn phased_paternal;
-        private System.Windows.Forms.DataGridViewTextBoxColumn phased_maternal;
     }
 }

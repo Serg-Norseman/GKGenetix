@@ -6,47 +6,154 @@
 
 using System;
 using System.ComponentModel;
-using System.Data;
-using System.IO;
 using System.Windows.Forms;
 using GenetixKit.Core;
 
 namespace GenetixKit.Forms
 {
-    public partial class GKMainFrm : Form
+    public partial class GKMainFrm : Form, IKitHost
     {
-        NewEditKitFrm newKitFrm = null;
-        SettingsFrm settingsFrm = null;
+        private NewEditKitFrm newKitFrm = null;
 
         public GKMainFrm()
         {
             InitializeComponent();
         }
 
-        public NewEditKitFrm getNewEditKitFrm()
+        #region Handlers
+
+        private void GGKitFrmMain_Load(object sender, EventArgs e)
         {
-            return newKitFrm;
+            SetStatus("Checking Integrity of DB ...");
+            this.Enabled = false;
+            bwIChkAndFix.RunWorkerAsync();
+            this.Text = Application.ProductName + " v" + Application.ProductVersion.ToString();
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void miExit_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
-        public void hideAllChildren(string exceptFrm)
+        private void miNew_Click(object sender, EventArgs e)
         {
-            foreach (Form frm in this.MdiChildren) {
+            NewKit(null, false);
+        }
+
+        private void miSave_Click(object sender, EventArgs e)
+        {
+            Form mdifrm = this.ActiveMdiChild;
+            if (mdifrm.Name == "NewEditKitFrm")
+                ((NewEditKitFrm)mdifrm).Save();
+            else if (mdifrm.Name == "QuickEditKit")
+                ((QuickEditKit)mdifrm).Save();
+        }
+
+        private void miOpen_Click(object sender, EventArgs e)
+        {
+            SelectOper(UIOperation.OPEN_KIT);
+        }
+
+        private void miDelete_Click(object sender, EventArgs e)
+        {
+            DeleteKit();
+        }
+
+        private void miOneToOne_Click(object sender, EventArgs e)
+        {
+            using (var frm = new SelectTwoKitsFrm(UIOperation.SELECT_ADMIXTURE)) {
+                frm.ShowDialog(this);
+            }
+        }
+
+        private void miOneToMany_Click(object sender, EventArgs e)
+        {
+            SelectOper(UIOperation.SELECT_ONE_TO_MANY);
+        }
+
+        private void bwIChkAndFix_DoWork(object sender, DoWorkEventArgs e)
+        {
+            GKSqlFuncs.CheckIntegrity();
+        }
+
+        private void bwIChkAndFix_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            SetStatus("Done.");
+            this.Enabled = true;
+        }
+
+        private void miProcessKits_Click(object sender, EventArgs e)
+        {
+            ShowProcessKits();
+        }
+
+        private void miAdmixture_Click(object sender, EventArgs e)
+        {
+            SelectKitFrm open = new SelectKitFrm(UIOperation.SELECT_ADMIXTURE);
+            open.ShowDialog(this);
+        }
+
+        private void miQuickEdit_Click(object sender, EventArgs e)
+        {
+            ShowQuickEdit();
+        }
+
+        private void miRunsOfHomozygosity_Click(object sender, EventArgs e)
+        {
+            SelectOper(UIOperation.SELECT_ROH);
+        }
+
+        private void miMtDnaPhylogeny_Click(object sender, EventArgs e)
+        {
+            SelectOper(UIOperation.SELECT_MTPHYLOGENY);
+        }
+
+        private void miMitoMap_Click(object sender, EventArgs e)
+        {
+            SelectOper(UIOperation.SELECT_MITOMAP);
+        }
+
+        private void miISOGGYTree_Click(object sender, EventArgs e)
+        {
+            SelectOper(UIOperation.SELECT_ISOGGYTREE);
+        }
+
+        private void miPhasing_Click(object sender, EventArgs e)
+        {
+            ShowMdiChild(new PhasingFrm());
+        }
+
+        #endregion
+
+        private void HideAllMdiChildren(string exceptFrm = "")
+        {
+            foreach (Form frm in MdiChildren) {
                 if (frm.Name != exceptFrm)
                     frm.Dispose();
             }
         }
 
-        public void setStatusMessage(string message)
+        private void ShowMdiChild(Form frm)
+        {
+            HideAllMdiChildren();
+            frm.MdiParent = this;
+            frm.Visible = true;
+            frm.WindowState = FormWindowState.Maximized;
+        }
+
+        public void DeleteKit()
+        {
+            Form mdifrm = this.ActiveMdiChild;
+            if (mdifrm.Name == "QuickEditKit")
+                ((QuickEditKit)mdifrm).Delete();
+        }
+
+        public void SetStatus(string message)
         {
             statusLbl.Text = message;
         }
 
-        public void setProgress(int percent)
+        public void SetProgress(int percent)
         {
             if (percent == -1 || percent == 100)
                 progressBar.Visible = false;
@@ -56,276 +163,116 @@ namespace GenetixKit.Forms
             }
         }
 
-        private void newToolStripButton_Click(object sender, EventArgs e)
+        public void NewKit(string kit, bool disabled)
         {
-            newToolStripMenuItem.PerformClick();
+            if (newKitFrm == null || newKitFrm.IsDisposed)
+                newKitFrm = new NewEditKitFrm(kit, disabled);
+            ShowMdiChild(newKitFrm);
         }
 
-        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        public void EnableSave()
         {
-            hideAllChildren("");
-            if (newKitFrm == null)
-                newKitFrm = new NewEditKitFrm(null, false);
-            if (newKitFrm.IsDisposed)
-                newKitFrm = new NewEditKitFrm(null, false);
-            newKitFrm.MdiParent = this;
-            newKitFrm.Visible = true;
-            newKitFrm.WindowState = FormWindowState.Maximized;
+            miSave.Enabled = true;
         }
 
-        public void enableSave()
+        public void DisableSave()
         {
-            saveToolStripButton.Enabled = true;
-            saveToolStripMenuItem.Enabled = true;
+            miSave.Enabled = false;
         }
 
-        public void disableSave()
+        public void EnableToolbar()
         {
-            saveToolStripButton.Enabled = false;
-            saveToolStripMenuItem.Enabled = false;
-        }
-
-        private void saveToolStripButton_Click(object sender, EventArgs e)
-        {
-            GKUIFuncs.SaveInfoFromActiveMdiChild();
-        }
-
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            GKUIFuncs.SaveInfoFromActiveMdiChild();
-        }
-
-        public void enableToolbar()
-        {
-            toolStripGGK.Enabled = true;
             menuStripGGK.Enabled = true;
         }
 
-        public void disableToolbar()
+        public void DisableToolbar()
         {
-            toolStripGGK.Enabled = false;
             menuStripGGK.Enabled = false;
         }
 
-        public void enable_EnableKitToolbarBtn()
+        public void EnableDelete()
         {
-            toolStripEnableIcon.Enabled = true;
-            enableToolStripMenuItem.Enabled = true;
+            miDelete.Enabled = true;
         }
 
-        public void disable_EnableKitToolbarBtn()
+        public void DisableDelete()
         {
-            toolStripEnableIcon.Enabled = false;
-            enableToolStripMenuItem.Enabled = false;
+            miDelete.Enabled = false;
         }
 
-        public void enableDeleteKitToolbarBtn()
+        public void ShowAdmixture(string kit)
         {
-            toolStripDeleteBtn.Enabled = true;
-            deleteToolStripMenuItem.Enabled = true;
+            ShowMdiChild(new AdmixtureFrm(kit));
         }
 
-        public void disableDeleteKitToolbarBtn()
+        public void ShowProcessKits()
         {
-            toolStripDeleteBtn.Enabled = false;
-            deleteToolStripMenuItem.Enabled = false;
+            ShowMdiChild(new ProcessKitsFrm());
         }
 
-
-        public void enable_DisableKitToolbarBtn()
+        public void ShowQuickEdit()
         {
-            toolStripDisableBtn.Enabled = true;
-            disableToolStripMenuItem.Enabled = true;
+            ShowMdiChild(new QuickEditKit());
         }
 
-        public void disable_DisableKitToolbarBtn()
+        public void ShowPhasedSegmentVisualizer(string kit1, string kit2, string chr, string start_pos, string end_pos)
         {
-            toolStripDisableBtn.Enabled = false;
-            disableToolStripMenuItem.Enabled = false;
-        }
-
-        private void openToolStripButton_Click(object sender, EventArgs e)
-        {
-            SelectKitFrm open = new SelectKitFrm(SelectKitFrm.OPEN_KIT);
-            open.ShowDialog(this);
-        }
-
-        private void toolStripDisableBtn_Click(object sender, EventArgs e)
-        {
-            GKUIFuncs.disableKit();
-        }
-
-        private void toolStripEnableIcon_Click(object sender, EventArgs e)
-        {
-            GKUIFuncs.enableKit();
-        }
-
-        private void toolStripDeleteBtn_Click(object sender, EventArgs e)
-        {
-            GKUIFuncs.deleteKit();
-        }
-
-        private void GGKitFrmMain_Load(object sender, EventArgs e)
-        {
-            setStatusMessage("Checking Integrity of DB ...");
-            this.Enabled = false;
-            bwIChkAndFix.RunWorkerAsync();
-            this.Text = Application.ProductName + " v" + Application.ProductVersion.ToString();
-        }
-
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SelectKitFrm open = new SelectKitFrm(SelectKitFrm.OPEN_KIT);
-            open.ShowDialog(this);
-        }
-
-
-        private void enableToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            GKUIFuncs.enableKit();
-        }
-
-        private void disableToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            GKUIFuncs.disableKit();
-        }
-
-        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            GKUIFuncs.deleteKit();
-        }
-
-        private void importToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (openFileDialogGGK.ShowDialog(this) == DialogResult.OK) {
-                disableToolbar();
-                setStatusMessage("Importing " + Path.GetFileName(openFileDialogGGK.FileName));
-                bwImport.RunWorkerAsync(openFileDialogGGK.FileName);
+            using (var frm = new PhasedSegmentFrm(kit1, kit2, chr, start_pos, end_pos)) {
+                frm.ShowDialog(this);
             }
         }
 
-        private void exportToolStripMenuItem_Click(object sender, EventArgs e)
+        public void SelectOper(UIOperation operation)
         {
-            SelectKitFrm open = new SelectKitFrm(SelectKitFrm.EXPORT_KIT);
-            open.ShowDialog(this);
+            using (SelectKitFrm open = new SelectKitFrm(operation))
+                open.ShowDialog(this);
         }
 
-        private void bwImport_DoWork(object sender, DoWorkEventArgs e)
+        public string SelectKit()
         {
-            GKSqlFuncs.importKit(e.Argument.ToString());
-        }
-
-        private void bwImport_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            setStatusMessage("Done.");
-            setProgress(-1);
-            enableToolbar();
-        }
-
-        private void onetoOneToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SelectTwoKitsFrm frm = new SelectTwoKitsFrm(SelectTwoKitsFrm.SELECT_ADMIXTURE);
-            frm.ShowDialog(this);
-        }
-
-        private void onetoManyToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SelectKitFrm open = new SelectKitFrm(SelectKitFrm.SELECT_ONE_TO_MANY);
-            open.ShowDialog(this);
-        }
-
-        private void factoryResetToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (MessageBox.Show("Are you sure to delete everything and reset to factory defaults?", "Factory Reset", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes) {
-                GKSqlFuncs.FactoryReset();
+            using (var open = new SelectKitFrm(UIOperation.SELECT_KIT)) {
+                open.ShowDialog(this);
+                return open.GetSelectedKit();
             }
         }
 
-        private void bwIChkAndFix_DoWork(object sender, DoWorkEventArgs e)
+        public void ShowMatchingKits(string kit)
         {
-            GKSqlFuncs.integrityCheckAndFix();
-            DataTable dt = GKSqlFuncs.QueryDB("select * from kit_master where reference=1");
-            if (dt.Rows.Count == 0) {
-                this.Invoke(new MethodInvoker(delegate {
-                    admixtureToolStripMenuItem.Enabled = false;
-                }));
+            ShowMdiChild(new MatchingKitsFrm(kit));
+        }
+
+        public void ShowROH(string kit)
+        {
+            ShowMdiChild(new ROHFrm(kit));
+        }
+
+        public void ShowMtPhylogeny(string kit)
+        {
+            ShowMdiChild(new MtPhylogenyFrm(kit));
+        }
+
+        public void ShowMitoMap(string kit)
+        {
+            ShowMdiChild(new MitoMapFrm(kit));
+        }
+
+        public void ShowIsoggYTree(string kit)
+        {
+            ShowMdiChild(new IsoggYTreeFrm(kit));
+        }
+
+        public void ShowOneToOneCmp(string kit1, string kit2)
+        {
+            ShowMdiChild(new OneToOneCmpFrm(kit1, kit2));
+        }
+
+        public void SelectLocation(ref int x, ref int y)
+        {
+            using (var frm = new LocationSelectFrm(x, y)) {
+                frm.ShowDialog(this);
+                x = frm.X;
+                y = frm.Y;
             }
-
-        }
-
-        private void bwIChkAndFix_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            setStatusMessage("Done.");
-            this.Enabled = true;
-        }
-
-        private void processKitsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            hideAllChildren("");
-            ProcessKitsFrm pkfrm = new ProcessKitsFrm();
-            pkfrm.MdiParent = this;
-            pkfrm.Visible = true;
-            pkfrm.WindowState = FormWindowState.Maximized;
-        }
-
-        private void admixtureToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SelectKitFrm open = new SelectKitFrm(SelectKitFrm.SELECT_ADMIXTURE);
-            open.ShowDialog(this);
-        }
-
-        private void quickEditToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            hideAllChildren("");
-            QuickEditKit qefrm = new QuickEditKit();
-            qefrm.MdiParent = this;
-            qefrm.Visible = true;
-            qefrm.WindowState = FormWindowState.Maximized;
-        }
-
-        private void runsOfHomozygosityToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SelectKitFrm open = new SelectKitFrm(SelectKitFrm.SELECT_ROH);
-            open.ShowDialog(this);
-        }
-
-        private void phasingToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            hideAllChildren("");
-            PhasingFrm pufrm = new PhasingFrm();
-            pufrm.MdiParent = this;
-            pufrm.Visible = true;
-            pufrm.WindowState = FormWindowState.Maximized;
-        }
-
-        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            hideAllChildren("SettingsFrm");
-            if (settingsFrm == null)
-                settingsFrm = new SettingsFrm();
-            if (settingsFrm.IsDisposed)
-                settingsFrm = new SettingsFrm();
-            settingsFrm.MdiParent = this;
-            settingsFrm.Visible = true;
-            settingsFrm.WindowState = FormWindowState.Maximized;
-        }
-
-        private void mtDnaPhylogenyToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SelectKitFrm open = new SelectKitFrm(SelectKitFrm.SELECT_MTPHYLOGENY);
-            open.ShowDialog(this);
-        }
-
-        private void mitoMapToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SelectKitFrm open = new SelectKitFrm(SelectKitFrm.SELECT_MITOMAP);
-            open.ShowDialog(this);
-        }
-
-        private void iSOGGYTreeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SelectKitFrm open = new SelectKitFrm(SelectKitFrm.SELECT_ISOGGYTREE);
-            open.ShowDialog(this);
         }
     }
 }

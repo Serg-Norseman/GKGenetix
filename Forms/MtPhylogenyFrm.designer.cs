@@ -3,6 +3,25 @@
     partial class MtPhylogenyFrm
     {
         private System.ComponentModel.IContainer components = null;
+        private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox txtSNPs;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label lblyhg;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label lblSb;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.RichTextBox snpTextBox;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button btnRefresh;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
 
         protected override void Dispose(bool disposing)
         {
@@ -34,7 +53,6 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -198,7 +216,6 @@
             this.lblSb.Size = new System.Drawing.Size(224, 60);
             this.lblSb.TabIndex = 8;
             this.lblSb.Text = "...";
-            this.lblSb.Click += new System.EventHandler(this.lblSb_Click);
             // 
             // label6
             // 
@@ -219,7 +236,6 @@
             this.lblyhg.Size = new System.Drawing.Size(224, 60);
             this.lblyhg.TabIndex = 2;
             this.lblyhg.Text = "...";
-            this.lblyhg.Click += new System.EventHandler(this.lblyhg_Click);
             // 
             // label5
             // 
@@ -255,10 +271,6 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // saveFileDialog1
-            // 
-            this.saveFileDialog1.Filter = "Html Reports|*.html";
-            // 
             // backgroundWorker1
             // 
             this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
@@ -270,7 +282,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.splitContainer1);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -294,27 +305,5 @@
             this.panel2.PerformLayout();
             this.ResumeLayout(false);
         }
-
-        private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.TreeView treeView1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox txtSNPs;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label lblyhg;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label lblSb;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
-        private System.Windows.Forms.RichTextBox snpTextBox;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button btnRefresh;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
-

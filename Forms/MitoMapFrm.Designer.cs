@@ -2,15 +2,18 @@
 {
     partial class MitoMapFrm
     {
-        private System.ComponentModel.IContainer components = null;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null)) {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.DataVisualization.Charting.Chart mtdna_chart;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage mtMapTab;
+        private System.Windows.Forms.TabPage details;
+        private System.Windows.Forms.DataGridView dgvmtdna;
+        private System.Windows.Forms.TabControl tabControl2;
+        private System.Windows.Forms.TabPage rsrs;
+        private System.Windows.Forms.DataGridView dgvNucleotides;
+        private System.Windows.Forms.TabPage tabFASTA;
+        private System.Windows.Forms.RichTextBox rtbFASTA;
+        private System.Windows.Forms.Label label1;
 
         private void InitializeComponent()
         {
@@ -23,18 +26,9 @@
             this.mtdna_chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.details = new System.Windows.Forms.TabPage();
             this.dgvmtdna = new System.Windows.Forms.DataGridView();
-            this.map_locus = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.start = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.end = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.total = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.shorthand = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.description = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.rsrs = new System.Windows.Forms.TabPage();
             this.dgvNucleotides = new System.Windows.Forms.DataGridView();
-            this.pos = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.rsrsname = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ckit = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabFASTA = new System.Windows.Forms.TabPage();
             this.rtbFASTA = new System.Windows.Forms.RichTextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -130,67 +124,12 @@
             // 
             // dgvmtdna
             // 
-            this.dgvmtdna.AllowUserToAddRows = false;
-            this.dgvmtdna.AllowUserToDeleteRows = false;
-            this.dgvmtdna.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dgvmtdna.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvmtdna.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.map_locus,
-            this.start,
-            this.end,
-            this.total,
-            this.shorthand,
-            this.description});
             this.dgvmtdna.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvmtdna.Location = new System.Drawing.Point(3, 3);
-            this.dgvmtdna.MultiSelect = false;
             this.dgvmtdna.Name = "dgvmtdna";
-            this.dgvmtdna.ReadOnly = true;
-            this.dgvmtdna.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvmtdna.Size = new System.Drawing.Size(528, 494);
             this.dgvmtdna.TabIndex = 0;
             this.dgvmtdna.SelectionChanged += new System.EventHandler(this.dgvmtdna_SelectionChanged);
-            // 
-            // map_locus
-            // 
-            this.map_locus.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.map_locus.HeaderText = "Map Locus";
-            this.map_locus.Name = "map_locus";
-            this.map_locus.ReadOnly = true;
-            // 
-            // start
-            // 
-            this.start.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.start.HeaderText = "Start Position";
-            this.start.Name = "start";
-            this.start.ReadOnly = true;
-            // 
-            // end
-            // 
-            this.end.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.end.HeaderText = "End Position";
-            this.end.Name = "end";
-            this.end.ReadOnly = true;
-            // 
-            // total
-            // 
-            this.total.HeaderText = "Total Nucleotides";
-            this.total.Name = "total";
-            this.total.ReadOnly = true;
-            // 
-            // shorthand
-            // 
-            this.shorthand.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.shorthand.HeaderText = "Shorthand";
-            this.shorthand.Name = "shorthand";
-            this.shorthand.ReadOnly = true;
-            // 
-            // description
-            // 
-            this.description.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.description.HeaderText = "Description";
-            this.description.Name = "description";
-            this.description.ReadOnly = true;
             // 
             // tabControl2
             // 
@@ -216,50 +155,11 @@
             // 
             // dgvNucleotides
             // 
-            this.dgvNucleotides.AllowUserToAddRows = false;
-            this.dgvNucleotides.AllowUserToDeleteRows = false;
-            this.dgvNucleotides.AllowUserToResizeColumns = false;
-            this.dgvNucleotides.AllowUserToResizeRows = false;
-            this.dgvNucleotides.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dgvNucleotides.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvNucleotides.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.pos,
-            this.rsrsname,
-            this.ckit});
             this.dgvNucleotides.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvNucleotides.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dgvNucleotides.Location = new System.Drawing.Point(3, 3);
-            this.dgvNucleotides.MultiSelect = false;
             this.dgvNucleotides.Name = "dgvNucleotides";
-            this.dgvNucleotides.ReadOnly = true;
-            this.dgvNucleotides.RowHeadersVisible = false;
-            this.dgvNucleotides.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvNucleotides.Size = new System.Drawing.Size(216, 494);
             this.dgvNucleotides.TabIndex = 0;
-            // 
-            // pos
-            // 
-            this.pos.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.pos.HeaderText = "Position";
-            this.pos.Name = "pos";
-            this.pos.ReadOnly = true;
-            this.pos.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // rsrsname
-            // 
-            this.rsrsname.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.rsrsname.HeaderText = "RSRS";
-            this.rsrsname.Name = "rsrsname";
-            this.rsrsname.ReadOnly = true;
-            this.rsrsname.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // ckit
-            // 
-            this.ckit.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.ckit.HeaderText = "Kit";
-            this.ckit.Name = "ckit";
-            this.ckit.ReadOnly = true;
-            this.ckit.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             // 
             // tabFASTA
             // 
@@ -303,7 +203,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "MitoMapFrm";
@@ -322,27 +221,5 @@
             this.tabFASTA.ResumeLayout(false);
             this.ResumeLayout(false);
         }
-
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.DataVisualization.Charting.Chart mtdna_chart;
-        private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage mtMapTab;
-        private System.Windows.Forms.TabPage details;
-        private System.Windows.Forms.DataGridView dgvmtdna;
-        private System.Windows.Forms.TabControl tabControl2;
-        private System.Windows.Forms.TabPage rsrs;
-        private System.Windows.Forms.DataGridView dgvNucleotides;
-        private System.Windows.Forms.DataGridViewTextBoxColumn map_locus;
-        private System.Windows.Forms.DataGridViewTextBoxColumn start;
-        private System.Windows.Forms.DataGridViewTextBoxColumn end;
-        private System.Windows.Forms.DataGridViewTextBoxColumn total;
-        private System.Windows.Forms.DataGridViewTextBoxColumn shorthand;
-        private System.Windows.Forms.DataGridViewTextBoxColumn description;
-        private System.Windows.Forms.DataGridViewTextBoxColumn pos;
-        private System.Windows.Forms.DataGridViewTextBoxColumn rsrsname;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ckit;
-        private System.Windows.Forms.TabPage tabFASTA;
-        private System.Windows.Forms.RichTextBox rtbFASTA;
-        private System.Windows.Forms.Label label1;
     }
 }

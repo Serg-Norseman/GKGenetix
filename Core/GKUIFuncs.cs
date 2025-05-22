@@ -4,167 +4,85 @@
  * License: MIT License (http://opensource.org/licenses/MIT)
  */
 
-using System.Diagnostics;
+using System;
 using System.Drawing;
-using System.IO;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using GenetixKit.Forms;
 
 namespace GenetixKit.Core
 {
     internal static class GKUIFuncs
     {
-        public static void setStatus(string message)
+        public static Color HeatMapColor(double percent, double max)
         {
-            Program.GGKitFrmMainInst.setStatusMessage(message);
+            double val = percent * 255 / max;
+
+            int r = 255;
+            int g = Convert.ToByte(val);
+            int b = Convert.ToByte(val);
+            return Color.FromArgb(255, r, g, b);
         }
 
-        public static void setProgress(int percent)
+        public static void AddColumn(this DataGridView dataGridView, string propertyName, string headerText, string format = "", bool visible = true, bool readOnly = true)
         {
-            Program.GGKitFrmMainInst.setProgress(percent);
+            var column = new DataGridViewTextBoxColumn() { DataPropertyName = propertyName, HeaderText = headerText };
+            if (!string.IsNullOrEmpty(format)) column.DefaultCellStyle.Format = format;
+            column.Visible = visible;
+            column.ReadOnly = readOnly;
+            dataGridView.Columns.Add(column);
         }
 
-        public static void enableSave()
+        public static void AddCheckedColumn(this DataGridView dataGridView, string propertyName, string headerText)
         {
-            Program.GGKitFrmMainInst.enableSave();
+            var column = new DataGridViewCheckBoxColumn() { DataPropertyName = propertyName, HeaderText = headerText };
+            dataGridView.Columns.Add(column);
         }
 
-        public static void disableSave()
+        public static void AddComboColumn(this DataGridView dataGridView, string propertyName, string headerText, object[] items)
         {
-            Program.GGKitFrmMainInst.disableSave();
+            var column = new DataGridViewComboBoxColumn() { DataPropertyName = propertyName, HeaderText = headerText };
+            column.Items.AddRange(items);
+            dataGridView.Columns.Add(column);
         }
 
-        public static void enableMenu()
+        public static void AddButtonColumn(this DataGridView dataGridView, string propertyName, string headerText)
         {
-            Program.GGKitFrmMainInst.MainMenuStrip.Enabled = true;
+            var column = new DataGridViewButtonColumn() { DataPropertyName = propertyName, HeaderText = headerText };
+            dataGridView.Columns.Add(column);
         }
 
-        public static void disableMenu()
+        public static void FixGridView(DataGridView dataGridView)
         {
-            Program.GGKitFrmMainInst.MainMenuStrip.Enabled = false;
+            dataGridView.AllowUserToAddRows = false;
+            dataGridView.AllowUserToDeleteRows = false;
+            dataGridView.EditMode = DataGridViewEditMode.EditProgrammatically;
+            dataGridView.ReadOnly = true;
+            dataGridView.ShowEditingIcon = false;
+
+            dataGridView.AllowUserToResizeRows = false;
+            dataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
+            dataGridView.AutoGenerateColumns = false;
+            dataGridView.CellBorderStyle = DataGridViewCellBorderStyle.Single;
+            dataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridView.MultiSelect = false;
+            dataGridView.RowHeadersVisible = false;
+            dataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         }
 
-
-        public static void enableToolbar()
+        public static void ShowMessage(string msg)
         {
-            Program.GGKitFrmMainInst.enableToolbar();
+            MessageBox.Show(msg);
         }
 
-        public static void disableToolbar()
+        public static DataGridViewRow[] GetArray(this DataGridViewRowCollection collection)
         {
-            Program.GGKitFrmMainInst.disableToolbar();
+            var result = new DataGridViewRow[collection.Count];
+            collection.CopyTo(result, 0);
+            return result;
         }
 
-        public static void hideAllMdiChildren()
+        public static T GetSelectedObj<T>(this DataGridView dataGridView) where T : class
         {
-            Program.GGKitFrmMainInst.hideAllChildren("");
-        }
-
-        public static void SaveInfoFromActiveMdiChild()
-        {
-            Form mdifrm = Program.GGKitFrmMainInst.ActiveMdiChild;
-            if (mdifrm.Name == "NewEditKitFrm")
-                ((NewEditKitFrm)mdifrm).Save();
-            else if (mdifrm.Name == "SettingsFrm")
-                ((SettingsFrm)mdifrm).Save();
-            else if (mdifrm.Name == "OneToOneCmpFrm")
-                ((OneToOneCmpFrm)mdifrm).Save();
-            else if (mdifrm.Name == "QuickEditKit")
-                ((QuickEditKit)mdifrm).Save();
-            else if (mdifrm.Name == "MtPhylogenyFrm")
-                ((MtPhylogenyFrm)mdifrm).Save();
-        }
-
-        public static void enable_EnableKitToolbarBtn()
-        {
-            Program.GGKitFrmMainInst.enable_EnableKitToolbarBtn();
-        }
-
-        public static void disable_EnableKitToolbarBtn()
-        {
-            Program.GGKitFrmMainInst.disable_EnableKitToolbarBtn();
-        }
-
-        public static void enableDeleteKitToolbarBtn()
-        {
-            Program.GGKitFrmMainInst.enableDeleteKitToolbarBtn();
-        }
-
-        public static void disableDeleteKitToolbarBtn()
-        {
-            Program.GGKitFrmMainInst.disableDeleteKitToolbarBtn();
-        }
-
-
-        public static void enable_DisableKitToolbarBtn()
-        {
-            Program.GGKitFrmMainInst.enable_DisableKitToolbarBtn();
-        }
-
-        public static void disable_DisableKitToolbarBtn()
-        {
-            Program.GGKitFrmMainInst.disable_DisableKitToolbarBtn();
-        }
-        ///
-        public static void disableKit()
-        {
-            Form mdifrm = Program.GGKitFrmMainInst.ActiveMdiChild;
-            if (mdifrm.Name == "NewEditKitFrm")
-                ((NewEditKitFrm)mdifrm).Disable();
-            else if (mdifrm.Name == "QuickEditKit")
-                ((QuickEditKit)mdifrm).Disable();
-        }
-        public static void enableKit()
-        {
-            Form mdifrm = Program.GGKitFrmMainInst.ActiveMdiChild;
-            if (mdifrm.Name == "NewEditKitFrm")
-                ((NewEditKitFrm)mdifrm).Enable();
-            else if (mdifrm.Name == "QuickEditKit")
-                ((QuickEditKit)mdifrm).Enable();
-        }
-        public static void deleteKit()
-        {
-            Form mdifrm = Program.GGKitFrmMainInst.ActiveMdiChild;
-            if (mdifrm.Name == "NewEditKitFrm")
-                ((NewEditKitFrm)mdifrm).Delete();
-            else if (mdifrm.Name == "QuickEditKit")
-                ((QuickEditKit)mdifrm).Delete();
-        }
-
-        public static string sqlSafe(string text)
-        {
-            text = Regex.Replace(text, "[^A-Za-z0-9 ]", " ");
-            return text;
-        }
-
-        public static byte[] imageToByteArray(System.Drawing.Image imageIn)
-        {
-            using (var ms = new MemoryStream()) {
-                imageIn.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                return ms.ToArray();
-            }
-        }
-
-        public static Image byteArrayToImage(byte[] byteArrayIn)
-        {
-            using (var ms = new MemoryStream(byteArrayIn)) {
-                Image returnImage = Image.FromStream(ms);
-                return returnImage;
-            }
-        }
-
-        public static Process execute(string file1, string file2, string diff_work_dir)
-        {
-            Process p = new Process();
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.WorkingDirectory = diff_work_dir;
-            p.StartInfo.FileName = diff_work_dir + "diff.exe";
-            p.StartInfo.Arguments = file1 + " " + file2;
-            p.Start();
-            return p;
+            return (dataGridView.SelectedRows.Count > 0) ? dataGridView.SelectedRows[0].DataBoundItem as T : null;
         }
     }
 }

@@ -15,7 +15,6 @@
             this.pbWorldMap.BackColor = System.Drawing.Color.White;
             this.pbWorldMap.Cursor = System.Windows.Forms.Cursors.Cross;
             this.pbWorldMap.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pbWorldMap.Image = global::GenetixKit.Properties.Resources.world_map;
             this.pbWorldMap.Location = new System.Drawing.Point(0, 0);
             this.pbWorldMap.Name = "pbWorldMap";
             this.pbWorldMap.Size = new System.Drawing.Size(678, 314);
@@ -24,6 +23,7 @@
             this.pbWorldMap.TabStop = false;
             this.pbWorldMap.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pbWorldMap_MouseClick);
             this.pbWorldMap.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pbWorldMap_MouseMove);
+            this.pbWorldMap.Paint += new System.Windows.Forms.PaintEventHandler(this.pbWorldMap_Paint);
             // 
             // LocationSelectFrm
             // 
