@@ -35,14 +35,13 @@ namespace GenetixKit.Forms
 
         private void AdmixtureFrm_Load(object sender, EventArgs e)
         {
-            kitLbl.Text = kit + " (" + GKSqlFuncs.GetKitName(kit) + ")";
+            kitLbl.Text = $"{kit} ({GKSqlFuncs.GetKitName(kit)})";
             var dt = GKSqlFuncs.GetAdmixture(kit, "50");
             AdmixtureRec.RecalcPercents(dt);
             dgvAdmixture.DataSource = dt;
 
-            for (int i = 0; i < dt.Count; i++) {
-                var row = dt[i];
-                chart1.Series[0].Points.AddXY(row.Population + ", " + row.Location + " (" + row.Percentage.ToString("#0.00") + "%)", new object[] { row.Percentage });
+            foreach (var row in dt) {
+                chart1.Series[0].Points.AddXY($"{row.Population}, {row.Location} ({row.Percentage:#0.00} %)", new object[] { row.Percentage });
             }
 
             foreach (DataPoint p in chart1.Series[0].Points) {

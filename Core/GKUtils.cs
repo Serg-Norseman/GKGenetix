@@ -43,7 +43,7 @@ namespace GenetixKit.Core
             }
         }
 
-        private static void CopyTo(Stream src, Stream dest)
+        private static void CopyTo(GZipStream src, Stream dest)
         {
             byte[] bytes = new byte[4096 * 4];
             int cnt;

@@ -6,8 +6,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GenetixKit.Core.Model;
@@ -42,16 +42,18 @@ namespace GenetixKit.Forms
         private void ROHFrm_Load(object sender, EventArgs e)
         {
             Program.KitInstance.SetStatus("Calculating ROH ...");
-            this.Text = "Runs of Homozygosity - " + kit + " (" + GKSqlFuncs.GetKitName(kit) + ")";
-            bwROH.RunWorkerAsync();
+            this.Text = $"Runs of Homozygosity - {kit} ({GKSqlFuncs.GetKitName(kit)})";
+
+            Task.Factory.StartNew(() => {
+                roh_results = GKGenFuncs.ROH(kit);
+
+                this.Invoke(new MethodInvoker(delegate {
+                    UpdateView();
+                }));
+            });
         }
 
-        private void bwROH_DoWork(object sender, DoWorkEventArgs e)
-        {
-            roh_results = GKGenFuncs.ROH(kit);
-        }
-
-        private void bwROH_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void UpdateView()
         {
             dgvSegmentIdx.DataSource = roh_results;
 

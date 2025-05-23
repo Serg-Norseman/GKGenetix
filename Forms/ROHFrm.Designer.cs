@@ -2,7 +2,6 @@
 {
     partial class ROHFrm
     {
-        private System.ComponentModel.BackgroundWorker bwROH;
         private System.Windows.Forms.Label lblLongestXSegment;
         private System.Windows.Forms.Label lblTotalXSegments;
         private System.Windows.Forms.Label lblMRCA;
@@ -21,8 +20,6 @@
 
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ROHFrm));
-            this.bwROH = new System.ComponentModel.BackgroundWorker();
             this.lblLongestXSegment = new System.Windows.Forms.Label();
             this.lblTotalXSegments = new System.Windows.Forms.Label();
             this.lblMRCA = new System.Windows.Forms.Label();
@@ -47,13 +44,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvSegmentIdx)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMatching)).BeginInit();
             this.SuspendLayout();
-            // 
-            // bwROH
-            // 
-            this.bwROH.WorkerReportsProgress = true;
-            this.bwROH.WorkerSupportsCancellation = true;
-            this.bwROH.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwROH_DoWork);
-            this.bwROH.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwROH_RunWorkerCompleted);
             // 
             // lblLongestXSegment
             // 

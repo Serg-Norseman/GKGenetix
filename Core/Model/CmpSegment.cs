@@ -4,30 +4,34 @@ using System.Data;
 
 namespace GenetixKit.Core.Model
 {
-    internal class CmpSegment : ISNPSegment
+    internal class CmpSegment : ISNPSegment, ITableRow
     {
-        public int SegmentId { get; }
-        public string Chromosome { get; }
-        public int StartPosition { get; }
-        public int EndPosition { get; }
-        public double SegmentLength_cm { get; }
-        public int SNPCount { get; }
+        public int SegmentId { get; private set; }
+        public string Chromosome { get; private set; }
+        public int StartPosition { get; private set; }
+        public int EndPosition { get; private set; }
+        public double SegmentLength_cm { get; private set; }
+        public int SNPCount { get; private set; }
 
 
         public IList<CmpSegmentRow> Rows { get; set; }
 
 
-        public CmpSegment(string chromosome, int startPosition, int endPosition, double segmentLength_cm, int snpCount, IList<CmpSegmentRow> rows)
+        public CmpSegment()
+        {
+        }
+
+        public CmpSegment(string chromosome, int startPosition, int endPosition, double segmentLength_cm, IList<CmpSegmentRow> rows)
         {
             Chromosome = chromosome;
             StartPosition = startPosition;
             EndPosition = endPosition;
             SegmentLength_cm = segmentLength_cm;
-            SNPCount = snpCount;
+            SNPCount = rows.Count;
             Rows = rows;
         }
 
-        public CmpSegment(IDataRecord values)
+        public void Load(IDataRecord values)
         {
             SegmentId = values.GetInt32(0);
             Chromosome = values.GetString(1);
@@ -42,14 +46,19 @@ namespace GenetixKit.Core.Model
     }
 
 
-    internal class CmpSegmentRow : ISNPHeader
+    internal class CmpSegmentRow : ISNPHeader, ITableRow
     {
-        public string RSID { get; }
-        public string Chromosome { get; }
-        public int Position { get; }
-        public string Kit1Genotype { get; }
-        public string Kit2Genotype { get; }
-        public string Match { get; }
+        public string RSID { get; private set; }
+        public string Chromosome { get; private set; }
+        public int Position { get; private set; }
+        public string Kit1Genotype { get; private set; }
+        public string Kit2Genotype { get; private set; }
+        public string Match { get; private set; }
+
+
+        public CmpSegmentRow()
+        {
+        }
 
         public CmpSegmentRow(string rsid, string chromosome, int position, string kit1Genotype, string kit2Genotype, string match)
         {
@@ -61,7 +70,7 @@ namespace GenetixKit.Core.Model
             Match = match;
         }
 
-        public CmpSegmentRow(IDataRecord values)
+        public void Load(IDataRecord values)
         {
             RSID = values.GetString(0);
             Chromosome = values.GetString(1);

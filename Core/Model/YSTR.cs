@@ -2,10 +2,15 @@
 
 namespace GenetixKit.Core.Model
 {
-    public class YSTR
+    public class YSTR : ITableRow
     {
-        public string Marker { get; }
-        public string Value { get; }
+        public string Marker { get; private set; }
+        public string Value { get; private set; }
+
+
+        public YSTR()
+        {
+        }
 
         public YSTR(string marker, string value)
         {
@@ -13,7 +18,7 @@ namespace GenetixKit.Core.Model
             Value = value;
         }
 
-        public YSTR(IDataRecord values)
+        public void Load(IDataRecord values)
         {
             Marker = values.GetString(0);
             Value = values.GetString(1);

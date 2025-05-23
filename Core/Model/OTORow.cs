@@ -2,17 +2,21 @@
 
 namespace GenetixKit.Core.Model
 {
-    internal class OTORow : ISNPHeader
+    internal class OTORow : ISNPHeader, ITableRow
     {
-        public string RSID { get; }
-        public string Chromosome { get; }
-        public int Position { get; }
-        public string Genotype1 { get; }
-        public string Genotype2 { get; }
-        public int Count { get; }
+        public string RSID { get; private set; }
+        public string Chromosome { get; private set; }
+        public int Position { get; private set; }
+        public string Genotype1 { get; private set; }
+        public string Genotype2 { get; private set; }
+        public int Count { get; private set; }
 
-        // rsid, chr, pos, gt1, gt2, count(*)
-        public OTORow(IDataRecord values)
+
+        public OTORow()
+        {
+        }
+
+        public void Load(IDataRecord values)
         {
             RSID = values.GetString(0);
             Chromosome = values.GetString(1);

@@ -15,7 +15,7 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.Label lblSegLabel;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button lblKit;
+        private System.Windows.Forms.Button btnKit;
 
         private void InitializeComponent()
         {
@@ -23,7 +23,7 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label3 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.lblKit = new System.Windows.Forms.Button();
+            this.btnKit = new System.Windows.Forms.Button();
             this.lblName = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -78,7 +78,7 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.lblKit);
+            this.panel1.Controls.Add(this.btnKit);
             this.panel1.Controls.Add(this.lblName);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
@@ -88,16 +88,16 @@
             this.panel1.Size = new System.Drawing.Size(778, 74);
             this.panel1.TabIndex = 0;
             // 
-            // lblKit
+            // btnKit
             // 
-            this.lblKit.AutoSize = true;
-            this.lblKit.Location = new System.Drawing.Point(55, 47);
-            this.lblKit.Name = "lblKit";
-            this.lblKit.Size = new System.Drawing.Size(75, 26);
-            this.lblKit.TabIndex = 4;
-            this.lblKit.Text = "..";
-            this.lblKit.UseVisualStyleBackColor = true;
-            this.lblKit.Click += new System.EventHandler(this.lblKit_Click);
+            this.btnKit.AutoSize = true;
+            this.btnKit.Location = new System.Drawing.Point(55, 47);
+            this.btnKit.Name = "btnKit";
+            this.btnKit.Size = new System.Drawing.Size(75, 26);
+            this.btnKit.TabIndex = 4;
+            this.btnKit.Text = "..";
+            this.btnKit.UseVisualStyleBackColor = true;
+            this.btnKit.Click += new System.EventHandler(this.btnKit_Click);
             // 
             // lblName
             // 

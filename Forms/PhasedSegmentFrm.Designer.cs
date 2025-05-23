@@ -6,7 +6,6 @@
         private System.Windows.Forms.DataGridView dgvSegment;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel statusLbl;
-        private System.ComponentModel.BackgroundWorker bwPhaseVisualizer;
 
         private void InitializeComponent()
         {
@@ -14,7 +13,6 @@
             this.pbSegment = new System.Windows.Forms.PictureBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLbl = new System.Windows.Forms.ToolStripStatusLabel();
-            this.bwPhaseVisualizer = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.dgvSegment)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbSegment)).BeginInit();
             this.statusStrip1.SuspendLayout();
@@ -56,11 +54,6 @@
             this.statusLbl.Name = "statusLbl";
             this.statusLbl.Size = new System.Drawing.Size(48, 17);
             this.statusLbl.Text = "Phased.";
-            // 
-            // bwPhaseVisualizer
-            // 
-            this.bwPhaseVisualizer.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwPhaseVisualizer_DoWork);
-            this.bwPhaseVisualizer.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwPhaseVisualizer_RunWorkerCompleted);
             // 
             // PhasedSegmentVisualizerFrm
             // 

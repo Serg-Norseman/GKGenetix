@@ -2,7 +2,6 @@
 {
     partial class OneToOneCmpFrm
     {
-        private System.ComponentModel.BackgroundWorker bwCompare;
         private System.Windows.Forms.DataGridView dgvSegmentIdx;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Panel panel1;
@@ -19,8 +18,6 @@
 
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OneToOneCmpFrm));
-            this.bwCompare = new System.ComponentModel.BackgroundWorker();
             this.dgvSegmentIdx = new System.Windows.Forms.DataGridView();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
@@ -38,11 +35,6 @@
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // bwCompare
-            // 
-            this.bwCompare.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwCompare_DoWork);
-            this.bwCompare.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwCompare_RunWorkerCompleted);
             // 
             // dgvSegmentIdx
             // 

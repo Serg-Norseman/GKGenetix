@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GenetixKit.Core.Model;
@@ -91,15 +92,17 @@ namespace GenetixKit.Forms
             rbFemale.Enabled = false;
 
             male = rbMale.Checked;
-            bwPhasing.RunWorkerAsync();
+
+            Task.Factory.StartNew(() => {
+                GKGenFuncs.DoPhasing(fatherKit, motherKit, childKit, ref dt, male);
+
+                this.Invoke(new MethodInvoker(delegate {
+                    UpdateView();
+                }));
+            });
         }
 
-        private void bwPhasing_DoWork(object sender, DoWorkEventArgs e)
-        {
-            GKGenFuncs.DoPhasing(fatherKit, motherKit, childKit, ref dt, male, bwPhasing);
-        }
-
-        private void bwPhasing_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void UpdateView()
         {
             dgvPhasing.DataSource = dt;
 
@@ -111,11 +114,6 @@ namespace GenetixKit.Forms
             rbFemale.Enabled = true;
 
             Program.KitInstance.SetStatus("Done.");
-        }
-
-        private void bwPhasing_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            Program.KitInstance.SetStatus(e.UserState.ToString());
         }
     }
 }

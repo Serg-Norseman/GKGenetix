@@ -18,16 +18,16 @@ namespace GenetixKit.Core
         public static readonly string[] ydna67 = new string[] { "DYS531", "DYS578", "DYF395S1", "DYS590", "DYS537", "DYS641", "DYS472", "DYF406S1", "DYS511", "DYS425", "DYS413", "DYS557", "DYS594", "DYS436", "DYS490", "DYS534", "DYS450", "DYS444", "DYS481", "DYS520", "DYS446", "DYS617", "DYS568", "DYS487", "DYS572", "DYS640", "DYS492", "DYS565" };
         public static readonly string[] ydna111 = new string[] { "DYS710", "DYS485", "DYS632", "DYS495", "DYS540", "DYS714", "DYS716", "DYS717", "DYS505", "DYS556", "DYS549", "DYS589", "DYS522", "DYS494", "DYS533", "DYS636", "DYS575", "DYS638", "DYS462", "DYS452", "DYS445", "Y-GATA-A10", "DYS463", "DYS441", "Y-GGAAT-1B07", "DYS525", "DYS712", "DYS593", "DYS650", "DYS532", "DYS715", "DYS504", "DYS513", "DYS561", "DYS552", "DYS726", "DYS635", "DYS587", "DYS643", "DYS497", "DYS510", "DYS434", "DYS461", "DYS435" };
 
-        private static Dictionary<int, double>[] cM_map = null;
+        private static SortedList<int, double>[] cM_map = null;
         private static Dictionary<string, string[]> ymap = null;
         private static char[] rsrs = null;
 
         // required for cM calculation
-        public static Dictionary<int, double>[] cM_Map
+        public static SortedList<int, double>[] cM_Map
         {
             get {
                 if (cM_map == null) {
-                    cM_map = new Dictionary<int, double>[23];
+                    cM_map = new SortedList<int, double>[23];
 
                     using (var ms = GKUtils.GUnzip2Stream(Properties.Resources.map_csv)) {
                         StreamReader reader = new StreamReader(ms);
@@ -42,7 +42,7 @@ namespace GenetixKit.Core
                             pos = int.Parse(data[2]);
                             cm = GKUtils.ParseFloat(data[3]);
                             if (cM_map[chr - 1] == null)
-                                cM_map[chr - 1] = new Dictionary<int, double>();
+                                cM_map[chr - 1] = new SortedList<int, double>();
                             cM_map[chr - 1].Add(pos, cm);
                         }
                         reader.Close();

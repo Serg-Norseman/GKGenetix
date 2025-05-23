@@ -3,18 +3,23 @@ using System.Data;
 
 namespace GenetixKit.Core.Model
 {
-    internal class AdmixtureRec
+    internal class AdmixtureRec : ITableRow
     {
-        public string Population { get; }
-        public string Location { get; }
-        public double AtTotal { get; }
-        public double AtLongest { get; }
-        public int X { get; }
-        public int Y { get; }
+        public string Population { get; private set; }
+        public string Location { get; private set; }
+        public double AtTotal { get; private set; }
+        public double AtLongest { get; private set; }
+        public int X { get; private set; }
+        public int Y { get; private set; }
 
         public double Percentage { get; set; }
 
-        public AdmixtureRec(IDataRecord values)
+
+        public AdmixtureRec()
+        {
+        }
+
+        public void Load(IDataRecord values)
         {
             string valPL = values.GetString(0);
             string[] data = valPL.Replace("_", " ").Split(new char[] { ',' });

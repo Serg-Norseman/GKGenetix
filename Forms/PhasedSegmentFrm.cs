@@ -6,8 +6,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GenetixKit.Core.Model;
@@ -44,20 +44,22 @@ namespace GenetixKit.Forms
 
         private void PhasedSegmentFrm_Load(object sender, EventArgs e)
         {
-            this.Text = "Phased Segment : Chr " + chromosome + ": " + startPosition + "-" + endPosition;
+            this.Text = $"Phased Segment : Chr {chromosome}: {startPosition}-{endPosition}";
             statusLbl.Text = "Loading ...";
-            bwPhaseVisualizer.RunWorkerAsync();
+
+            Task.Factory.StartNew(() => {
+                tblSegments = GKSqlFuncs.GetPhaseSegments(unphasedKit, startPosition, endPosition, chromosome, phasedKit);
+                if (tblSegments.Count > 0 && this.IsHandleCreated) {
+                    original = GKGenFuncs.GetPhasedSegmentImage(tblSegments, chromosome);
+                }
+
+                this.Invoke(new MethodInvoker(delegate {
+                    UpdateView();
+                }));
+            });
         }
 
-        private void bwPhaseVisualizer_DoWork(object sender, DoWorkEventArgs e)
-        {
-            tblSegments = GKSqlFuncs.GetPhaseSegments(unphasedKit, startPosition, endPosition, chromosome, phasedKit);
-            if (tblSegments.Count > 0 && this.IsHandleCreated) {
-                original = GKGenFuncs.GetPhasedSegmentImage(tblSegments, chromosome);
-            }
-        }
-
-        private void bwPhaseVisualizer_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void UpdateView()
         {
             dgvSegment.DataSource = tblSegments;
             pbSegment.Image = original;

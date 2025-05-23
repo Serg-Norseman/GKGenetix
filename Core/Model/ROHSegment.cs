@@ -4,29 +4,33 @@ using System.Data;
 
 namespace GenetixKit.Core.Model
 {
-    internal class ROHSegment : ISNPSegment
+    internal class ROHSegment : ISNPSegment, ITableRow
     {
-        public string Chromosome { get; }
-        public int StartPosition { get; }
-        public int EndPosition { get; }
-        public double SegmentLength_cm { get; }
-        public int SNPCount { get; }
+        public string Chromosome { get; private set; }
+        public int StartPosition { get; private set; }
+        public int EndPosition { get; private set; }
+        public double SegmentLength_cm { get; private set; }
+        public int SNPCount { get; private set; }
 
 
         public IList<SingleSNP> Rows { get; set; }
 
 
-        public ROHSegment(string chromosome, int startPosition, int endPosition, double segmentLength_cm, int snpCount, IList<SingleSNP> rows)
+        public ROHSegment()
+        {
+        }
+
+        public ROHSegment(string chromosome, int startPosition, int endPosition, double segmentLength_cm, IList<SingleSNP> rows)
         {
             Chromosome = chromosome;
             StartPosition = startPosition;
             EndPosition = endPosition;
             SegmentLength_cm = segmentLength_cm;
-            SNPCount = snpCount;
+            SNPCount = rows.Count;
             Rows = rows;
         }
 
-        public ROHSegment(IDataRecord values)
+        public void Load(IDataRecord values)
         {
             Chromosome = values.GetString(0);
             StartPosition = values.GetInt32(1);

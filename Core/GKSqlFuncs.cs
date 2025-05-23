@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Windows.Forms;
@@ -16,7 +15,7 @@ namespace GenetixKit.Core
 {
     internal static class GKSqlFuncs
     {
-        private static Dictionary<string, string> kit_name = null;
+        #region Tables
 
         private static readonly string SQLITE_DB = @"ggk.db";
 
@@ -34,19 +33,23 @@ namespace GenetixKit.Core
         private const string TABLE_cmp_phased_CREATE_SQL = "CREATE TABLE [cmp_phased] ([phased_kit] TEXT NOT NULL REFERENCES [kit_master]([kit_no]) ON DELETE CASCADE ON UPDATE CASCADE, [match_kit] TEXT NOT NULL, [chromosome] TEXT NOT NULL, [start_position] INTEGER NOT NULL, [end_position] INTEGER NOT NULL, [segment_image] BLOB, [segment_xml] TEXT)";
 
         private static readonly string[] CreateTableSQL = new string[]{
-            "kit_master",TABLE_kit_master_CREATE_SQL,
-            "kit_autosomal",TABLE_kit_autosomal_CREATE_SQL,
-            "kit_mtdna",TABLE_kit_mtdna_CREATE_SQL,
-            "kit_ysnps",TABLE_kit_ysnps_CREATE_SQL,
-            "kit_ystr",TABLE_kit_ystr_CREATE_SQL,
-            "ggk_settings",TABLE_ggk_settings_CREATE_SQL,
-            "cmp_autosomal",TABLE_cmp_autosomal_CREATE_SQL,
-            "cmp_mrca",TABLE_cmp_mrca_CREATE_SQL,
-            "cmp_status",TABLE_cmp_status_CREATE_SQL,
-            "kit_roh",TABLE_kit_roh_CREATE_SQL,
-            "kit_phased",TABLE_kit_phased_CREATE_SQL,
-            "cmp_phased",TABLE_cmp_phased_CREATE_SQL
+            "kit_master", TABLE_kit_master_CREATE_SQL,
+            "kit_autosomal", TABLE_kit_autosomal_CREATE_SQL,
+            "kit_mtdna", TABLE_kit_mtdna_CREATE_SQL,
+            "kit_ysnps", TABLE_kit_ysnps_CREATE_SQL,
+            "kit_ystr", TABLE_kit_ystr_CREATE_SQL,
+            "ggk_settings", TABLE_ggk_settings_CREATE_SQL,
+            "cmp_autosomal", TABLE_cmp_autosomal_CREATE_SQL,
+            "cmp_mrca", TABLE_cmp_mrca_CREATE_SQL,
+            "cmp_status", TABLE_cmp_status_CREATE_SQL,
+            "kit_roh", TABLE_kit_roh_CREATE_SQL,
+            "kit_phased", TABLE_kit_phased_CREATE_SQL,
+            "cmp_phased", TABLE_cmp_phased_CREATE_SQL
         };
+
+        #endregion
+
+        #region Common database
 
         private static void ResetFactory()
         {
@@ -57,26 +60,25 @@ namespace GenetixKit.Core
 
             Dictionary<string, string> pragma = new Dictionary<string, string> {
                 { "foreign_keys", "ON" },
-                { "auto_vacuum", "FULL" }
+                { "auto_vacuum", "FULL" },
+                { "journal_mode", "WAL" }
             };
 
             using (SQLiteTransaction trans = connection.BeginTransaction()) {
-                SQLiteCommand ss2 = null;
                 foreach (string key in pragma.Keys) {
-                    ss2 = new SQLiteCommand("PRAGMA " + key + " = " + pragma[key] + ";", connection);
-                    ss2.ExecuteNonQuery();
+                    ExecCmd("PRAGMA " + key + " = " + pragma[key] + ";", connection, trans);
                 }
 
                 for (int idx = 0; idx < CreateTableSQL.Length; idx += 2) {
-                    ss2 = new SQLiteCommand(CreateTableSQL[idx + 1], connection);
-                    ss2.ExecuteNonQuery();
+                    ExecCmd(CreateTableSQL[idx + 1], connection, trans);
                 }
+
                 trans.Commit();
             }
             connection.Close();
         }
 
-        public static SQLiteConnection GetDBConnection()
+        private static SQLiteConnection GetDBConnection()
         {
             if (File.Exists(SQLITE_DB)) {
                 string connStr = @"Data Source=" + SQLITE_DB + @";Version=3; Compress=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;";
@@ -86,12 +88,12 @@ namespace GenetixKit.Core
 
                 Dictionary<string, string> pragma = new Dictionary<string, string> {
                     { "foreign_keys", "ON" },
-                    { "auto_vacuum", "FULL" }
+                    { "auto_vacuum", "FULL" },
+                    { "journal_mode", "WAL" }
                 };
 
                 foreach (string key in pragma.Keys) {
-                    SQLiteCommand ss2 = new SQLiteCommand("PRAGMA " + key + " = " + pragma[key] + ";", connection);
-                    ss2.ExecuteNonQuery();
+                    ExecCmd("PRAGMA " + key + " = " + pragma[key] + ";", connection);
                 }
 
                 return connection;
@@ -105,149 +107,219 @@ namespace GenetixKit.Core
             return null;
         }
 
-        public static void DeleteKit(string kit)
-        {
-            SQLiteConnection conn = GetDBConnection();
-            using (SQLiteTransaction trans = conn.BeginTransaction()) {
-                SQLiteCommand upCmd = new SQLiteCommand("DELETE FROM kit_master WHERE kit_no=@kit_no", conn);
-                upCmd.Parameters.AddWithValue("@kit_no", kit);
-                upCmd.ExecuteNonQuery();
-                trans.Commit();
-            }
-        }
-
-        public static void DeleteAutosomal(string kit_no)
-        {
-            UpdateDB(@"DELETE from kit_autosomal where kit_no = {0}", kit_no);
-        }
-
         public static void CheckIntegrity()
         {
-            SQLiteConnection conn = GetDBConnection();
-            SQLiteCommand ss = new SQLiteCommand("select tbl_name from sqlite_master where type='table'", conn);
-            SQLiteDataReader reader = ss.ExecuteReader();
-            var list = new List<string>();
-            while (reader.Read())
-                list.Add(reader["tbl_name"].ToString());
-            reader.Close();
-            ss.Dispose();
-            for (int idx = 0; idx < CreateTableSQL.Length; idx += 2) {
-                if (!list.Contains(CreateTableSQL[idx])) {
-                    ss = new SQLiteCommand(CreateTableSQL[idx + 1], conn);
-                    ss.ExecuteNonQuery();
-                    ss.Dispose();
+            using (var conn = GetDBConnection()) {
+                var list = new List<string>();
+
+                using (SQLiteCommand ss = new SQLiteCommand("select tbl_name from sqlite_master where type='table'", conn))
+                using (SQLiteDataReader reader = ss.ExecuteReader()) {
+                    while (reader.Read())
+                        list.Add(reader["tbl_name"].ToString());
+                }
+
+                for (int idx = 0; idx < CreateTableSQL.Length; idx += 2) {
+                    if (!list.Contains(CreateTableSQL[idx])) {
+                        ExecCmd(CreateTableSQL[idx + 1], conn);
+                    }
                 }
             }
-            conn.Close();
         }
 
-        private static SQLiteDataReader QueryReader(string table, string[] fields, string conditions)
-        {
-            string fields_list = string.Join(", ", fields);
-
-            SQLiteConnection conn = GetDBConnection();
-            SQLiteCommand ss = new SQLiteCommand("select " + fields_list + " from " + table + " " + conditions, conn);
-            return ss.ExecuteReader();
-        }
-
-        private static SQLiteDataReader QueryReader(string sql)
-        {
-            SQLiteConnection conn = GetDBConnection();
-            SQLiteCommand ss = new SQLiteCommand(sql, conn);
-            return ss.ExecuteReader();
-        }
-
-        public static DataTable QueryTable(string table, string[] fields, string conditions)
-        {
-            string fields_list = string.Join(", ", fields);
-            return QueryTable("select " + fields_list + " from " + table + " " + conditions);
-        }
-
-        public static DataTable QueryTable(string sql)
+        public static string QueryValue(string sql)
         {
             using (SQLiteConnection conn = GetDBConnection())
             using (SQLiteCommand ss = new SQLiteCommand(sql, conn))
             using (SQLiteDataReader reader = ss.ExecuteReader()) {
-                DataTable dt = new DataTable();
-                dt.Load(reader);
-                reader.Close();
-                conn.Close();
-                return dt;
-            }
-        }
-
-        public static string QueryValue(string table, string[] fields, string conditions)
-        {
-            string fields_list = string.Join(", ", fields);
-
-            using (SQLiteConnection conn = GetDBConnection())
-            using (SQLiteCommand ss = new SQLiteCommand("select " + fields_list + " from " + table + " " + conditions, conn))
-            using (SQLiteDataReader reader = ss.ExecuteReader())
-            using (DataTable dt = new DataTable(table)) {
-                dt.Load(reader);
-                reader.Close();
-                conn.Close();
-                if (dt.Rows.Count > 0 && dt.Rows[0].ItemArray.Length > 0) {
-                    return dt.Rows[0].ItemArray[0].ToString();
+                while (reader.Read()) {
+                    if (reader.FieldCount > 0) {
+                        return Convert.ToString(reader[0]);
+                    }
                 }
-                return "";
             }
+            return null;
         }
 
-        private static int UpdateSQL(string sql)
+        private static void ExecCmd(string command, SQLiteConnection conn, SQLiteTransaction trans = null)
+        {
+            using (var cmd = new SQLiteCommand(command, conn, trans))
+                cmd.ExecuteNonQuery();
+        }
+
+        public static IList<T> GetRows<T>(string query) where T : ITableRow, new()
         {
             using (SQLiteConnection conn = GetDBConnection())
-            using (SQLiteCommand ss = new SQLiteCommand(sql, conn)) {
-                int output = ss.ExecuteNonQuery();
-                conn.Close();
-                return output;
+            using (SQLiteCommand ss = new SQLiteCommand(query, conn))
+            using (var reader = ss.ExecuteReader()) {
+                var result = new List<T>();
+                while (reader.Read()) {
+                    var row = new T();
+                    row.Load(reader);
+                    result.Add(row);
+                }
+                return result;
             }
         }
 
-        public static void UpdateDB(string sql, params object[] values)
+        #endregion
+
+        #region Kits
+
+        private static Dictionary<string, string> kitNames = null;
+
+        public static string GetKitName(string kit)
         {
-            sql = string.Format(sql, values);
-            UpdateSQL(sql);
+            if (kitNames == null)
+                kitNames = new Dictionary<string, string>();
+
+            if (kitNames.TryGetValue(kit, out string value))
+                return value;
+            else {
+                string kitName = QueryValue($"select name from kit_master where kit_no='{kit}'");
+                if (!string.IsNullOrEmpty(kitName)) {
+                    kitNames.Add(kit, kitName);
+                    return kitName;
+                }
+                return "Unknown";
+            }
         }
+
+        public static void DeleteKit(string kit)
+        {
+            SQLiteConnection conn = GetDBConnection();
+            using (SQLiteTransaction trans = conn.BeginTransaction()) {
+                ExecCmd($"delete from kit_master where kit_no = '{kit}'", conn, trans);
+                trans.Commit();
+            }
+        }
+
+        public static IList<KitDTO> QueryKits(bool excludeDisabled = false, string whereSql = "", string orderBy = "")
+        {
+            var result = new List<KitDTO>();
+
+            string where = whereSql;
+            if (excludeDisabled)
+                where = "where disabled = 0";
+
+            if (string.IsNullOrEmpty(orderBy))
+                orderBy = "order by last_modified desc";
+
+            string sql = $"select kit_no, name, sex, disabled, coalesce(x, 0), coalesce(y, 0), last_modified, reference, roh_status from kit_master {where} {orderBy}";
+
+            using (SQLiteConnection cnn = GetDBConnection())
+            using (SQLiteCommand query = new SQLiteCommand(sql, cnn))
+            using (SQLiteDataReader reader = query.ExecuteReader())
+                while (reader.Read()) {
+                    result.Add(new KitDTO(reader, true, true));
+                }
+
+            return result;
+        }
+
+        public static void GetKit(string kitNo, out string name, out string sex)
+        {
+            using (var conn = GetDBConnection()) {
+                SQLiteCommand query = new SQLiteCommand($"select name, sex from kit_master where kit_no = '{kitNo}'", conn);
+                SQLiteDataReader reader = query.ExecuteReader();
+                if (reader.Read()) {
+                    name = reader.GetString(0);
+                    sex = reader.GetString(1);
+                }
+                reader.Close();
+                query.Dispose();
+            }
+
+            name = string.Empty;
+            sex = string.Empty;
+        }
+
+        public static void UpdateKit(string kit_no, string name, string sex)
+        {
+            using (var conn = GetDBConnection()) {
+                ExecCmd($"update kit_master set name = '{name}', sex = '{sex[0]}' where kit_no = '{kit_no}'", conn);
+            }
+        }
+
+        public static void InsertKit(string kit_no, string name, string sex)
+        {
+            using (var conn = GetDBConnection()) {
+                ExecCmd($"insert or replace into kit_master (kit_no, name, sex) values ('{kit_no}', '{name}', '{sex[0]}')", conn);
+            }
+        }
+
+        public static void SaveKit(string kit_no, string name, string sex, bool disabled, string x, string y)
+        {
+            using (var conn = GetDBConnection()) {
+                sex = sex[0].ToString();
+                string dis = (disabled) ? "1" : "0";
+                ExecCmd($"update kit_master set name = '{name}', sex = '{sex}', disabled = {dis}, x = {x}, y = {y} where kit_no = '{kit_no}'", conn);
+            }
+        }
+
+        #endregion
+
+        #region Common comparisons
 
         public static void ClearAllComparisons(bool excludeReferences)
         {
             string upCmd;
             if (excludeReferences)
-                upCmd = @"DELETE from cmp_status where kit1 in (select kit_no from kit_master) and kit2 in (select kit_no from kit_master) ";
+                upCmd = @"delete from cmp_status where kit1 in (select kit_no from kit_master) and kit2 in (select kit_no from kit_master) ";
             else
-                upCmd = @"DELETE FROM cmp_status";
-            GKSqlFuncs.UpdateSQL(upCmd);
+                upCmd = @"delete from cmp_status";
+
+            using (var conn = GetDBConnection())
+                ExecCmd(upCmd, conn);
         }
 
-        public static void SaveAutosomalCmp(string kit1, string kit2, List<CmpSegment> segment_idx, bool reference)
+        public static bool CheckAlreadyCompared(string kit1, string kit2)
+        {
+            var val = QueryValue($"select status_autosomal from cmp_status where (kit1 = '{kit1}' and kit2 = '{kit2}') or (kit1 = '{kit2}' and kit2 = '{kit1}')");
+            return !string.IsNullOrEmpty(val);
+        }
+
+        public static IList<CmpSegmentRow> GetCmpSeg(int segmentId)
+        {
+            return GetRows<CmpSegmentRow>(
+                $"select rsid, chromosome, position, kit1_genotype, kit2_genotype, match from cmp_mrca where segment_id = '{segmentId}'");
+        }
+
+        public static IList<AdmixtureRec> GetAdmixture(string kit, string limit = "3")
+        {
+            //  "select name, at_total, at_longest, x, y FROM (select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit1='" + kit + "' and a.kit2=b.kit_no and a.kit2 like 'HGDP%' and a.status_autosomal=1 and a.at_longest<3 and a.at_total!=0 UNION select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit2='" + kit + "' and a.kit1=b.kit_no and a.kit1 like 'HGDP%' and a.status_autosomal=1 and a.at_longest<3 and a.at_total!=0) ORDER BY at_total DESC";
+
+            return GetRows<AdmixtureRec>(
+                "select name, at_total, at_longest, x, y from (" +
+                $"select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit1='{kit}' and a.kit2=b.kit_no and a.status_autosomal=1 and a.at_longest < {limit} and a.at_total != 0 " +
+                $"union select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit2='{kit}' and a.kit1=b.kit_no and a.status_autosomal=1 and a.at_longest < {limit} and a.at_total != 0" +
+                ") order by at_total desc");
+        }
+
+        #endregion
+
+        #region Autosomal
+
+        public static void DeleteAutosomal(string kit_no)
+        {
+            using (var conn = GetDBConnection())
+                ExecCmd($"delete from kit_autosomal where kit_no = '{kit_no}'", conn);
+        }
+
+        public static void SaveAutosomalCmp(string kit1, string kit2, IList<CmpSegment> segment_idx, bool reference)
         {
             SQLiteConnection cnn = GetDBConnection();
 
-            SQLiteCommand upCmd = new SQLiteCommand(@"DELETE from cmp_status WHERE (kit1=@kit1 AND kit2=@kit2) OR (kit1=@kit3 AND kit2=@kit4)", cnn);
-            upCmd.Parameters.AddWithValue("@kit1", kit1);
-            upCmd.Parameters.AddWithValue("@kit2", kit2);
-            upCmd.Parameters.AddWithValue("@kit3", kit2);
-            upCmd.Parameters.AddWithValue("@kit4", kit1);
-            upCmd.ExecuteNonQuery();
+            ExecCmd($"delete from cmp_status where (kit1 = '{kit1}' and kit2 = '{kit2}') or (kit1 = '{kit2}' and kit2 = '{kit1}')", cnn);
 
-            var segmentStats = SegmentStats.CalculateSegmentStats(segment_idx);
+            var stats = SegmentStats.CalculateSegmentStats(segment_idx);
 
-            upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO cmp_status (kit1,kit2,status_autosomal,at_longest,at_total,x_longest,x_total,mrca) VALUES (@kit1,@kit2,@status_autosomal,@at_longest,@at_total,@x_longest,@x_total,@mrca)", cnn);
-            upCmd.Parameters.AddWithValue("@kit1", kit1);
-            upCmd.Parameters.AddWithValue("@kit2", kit2);
-            upCmd.Parameters.AddWithValue("@status_autosomal", "1");
-            upCmd.Parameters.AddWithValue("@at_longest", segmentStats.Longest);
-            upCmd.Parameters.AddWithValue("@at_total", segmentStats.Total);
-            upCmd.Parameters.AddWithValue("@x_longest", segmentStats.XLongest);
-            upCmd.Parameters.AddWithValue("@x_total", segmentStats.XTotal);
-            upCmd.Parameters.AddWithValue("@mrca", segmentStats.Mrca);
-            upCmd.ExecuteNonQuery();
+            ExecCmd(
+                @"insert or replace into cmp_status (kit1, kit2, status_autosomal, at_longest, at_total, x_longest, x_total, mrca) " +
+                $"values ('{kit1}', '{kit2}', 1, {stats.Longest}, {stats.Total}, {stats.XLongest}, {stats.XTotal}, {stats.Mrca})", cnn);
 
-            upCmd = new SQLiteCommand(@"SELECT cmp_id FROM cmp_status WHERE kit1=@kit1 AND kit2=@kit2", cnn);
-            upCmd.Parameters.AddWithValue("@kit1", kit1);
-            upCmd.Parameters.AddWithValue("@kit2", kit2);
+            var upCmd = new SQLiteCommand($"select cmp_id from cmp_status where kit1 = '{kit1}' and kit2 = '{kit2}'", cnn);
             SQLiteDataReader reader = upCmd.ExecuteReader();
+
             string cmp_id = "-1";
             if (reader.Read())
                 cmp_id = reader["cmp_id"].ToString();
@@ -262,25 +334,16 @@ namespace GenetixKit.Core
                 string segment_length_cm = obj.SegmentLength_cm.ToString();
                 string snp_count = obj.SNPCount.ToString();
 
-                upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO cmp_autosomal(cmp_id,kit1,kit2,chromosome,start_position,end_position,segment_length_cm,snp_count) values (@cmp_id,@kit1,@kit2,@chromosome,@start_position,@end_position,@segment_length_cm,@snp_count)", cnn);
-                upCmd.Parameters.AddWithValue("@cmp_id", cmp_id);
-                upCmd.Parameters.AddWithValue("@kit1", kit1);
-                upCmd.Parameters.AddWithValue("@kit2", kit2);
-                upCmd.Parameters.AddWithValue("@chromosome", chromosome);
-                upCmd.Parameters.AddWithValue("@start_position", start_position);
-                upCmd.Parameters.AddWithValue("@end_position", end_position);
-                upCmd.Parameters.AddWithValue("@segment_length_cm", segment_length_cm);
-                upCmd.Parameters.AddWithValue("@snp_count", snp_count);
-                upCmd.ExecuteNonQuery();
+                ExecCmd(
+                    @"insert or replace into cmp_autosomal (cmp_id, kit1, kit2, chromosome, start_position, end_position, segment_length_cm, snp_count) " +
+                    $"values ({cmp_id}, '{kit1}', '{kit2}', '{chromosome}', {start_position}, {end_position}, {segment_length_cm}, {snp_count})", cnn);
 
                 if (!reference) {
-                    upCmd = new SQLiteCommand(@"SELECT segment_id FROM cmp_autosomal WHERE kit1=@kit1 AND kit2=@kit2 AND chromosome=@chromosome AND start_position=@start_position AND end_position=@end_position", cnn);
-                    upCmd.Parameters.AddWithValue("@kit1", kit1);
-                    upCmd.Parameters.AddWithValue("@kit2", kit2);
-                    upCmd.Parameters.AddWithValue("@chromosome", chromosome);
-                    upCmd.Parameters.AddWithValue("@start_position", start_position);
-                    upCmd.Parameters.AddWithValue("@end_position", end_position);
+                    upCmd = new SQLiteCommand(
+                        @"select segment_id from cmp_autosomal " +
+                        $"where kit1 = '{kit1}' and kit2 = '{kit2}' and chromosome = '{chromosome}' and start_position = '{start_position}' and end_position = '{end_position}'", cnn);
                     reader = upCmd.ExecuteReader();
+
                     string segment_id = "-1";
                     if (reader.Read()) {
                         segment_id = reader.GetInt16(0).ToString();
@@ -289,15 +352,9 @@ namespace GenetixKit.Core
 
                     using (var transaction = cnn.BeginTransaction()) {
                         foreach (var row in obj.Rows) {
-                            upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO cmp_mrca (rsid,chromosome,position,kit1_genotype,kit2_genotype,match,segment_id) values (@rsid,@chromosome,@position,@kit1_genotype,@kit2_genotype,@match,@segment_id)", cnn);
-                            upCmd.Parameters.AddWithValue("@rsid", row.RSID);
-                            upCmd.Parameters.AddWithValue("@chromosome", row.Chromosome);
-                            upCmd.Parameters.AddWithValue("@position", row.Position);
-                            upCmd.Parameters.AddWithValue("@kit1_genotype", row.Kit1Genotype);
-                            upCmd.Parameters.AddWithValue("@kit2_genotype", row.Kit2Genotype);
-                            upCmd.Parameters.AddWithValue("@match", row.Match);
-                            upCmd.Parameters.AddWithValue("@segment_id", segment_id);
-                            upCmd.ExecuteNonQuery();
+                            ExecCmd(
+                                "insert or replace into cmp_mrca (rsid, chromosome, position, kit1_genotype, kit2_genotype, match, segment_id) " +
+                                $"values ('{row.RSID}', '{row.Chromosome}', {row.Position}, '{row.Kit1Genotype}', '{row.Kit2Genotype}', '{row.Match}', '{segment_id}')", cnn, transaction);
                         }
                         transaction.Commit();
                     }
@@ -305,25 +362,79 @@ namespace GenetixKit.Core
             }
         }
 
-        public static string GetKitName(string kit)
+        public static IList<CmpSegment> GetAutosomalCmp(string kit1, string kit2)
         {
-            if (kit_name == null)
-                kit_name = new Dictionary<string, string>();
-            if (kit_name.ContainsKey(kit))
-                return kit_name[kit];
-            else {
-                DataTable dt = QueryTable("kit_master", new string[] { "name" }, "where kit_no='" + kit + "'");
-                if (dt.Rows.Count > 0) {
-                    kit_name.Add(kit, dt.Rows[0].ItemArray[0].ToString());
-                    return dt.Rows[0].ItemArray[0].ToString();
+            return GetRows<CmpSegment>(
+                $"select segment_id, chromosome, start_position, end_position, segment_length_cm, snp_count from cmp_autosomal " +
+                $"where (kit1 = '{kit1}' and kit2 = '{kit2}') or (kit1 = '{kit2}' and kit2 = '{kit1}')");
+        }
+
+        public static IList<CmpSegment> GetAutosomalCmp(int cmp_id)
+        {
+            return GetRows<CmpSegment>(
+                $"select segment_id, chromosome, start_position, end_position, segment_length_cm, snp_count from cmp_autosomal where cmp_id = '{cmp_id}'");
+        }
+
+        public static IList<SingleSNP> GetAutosomal(string kit)
+        {
+            return GetRows<SingleSNP>(
+                $"select rsid, chromosome, position, genotype from kit_autosomal where kit_no = '{kit}' order by chromosome, position");
+        }
+
+        public static IList<OTORow> GetOTORows(string kit1, string kit2)
+        {
+            return GetRows<OTORow>(
+                @"select rsid, chr, pos, gt1, gt2, count(*) from (" +
+                "select kit1.rsid 'rsid', kit1.chromosome 'chr', kit1.position 'pos', kit1.genotype 'gt1', kit2.genotype 'gt2' from kit_autosomal kit1 " +
+                $"left join kit_autosomal kit2 on kit1.rsid=kit2.rsid where kit1.kit_no = '{kit1}' and kit2.kit_no = '{kit2}' " +
+                "union select kit1.rsid 'rsid', kit1.chromosome 'chr', kit1.position 'pos', kit1.genotype 'gt1', kit2.genotype 'gt2' from kit_autosomal kit1 " +
+                $"left join kit_autosomal kit2 on kit1.rsid=kit2.rsid where kit1.kit_no = '{kit2}' and kit2.kit_no = '{kit1}'" +
+                ") group by rsid order by cast(chr as integer), pos");
+        }
+
+        public static void SaveAutosomal(string kit_no, DataGridViewRowCollection rows)
+        {
+            DeleteAutosomal(kit_no);
+
+            using (var conn = GetDBConnection()) {
+                using (var transaction = conn.BeginTransaction()) {
+                    bool incomplete = false;
+                    foreach (DataGridViewRow row in rows) {
+                        if (row.IsNewRow)
+                            continue;
+
+                        incomplete = false;
+                        for (int c = 0; c < row.Cells.Count; c++) {
+                            var val = Convert.ToString(row.Cells[c].Value).Trim();
+                            if (string.IsNullOrEmpty(val)) {
+                                incomplete = true;
+                                break;
+                            }
+                        }
+
+                        if (incomplete)
+                            continue;
+
+                        var rsid = row.Cells[0].Value.ToString();
+                        var chr = row.Cells[1].Value.ToString();
+                        var pos = row.Cells[2].Value.ToString();
+                        var gt = row.Cells[3].Value.ToString();
+
+                        ExecCmd($"insert or replace into kit_autosomal(kit_no, rsid, chromosome, position, genotype) values ('{kit_no}', '{rsid}', '{chr}', {pos}, '{gt}')", conn, transaction);
+                    }
+
+                    transaction.Commit();
                 }
-                return "Unknown";
             }
         }
 
+        #endregion
+
+        #region RoH
+
         public static bool CheckROHExists(string kit)
         {
-            string roh = QueryValue("kit_master", new string[] { "roh_status" }, "where kit_no='" + kit + "'");
+            string roh = QueryValue($"select roh_status from kit_master where kit_no = '{kit}'");
             if (roh == "0")
                 return false;
             else
@@ -333,356 +444,183 @@ namespace GenetixKit.Core
         public static void SaveROHCmp(string kit, IList<ROHSegment> segment_idx)
         {
             using (SQLiteConnection cnn = GetDBConnection()) {
-                using (var upCmd = new SQLiteCommand(@"DELETE from kit_roh WHERE kit_no=@kit", cnn)) {
-                    upCmd.Parameters.AddWithValue("@kit", kit);
-                    upCmd.ExecuteNonQuery();
-                    using (SQLiteTransaction trans = cnn.BeginTransaction()) {
-                        for (int i = 0; i < segment_idx.Count; i++) {
-                            var obj = segment_idx[i];
+                ExecCmd($"delete from kit_roh where kit_no = '{kit}'", cnn);
 
-                            using (var xCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_roh(kit_no,chromosome,start_position,end_position,segment_length_cm,snp_count) values (@kit_no,@chromosome,@start_position,@end_position,@segment_length_cm,@snp_count)", cnn)) {
-                                xCmd.Parameters.AddWithValue("@kit_no", kit);
-                                xCmd.Parameters.AddWithValue("@chromosome", obj.Chromosome);
-                                xCmd.Parameters.AddWithValue("@start_position", obj.StartPosition);
-                                xCmd.Parameters.AddWithValue("@end_position", obj.EndPosition);
-                                xCmd.Parameters.AddWithValue("@segment_length_cm", obj.SegmentLength_cm);
-                                xCmd.Parameters.AddWithValue("@snp_count", obj.SNPCount);
-                                xCmd.ExecuteNonQuery();
-                            }
-                        }
-                        trans.Commit();
+                using (SQLiteTransaction trans = cnn.BeginTransaction()) {
+                    for (int i = 0; i < segment_idx.Count; i++) {
+                        var obj = segment_idx[i];
+
+                        ExecCmd(
+                            "insert or replace into kit_roh (kit_no, chromosome, start_position, end_position, segment_length_cm, snp_count) " +
+                            $"values ('{kit}', '{obj.Chromosome}', {obj.StartPosition}, {obj.EndPosition}, {obj.SegmentLength_cm}, {obj.SNPCount})",
+                            cnn, trans);
                     }
+
+                    trans.Commit();
                 }
 
-                using (var upCmd = new SQLiteCommand(@"UPDATE kit_master SET roh_status=1 WHERE kit_no=@kit_no", cnn)) {
-                    upCmd.Parameters.AddWithValue("@kit_no", kit);
-                    upCmd.ExecuteNonQuery();
-                }
-
-                cnn.Close();
+                ExecCmd($"update kit_master set roh_status = 1 where kit_no = '{kit}'", cnn);
             }
         }
 
         public static IList<ROHSegment> GetROHCmp(string kit)
         {
-            var reader = QueryReader("kit_roh",
-                new string[] { "chromosome", "start_position", "end_position", "segment_length_cm", "snp_count" },
-                "WHERE kit_no='" + kit + "'");
-
-            using (reader) {
-                var result = new List<ROHSegment>();
-                while (reader.Read()) {
-                    result.Add(new ROHSegment(reader));
-                }
-                return result;
-            }
-        }
-
-        public static List<CmpSegment> GetAutosomalCmp(string kit1, string kit2)
-        {
-            var reader = QueryReader(
-                "cmp_autosomal",
-                new string[] { "segment_id", "chromosome", "start_position", "end_position", "segment_length_cm", "snp_count" },
-                "WHERE (kit1='" + kit1 + "' AND kit2='" + kit2 + "') OR (kit1='" + kit2 + "' AND kit2='" + kit1 + "')");
-
-            using (reader) {
-                var result = new List<CmpSegment>();
-                while (reader.Read()) {
-                    result.Add(new CmpSegment(reader));
-                }
-                return result;
-            }
-        }
-
-        public static bool IsPhased(string kit)
-        {
-            DataTable dt = QueryTable("select kit_no from kit_phased where kit_no='" + kit + "'");
-            if (dt.Rows.Count > 0)
-                return true;
-            else
-                return false;
-        }
-
-        public static bool CheckAlreadyCompared(string kit1, string kit2)
-        {
-            using (var tbl = QueryTable("cmp_status", new string[] { "status_autosomal" }, "WHERE (kit1='" + kit1 + "' AND kit2='" + kit2 + "') OR (kit1='" + kit2 + "' AND kit2='" + kit1 + "')")) {
-                return tbl.Rows.Count != 0;
-            }
-        }
-
-        public static IList<CmpSegmentRow> GetCmpSeg(int segmentId)
-        {
-            var reader = QueryReader(
-                "cmp_mrca",
-                new string[] { "rsid", "chromosome", "position", "kit1_genotype", "kit2_genotype", "match" },
-                "WHERE segment_id='" + segmentId + "'");
-
-            using (reader) {
-                var result = new List<CmpSegmentRow>();
-                while (reader.Read()) {
-                    result.Add(new CmpSegmentRow(reader));
-                }
-                return result;
-            }
+            return GetRows<ROHSegment>($"select chromosome, start_position, end_position, segment_length_cm, snp_count from kit_roh where kit_no = '{kit}'");
         }
 
         public static IList<SingleSNP> GetROHSeg(string kit, string chromosome, int startPos, int endPos)
         {
-            var reader = QueryReader(
-                        "select rsid, chromosome, position, genotype from kit_autosomal " +
-                        "where kit_no='" + kit + "' and chromosome='" + chromosome + "' and position>=" + startPos + " and position<=" + endPos + " order by position");
-
-            using (reader) {
-                var result = new List<SingleSNP>();
-                while (reader.Read()) {
-                    result.Add(new SingleSNP(reader));
-                }
-                return result;
-            }
+            return GetRows<SingleSNP>(
+                "select rsid, chromosome, position, genotype from kit_autosomal " +
+                $"where kit_no = '{kit}' and chromosome = '{chromosome}' and position >= {startPos} and position <= {endPos} order by position");
         }
 
-        public static IList<SingleSNP> GetAutosomal(string kit)
+        public static IList<SingleSNP> GetROHRows(string kit)
         {
-            var reader = QueryReader(
-                        @"SELECT rsid, chromosome, position, genotype from kit_autosomal where kit_no=" + kit + " order by chromosome,position");
+            return GetRows<SingleSNP>($"select rsid, chromosome, position, genotype from kit_autosomal where kit_no = '{kit}' order by cast(chromosome as integer), position");
+        }
 
-            using (reader) {
-                var result = new List<SingleSNP>();
-                while (reader.Read()) {
-                    result.Add(new SingleSNP(reader));
-                }
-                return result;
-            }
+        #endregion
+
+        #region Phasing
+
+        public static bool IsPhased(string kit)
+        {
+            var val = QueryValue($"select kit_no from kit_phased where kit_no = '{kit}'");
+            return !string.IsNullOrEmpty(val);
+        }
+
+        public static IList<UnphasedSegment> GetUnphasedSegments(string phased_kit)
+        {
+            return GetRows<UnphasedSegment>(
+                "select unphased_kit, chromosome, start_position, end_position from (" +
+                $"select kit1'unphased_kit', chromosome, start_position, end_position from cmp_autosomal where kit2='{phased_kit}' " +
+                $"union select kit2'unphased_kit', chromosome, start_position, end_position from cmp_autosomal where kit1='{phased_kit}'" +
+                ") order by cast(chromosome as integer), start_position");
         }
 
         public static IList<PhaseSegment> GetPhaseSegments(string unphased_kit, string start_position, string end_position, string chromosome, string phased_kit)
         {
-            string query =
-                "select a.position,a.genotype,p.paternal_genotype,p.maternal_genotype from kit_autosomal a,kit_phased p where a.kit_no='" + unphased_kit +
-                "' and a.position>" + start_position + " and a.position<" + end_position + " and a.chromosome='" + chromosome +
-                "' and p.rsid=a.rsid and p.kit_no='" + phased_kit + "' order by a.position";
-
-            var reader = QueryReader(query);
-
-            using (reader) {
-                var result = new List<PhaseSegment>();
-                while (reader.Read()) {
-                    result.Add(new PhaseSegment(reader));
-                }
-                return result;
-            }
+            return GetRows<PhaseSegment>(
+                $"select a.position, a.genotype, p.paternal_genotype, p.maternal_genotype from kit_autosomal a, kit_phased p where a.kit_no = '{unphased_kit}' " +
+                $"and a.position > {start_position} and a.position < {end_position} and a.chromosome = '{chromosome}' " +
+                $"and p.rsid = a.rsid and p.kit_no = '{phased_kit}' order by a.position");
         }
 
         public static IList<PhaseRow> GetPhaseRows(string father_kit, string mother_kit, string child_kit)
         {
             string query = "";
 
+            // [rsid], [chromosome], [position], "Child", "Father", "Mother", "Phased Paternal", "Phased Maternal"
             if (father_kit != "Unknown" && mother_kit != "Unknown")
-                query = ("SELECT c.[rsid]'RSID',c.[chromosome]'Chromosome',c.[position]'Position',c.[genotype]\"Child\",COALESCE(f.[genotype],'--')\"Father\",COALESCE(m.[genotype],'--')\"Mother\",''\"Phased Paternal\",''\"Phased Maternal\"  FROM kit_autosomal c left outer join kit_autosomal f,kit_autosomal m on f.rsid=c.rsid AND m.rsid=c.rsid WHERE c.kit_no='" + child_kit + "' AND f.kit_no='" + father_kit + "' AND m.[kit_no]='" + mother_kit + "' ORDER BY cast(c.chromosome as integer),c.position");
+                query = ("select c.[rsid], c.[chromosome], c.[position], c.[genotype]\"Child\", coalesce(f.[genotype],'--')\"Father\", coalesce(m.[genotype],'--')\"Mother\", ''\"Phased Paternal\",''\"Phased Maternal\"  from kit_autosomal c left outer join kit_autosomal f,kit_autosomal m on f.rsid=c.rsid and m.rsid=c.rsid where c.kit_no='" + child_kit + "' and f.kit_no='" + father_kit + "' and m.[kit_no]='" + mother_kit + "' order by cast(c.chromosome as integer),c.position");
             else if (father_kit != "Unknown" && mother_kit == "Unknown")
-                query = ("SELECT c.[rsid]'RSID',c.[chromosome]'Chromosome',c.[position]'Position',c.[genotype]\"Child\",COALESCE(f.[genotype],'--')\"Father\",'--'\"Mother\",''\"Phased Paternal\",''\"Phased Maternal\"  FROM kit_autosomal c left outer join kit_autosomal f on f.rsid=c.rsid  WHERE c.kit_no='" + child_kit + "' AND f.kit_no='" + father_kit + "' ORDER BY cast(c.chromosome as integer),c.position");
+                query = ("select c.[rsid], c.[chromosome], c.[position], c.[genotype]\"Child\", coalesce(f.[genotype],'--')\"Father\", '--'\"Mother\", ''\"Phased Paternal\", ''\"Phased Maternal\"  from kit_autosomal c left outer join kit_autosomal f on f.rsid=c.rsid  where c.kit_no='" + child_kit + "' and f.kit_no='" + father_kit + "' order by cast(c.chromosome as integer), c.position");
             else if (father_kit == "Unknown" && mother_kit != "Unknown")
-                query = ("SELECT c.[rsid]'RSID',c.[chromosome]'Chromosome',c.[position]'Position',c.[genotype]\"Child\",'--'\"Father\",COALESCE(m.[genotype],'--')\"Mother\" ,''\"Phased Paternal\",''\"Phased Maternal\"  FROM kit_autosomal c left outer join kit_autosomal m on m.rsid=c.rsid WHERE c.kit_no='" + child_kit + "' AND m.kit_no='" + mother_kit + "' ORDER BY cast(c.chromosome as integer),c.position");
+                query = ("select c.[rsid], c.[chromosome], c.[position], c.[genotype]\"Child\", '--'\"Father\", coalesce(m.[genotype],'--')\"Mother\", ''\"Phased Paternal\", ''\"Phased Maternal\"  from kit_autosomal c left outer join kit_autosomal m on m.rsid=c.rsid where c.kit_no='" + child_kit + "' and m.kit_no='" + mother_kit + "' order by cast(c.chromosome as integer), c.position");
 
-            var reader = QueryReader(query);
-
-            using (reader) {
-                var result = new List<PhaseRow>();
-                while (reader.Read()) {
-                    result.Add(new PhaseRow(reader));
-                }
-                return result;
-            }
+            return GetRows<PhaseRow>(query);
         }
 
         public static void SavePhasedKit(string father_kit, string mother_kit, string child_kit, IList<PhaseRow> dt)
         {
-            UpdateDB("DELETE FROM kit_phased where kit_no = {0}", child_kit);
+            using (var conn = GetDBConnection()) {
+                ExecCmd($"delete from kit_phased where kit_no = '{child_kit}'", conn);
 
-            var conn = GetDBConnection();
-            using (var trans = conn.BeginTransaction()) {
-                foreach (var row in dt) {
-                    string phasedPaternal = ("" + row.PhasedPaternal).Trim();
-                    if (string.IsNullOrEmpty(phasedPaternal)) phasedPaternal = string.Empty;
+                if (father_kit == "Unknown")
+                    father_kit = "";
 
-                    string phasedMaternal = ("" + row.PhasedMaternal).Trim();
-                    if (string.IsNullOrEmpty(phasedMaternal)) phasedMaternal = string.Empty;
+                if (mother_kit == "Unknown")
+                    mother_kit = "";
 
-                    var cmd = conn.CreateCommand();
-                    cmd.CommandText = "INSERT OR REPLACE INTO kit_phased(kit_no,rsid,chromosome,position,paternal_genotype,maternal_genotype,paternal_kit_no,maternal_kit_no) VALUES (@kit_no,@rsid,@chromosome,@position,@paternal_genotype,@maternal_genotype,@paternal_kit_no,@maternal_kit_no)";
-                    cmd.Parameters.AddWithValue("@kit_no", child_kit);
-                    cmd.Parameters.AddWithValue("@rsid", row.RSID);
-                    cmd.Parameters.AddWithValue("@chromosome", row.Chromosome);
-                    cmd.Parameters.AddWithValue("@position", row.Position);
-                    cmd.Parameters.AddWithValue("@paternal_genotype", phasedPaternal);
-                    cmd.Parameters.AddWithValue("@maternal_genotype", phasedMaternal);
-                    if (father_kit == "Unknown")
-                        cmd.Parameters.AddWithValue("@paternal_kit_no", "");
-                    else
-                        cmd.Parameters.AddWithValue("@paternal_kit_no", father_kit);
-                    if (mother_kit == "Unknown")
-                        cmd.Parameters.AddWithValue("@maternal_kit_no", "");
-                    else
-                        cmd.Parameters.AddWithValue("@maternal_kit_no", mother_kit);
-                    cmd.ExecuteNonQuery();
+                using (var trans = conn.BeginTransaction()) {
+                    foreach (var row in dt) {
+                        string phasedPaternal = ("" + row.PhasedPaternal).Replace("\0", "").Trim();
+                        if (string.IsNullOrEmpty(phasedPaternal)) phasedPaternal = string.Empty;
+
+                        string phasedMaternal = ("" + row.PhasedMaternal).Replace("\0", "").Trim();
+                        if (string.IsNullOrEmpty(phasedMaternal)) phasedMaternal = string.Empty;
+
+                        ExecCmd(
+                            "insert or replace into kit_phased (kit_no, rsid, chromosome, position, paternal_genotype, maternal_genotype, paternal_kit_no, maternal_kit_no) " +
+                            $"values ('{child_kit}', '{row.RSID}', '{row.Chromosome}', {row.Position}, '{phasedPaternal}', '{phasedMaternal}', '{father_kit}', '{mother_kit}')", conn, trans);
+                    }
+                    trans.Commit();
                 }
-                trans.Commit();
             }
         }
 
-        public static IList<OTORow> GetOTORows(string kit1, string kit2)
+        public static void DeletePhasedKit(string kit)
         {
-            string query =
-                @"select rsid, chr, pos, gt1, gt2, count(*) FROM (SELECT kit1.rsid 'rsid',kit1.chromosome 'chr',kit1.position 'pos',kit1.genotype 'gt1',kit2.genotype 'gt2' FROM kit_autosomal kit1 LEFT JOIN kit_autosomal kit2 on kit1.rsid=kit2.rsid WHERE kit1.kit_no = '" + kit1 + "' AND kit2.kit_no = '" + kit2 + "' UNION SELECT kit1.rsid 'rsid',kit1.chromosome 'chr',kit1.position 'pos',kit1.genotype 'gt1', kit2.genotype 'gt2' FROM kit_autosomal kit1 LEFT JOIN kit_autosomal kit2 on kit1.rsid=kit2.rsid WHERE kit1.kit_no = '" + kit2 + "' AND kit2.kit_no = '" + kit1 + "') GROUP BY rsid ORDER BY CAST(chr as INTEGER),pos";
+            using (var conn = GetDBConnection())
+                ExecCmd($"delete from cmp_phased where phased_kit = '{kit}'", conn);
+        }
 
-            var reader = QueryReader(query);
-
-            using (reader) {
-                var result = new List<OTORow>();
+        public static IList<string> GetPhasedKits()
+        {
+            using (SQLiteConnection conn = GetDBConnection())
+            using (SQLiteCommand ss = new SQLiteCommand("select distinct kit_no from kit_phased", conn))
+            using (var reader = ss.ExecuteReader()) {
+                var result = new List<string>();
                 while (reader.Read()) {
-                    result.Add(new OTORow(reader));
+                    var row = reader.GetString(0);
+                    result.Add(row);
                 }
                 return result;
             }
         }
 
-        public static IList<SingleSNP> GetROHRows(string kit)
-        {
-            string query =
-                @"select rsid, chromosome, position, genotype from kit_autosomal where kit_no='" + kit + "' order by cast(chromosome as integer), position";
+        #endregion
 
-            var reader = QueryReader(query);
-
-            using (reader) {
-                var result = new List<SingleSNP>();
-                while (reader.Read()) {
-                    result.Add(new SingleSNP(reader));
-                }
-                return result;
-            }
-        }
-
-        public static IList<YSTR> GetYSTR(string kit)
-        {
-            string query =
-                @"SELECT marker, value from kit_ystr where kit_no = " + kit;
-
-            var reader = QueryReader(query);
-
-            using (reader) {
-                var result = new List<YSTR>();
-                while (reader.Read()) {
-                    result.Add(new YSTR(reader));
-                }
-                return result;
-            }
-        }
-
-        public static IList<AdmixtureRec> GetAdmixture(string kit, string limit = "3")
-        {
-            string query =
-                "select name, at_total, at_longest, x, y FROM (select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit1='" + kit + "' and a.kit2=b.kit_no and a.status_autosomal=1 and a.at_longest<" + limit + " and a.at_total!=0 UNION select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit2='" + kit + "' and a.kit1=b.kit_no and a.status_autosomal=1 and a.at_longest<" + limit + " and a.at_total!=0) ORDER BY at_total DESC";
-            //  "select name, at_total, at_longest, x, y FROM (select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit1='" + kit + "' and a.kit2=b.kit_no and a.kit2 like 'HGDP%' and a.status_autosomal=1 and a.at_longest<3 and a.at_total!=0 UNION select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit2='" + kit + "' and a.kit1=b.kit_no and a.kit1 like 'HGDP%' and a.status_autosomal=1 and a.at_longest<3 and a.at_total!=0) ORDER BY at_total DESC";
-
-            var reader = QueryReader(query);
-
-            using (reader) {
-                var result = new List<AdmixtureRec>();
-                while (reader.Read()) {
-                    result.Add(new AdmixtureRec(reader));
-                }
-                return result;
-            }
-        }
+        #region MtDna
 
         public static void SaveKitMtDNA(string kit_no, string mutations, string fasta)
         {
             using (var conn = GetDBConnection()) {
-                SQLiteCommand upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_mtdna(kit_no, mutations,fasta)values(@kit_no,@mutations,@fasta)", conn);
-                upCmd.Parameters.AddWithValue("@kit_no", kit_no);
-                upCmd.Parameters.AddWithValue("@mutations", mutations);
-                upCmd.Parameters.AddWithValue("@fasta", fasta);
-                upCmd.ExecuteNonQuery();
+                ExecCmd($"insert or replace into kit_mtdna (kit_no, mutations, fasta) values ('{kit_no}', '{mutations}', '{fasta}')", conn);
             }
+        }
+
+        public static void GetMtDNA(string kit, out string mutations, out string fasta)
+        {
+            using (var conn = GetDBConnection()) {
+                var query = new SQLiteCommand($"select mutations, fasta from kit_mtdna where kit_no = '{kit}'", conn);
+
+                var reader = query.ExecuteReader();
+                if (reader.Read()) {
+                    mutations = reader.GetString(0);
+                    fasta = reader.GetString(1);
+                    return;
+                }
+                reader.Close();
+                query.Dispose();
+            }
+
+            mutations = string.Empty;
+            fasta = string.Empty;
+        }
+
+        #endregion
+
+        #region YDna
+
+        public static IList<YSTR> GetYSTR(string kit)
+        {
+            return GetRows<YSTR>($"select marker, value from kit_ystr where kit_no = '{kit}'");
         }
 
         public static void SaveKitYSNPs(string kit_no, string ysnps_list)
         {
             using (var conn = GetDBConnection()) {
-                SQLiteCommand upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_ysnps(kit_no, ysnps) values (@kit_no,@ysnps)", conn);
-                upCmd.Parameters.AddWithValue("@kit_no", kit_no);
-                upCmd.Parameters.AddWithValue("@ysnps", ysnps_list);
-                upCmd.ExecuteNonQuery();
+                ExecCmd($"insert or replace into kit_ysnps (kit_no, ysnps) values ('{kit_no}', '{ysnps_list}')", conn);
             }
-        }
-
-        public static void UpdateKit(string kit_no, string name, string sex)
-        {
-            using (var conn = GetDBConnection()) {
-                SQLiteCommand upCmd = new SQLiteCommand(@"UPDATE kit_master SET name=@name, sex=@sex WHERE kit_no=@kit_no", conn);
-                upCmd.Parameters.AddWithValue("@name", name);
-                upCmd.Parameters.AddWithValue("@sex", sex[0].ToString());
-                upCmd.Parameters.AddWithValue("@kit_no", kit_no);
-                upCmd.ExecuteNonQuery();
-            }
-        }
-
-        public static void InsertKit(string kit_no, string name, string sex)
-        {
-            using (var conn = GetDBConnection()) {
-                SQLiteCommand upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_master(kit_no, name, sex)values(@kit_no,@name,@sex)", conn);
-                upCmd.Parameters.AddWithValue("@kit_no", kit_no);
-                upCmd.Parameters.AddWithValue("@name", name);
-                upCmd.Parameters.AddWithValue("@sex", sex[0].ToString());
-                upCmd.ExecuteNonQuery();
-            }
-        }
-
-        public static void SaveKit(string kit_no, string name, string sex, bool disabled, string x, string y)
-        {
-            using (var conn = GetDBConnection()) {
-                SQLiteCommand upCmd = new SQLiteCommand("UPDATE kit_master set name=@name, sex=@sex, disabled=@disabled, x=@x, y=@y WHERE kit_no=@kit_no", conn);
-                upCmd.Parameters.AddWithValue("@name", name);
-
-                if (sex == "Unknown")
-                    upCmd.Parameters.AddWithValue("@sex", "U");
-                else if (sex == "Male")
-                    upCmd.Parameters.AddWithValue("@sex", "M");
-                else if (sex == "Female")
-                    upCmd.Parameters.AddWithValue("@sex", "F");
-
-                if (disabled)
-                    upCmd.Parameters.AddWithValue("@disabled", "1");
-                else
-                    upCmd.Parameters.AddWithValue("@disabled", "0");
-
-                upCmd.Parameters.AddWithValue("@x", x);
-                upCmd.Parameters.AddWithValue("@y", y);
-
-                upCmd.Parameters.AddWithValue("@kit_no", kit_no);
-                upCmd.ExecuteNonQuery();
-            }
-        }
-
-        public static IList<KitDTO> QueryKits()
-        {
-            var result = new List<KitDTO>();
-
-            using (SQLiteConnection cnn = GetDBConnection())
-            using (SQLiteCommand query = new SQLiteCommand(@"SELECT kit_no, name, sex, disabled, coalesce(x, 0), coalesce(y, 0), last_modified FROM kit_master order by last_modified DESC", cnn))
-            using (SQLiteDataReader reader = query.ExecuteReader())
-                while (reader.Read()) {
-                    result.Add(new KitDTO(reader, true, true));
-                }
-
-            return result;
         }
 
         public static string GetYSNPs(string kit)
         {
             using (var conn = GetDBConnection()) {
-                var query = new SQLiteCommand(@"SELECT ysnps from kit_ysnps where kit_no=@kit_no", conn);
-                query.Parameters.AddWithValue("@kit_no", kit);
+                var query = new SQLiteCommand($"select ysnps from kit_ysnps where kit_no = '{kit}'", conn);
+
                 var reader = query.ExecuteReader();
                 if (reader.Read()) {
                     return reader.GetString(0);
@@ -693,100 +631,41 @@ namespace GenetixKit.Core
             return string.Empty;
         }
 
-        public static void GetMtDNA(string kit, out string mutations, out string fasta)
-        {
-            using (var conn = GetDBConnection()) {
-                var query = new SQLiteCommand(@"SELECT mutations,fasta from kit_mtdna where kit_no=@kit_no", conn);
-                query.Parameters.AddWithValue("@kit_no", kit);
-                var reader = query.ExecuteReader();
-                if (reader.Read()) {
-                    mutations = reader.GetString(0);
-                    fasta = reader.GetString(1);
-                }
-                reader.Close();
-                query.Dispose();
-            }
-
-            mutations = string.Empty;
-            fasta = string.Empty;
-        }
-
-        public static void GetKit(string kitNo, out string name, out string sex)
-        {
-            using (var conn = GetDBConnection()) {
-                SQLiteCommand query = new SQLiteCommand(@"SELECT name, sex from kit_master where kit_no=@kit_no", conn);
-                query.Parameters.AddWithValue("@kit_no", kitNo);
-                SQLiteDataReader reader = query.ExecuteReader();
-                if (reader.Read()) {
-                    name = reader.GetString(0);
-                    sex = reader.GetString(1);
-                }
-                reader.Close();
-                query.Dispose();
-            }
-
-            name = string.Empty;
-            sex = string.Empty;
-        }
-
-        public static void SaveAutosomal(string kit_no, DataGridViewRowCollection rows)
-        {
-            DeleteAutosomal(kit_no);
-
-            using (var conn = GetDBConnection()) {
-                SQLiteCommand upCmd = new SQLiteCommand(@"INSERT OR REPLACE INTO kit_autosomal(kit_no, rsid, chromosome, position, genotype) values (@kit_no, @rsid, @chromosome, @position, @genotype)", conn);
-                using (var transaction = conn.BeginTransaction()) {
-                    bool incomplete = false;
-                    foreach (DataGridViewRow row in rows) {
-                        if (row.IsNewRow)
-                            continue;
-
-                        incomplete = false;
-                        for (int c = 0; c < row.Cells.Count; c++)
-                            if (row.Cells[c].Value == null) {
-                                incomplete = true;
-                                break;
-                            } else if (row.Cells[c].Value.ToString().Trim() == "") {
-                                incomplete = true;
-                                break;
-                            }
-
-                        if (incomplete)
-                            continue;
-
-                        upCmd.Parameters.AddWithValue("@kit_no", kit_no);
-                        upCmd.Parameters.AddWithValue("@rsid", row.Cells[0].Value.ToString());
-                        upCmd.Parameters.AddWithValue("@chromosome", row.Cells[1].Value.ToString());
-                        upCmd.Parameters.AddWithValue("@position", row.Cells[2].Value.ToString());
-                        upCmd.Parameters.AddWithValue("@genotype", row.Cells[3].Value.ToString());
-                        upCmd.ExecuteNonQuery();
-                    }
-                    transaction.Commit();
-                }
-            }
-        }
-
         public static void SaveYSTR(string kit_no, DataGridViewRow[] yRows)
         {
             using (var conn = GetDBConnection()) {
-                SQLiteCommand upCmd = new SQLiteCommand(@"delete from kit_ystr where kit_no=@kit_no", conn);
-                upCmd.Parameters.AddWithValue("@kit_no", kit_no);
-                upCmd.ExecuteNonQuery();
+                using (var trans = conn.BeginTransaction()) {
+                    ExecCmd($"delete from kit_ystr where kit_no = '{kit_no}'", conn, trans);
 
-                upCmd = new SQLiteCommand(@"insert or replace into kit_ystr(kit_no, marker, value) values (@kit_no, @marker, @value)", conn);
-                using (var transaction = conn.BeginTransaction()) {
                     foreach (DataGridViewRow row in yRows) {
-                        if (row.IsNewRow || row.Cells[1].Value.ToString().Trim() == "") continue;
+                        var marker = row.Cells[0].Value.ToString();
+                        var value = row.Cells[1].Value.ToString();
 
-                        upCmd.Parameters.AddWithValue("@kit_no", kit_no);
-                        upCmd.Parameters.AddWithValue("@marker", row.Cells[0].Value.ToString());
-                        upCmd.Parameters.AddWithValue("@value", row.Cells[1].Value.ToString());
-                        upCmd.ExecuteNonQuery();
+                        if (row.IsNewRow || value.Trim() == "") continue;
+
+                        ExecCmd($"insert or replace into kit_ystr (kit_no, marker, value) values ('{kit_no}', '{marker}', '{value}')", conn, trans);
                     }
-                    transaction.Commit();
+
+                    trans.Commit();
                 }
-                upCmd.Dispose();
             }
         }
+
+        #endregion
+
+        #region One2Many (MatchingKits)
+
+        public static IList<MatchingKit> GetMatchingKits(string kit)
+        {
+            return GetRows<MatchingKit>(
+                "select cmp_id, kit, name, at_longest, at_total, x_longest, x_total, mrca from (" +
+                "select a.cmp_id,a.kit1'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca "+
+                $"from cmp_status a,kit_master b where a.at_total!=0 and a.kit1!='{kit}' and a.kit2='{kit}' and a.status_autosomal=1 and b.kit_no=a.kit1 and b.disabled=0 "+
+                "union select a.cmp_id,a.kit2'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca "+
+                $"from cmp_status a,kit_master b where a.at_total!=0 and a.kit2!='{kit}' and a.kit1='{kit}' and a.status_autosomal=1 and b.kit_no=a.kit2 and b.disabled=0 "+
+                ") order by at_longest desc, at_total desc");
+        }
+
+        #endregion
     }
 }

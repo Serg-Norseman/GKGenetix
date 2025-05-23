@@ -7,7 +7,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using GenetixKit.Core;
@@ -31,7 +30,7 @@ namespace GenetixKit.Forms
         private void MainFrm_Load(object sender, EventArgs e)
         {
             label2.Text = GKSqlFuncs.GetKitName(kit);
-            txtSNPs.Text = GKSqlFuncs.QueryValue("kit_ysnps", new string[] { "ysnps" }, "where kit_no='" + kit + "'");
+            txtSNPs.Text = GKSqlFuncs.GetYSNPs(kit);
             Program.KitInstance.SetStatus("Plotting on ISOGG Y-Tree ...");
 
             XDocument doc = XDocument.Parse(Properties.Resources.ytree);
