@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <ItemGroup>
+        <None Include="Resources\map.csv.gz" />
+        <None Include="Resources\mtdna_map.csv" />
+        <None Include="Resources\RSRS.txt.gz" />
+        <None Include="Resources\ysnp_hg19.txt.gz" />
+        <Content Include="Resources\snps_on_tree.txt" />
+        <Content Include="Resources\ytree.xml" />
+        <Content Include="Resources\Images\delete.png" />
+        <Content Include="Resources\diff.exe" />
+        <Content Include="Resources\Images\eraser.png" />
+        <None Include="Resources\mtDNAPhylogeny.xml" />
+        <Content Include="Resources\Images\paste.png" />
+        <None Include="Resources\Images\refresh.png" />
+    </ItemGroup>
+
+</Project>

@@ -60,7 +60,9 @@
     <Compile Include="Core\Model\DNARec.cs" />
     <Compile Include="Core\Model\ISNPHeader.cs" />
     <Compile Include="Core\Model\ISNPSegment.cs" />
+    <Compile Include="Core\Model\ITableRow.cs" />
     <Compile Include="Core\Model\KitDTO.cs" />
+    <Compile Include="Core\Model\MatchingKit.cs" />
     <Compile Include="Core\Model\OTORow.cs" />
     <Compile Include="Core\Model\PhaseSegment.cs" />
     <Compile Include="Core\Model\ROHSegment.cs" />
@@ -184,20 +186,9 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\map.csv.gz" />
-    <None Include="Resources\mtdna_map.csv" />
-    <None Include="Resources\RSRS.txt.gz" />
-    <None Include="Resources\ysnp_hg19.txt.gz" />
-    <Content Include="Resources\snps_on_tree.txt" />
-    <Content Include="Resources\ytree.xml" />
-    <Content Include="Resources\Images\delete.png" />
-    <Content Include="Resources\diff.exe" />
-    <Content Include="Resources\Images\eraser.png" />
-    <None Include="Resources\mtDNAPhylogeny.xml" />
-    <Content Include="Resources\Images\paste.png" />
-    <None Include="Resources\Images\refresh.png" />
     <Content Include="System.Data.SQLite.dll" />
   </ItemGroup>
+  <Import Project="GenetixKit.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
