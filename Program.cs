@@ -23,7 +23,11 @@ namespace GenetixKit
         [STAThread]
         static void Main()
         {
+#if NETCORE
+            Application.SetHighDpiMode(HighDpiMode.SystemAware);
+#else
             Application.EnableVisualStyles();
+#endif
             Application.SetCompatibleTextRenderingDefault(false);
             mainInstance = new GKMainFrm();
             Application.Run(mainInstance);
