@@ -2,14 +2,19 @@
 
 namespace GenetixKit.Core.Model
 {
-    internal class PhaseSegment
+    internal class PhaseSegment : ITableRow
     {
-        public int Position { get; }
-        public string Genotype { get; }
-        public string PaternalGenotype { get; }
-        public string MaternalGenotype { get; }
+        public int Position { get; private set; }
+        public string Genotype { get; private set; }
+        public string PaternalGenotype { get; private set; }
+        public string MaternalGenotype { get; private set; }
 
-        public PhaseSegment(IDataRecord values)
+
+        public PhaseSegment()
+        {
+        }
+
+        public void Load(IDataRecord values)
         {
             Position = values.GetInt32(0);
             Genotype = values.GetString(1);
@@ -19,11 +24,11 @@ namespace GenetixKit.Core.Model
     }
 
 
-    internal class PhaseRow : ISNPHeader
+    internal class PhaseRow : ISNPHeader, ITableRow
     {
-        public string RSID { get; } // 0
-        public string Chromosome { get; } // 1
-        public int Position { get; } // 2
+        public string RSID { get; private set; } // 0
+        public string Chromosome { get; private set; } // 1
+        public int Position { get; private set; } // 2
 
         public string ChildGenotype { get; set; } // 3
         public string PaternalGenotype { get; set; } // 4
@@ -36,7 +41,11 @@ namespace GenetixKit.Core.Model
         public bool Ambiguous { get; set; }
 
 
-        public PhaseRow(IDataRecord values)
+        public PhaseRow()
+        {
+        }
+
+        public void Load(IDataRecord values)
         {
             RSID = values.GetString(0);
             Chromosome = values.GetString(1);
@@ -44,6 +53,28 @@ namespace GenetixKit.Core.Model
             ChildGenotype = values.GetString(3);
             PaternalGenotype = values.GetString(4);
             MaternalGenotype = values.GetString(5);
+        }
+    }
+
+
+    internal class UnphasedSegment : ITableRow
+    {
+        public string UnphasedKit { get; private set; }
+        public string Chromosome { get; private set; }
+        public int StartPosition { get; private set; }
+        public int EndPosition { get; private set; }
+
+
+        public UnphasedSegment()
+        {
+        }
+
+        public void Load(IDataRecord values)
+        {
+            UnphasedKit = values.GetString(0);
+            Chromosome = values.GetString(1);
+            StartPosition = values.GetInt32(2);
+            EndPosition = values.GetInt32(3);
         }
     }
 }

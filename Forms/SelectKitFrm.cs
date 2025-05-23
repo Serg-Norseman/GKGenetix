@@ -6,10 +6,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
 using GenetixKit.Core;
+using GenetixKit.Core.Model;
 
 namespace GenetixKit.Forms
 {
@@ -18,6 +18,7 @@ namespace GenetixKit.Forms
         private readonly List<string> disabled = new List<string>();
         private readonly UIOperation selectedOperation = 0;
         private string kit = "Unknown";
+        private IList<KitDTO> tbl;
 
         public string GetSelectedKit()
         {
@@ -29,68 +30,52 @@ namespace GenetixKit.Forms
             InitializeComponent();
 
             GKUIFuncs.FixGridView(dgvKits);
-            dgvKits.AddColumn("kit_no", "Kit #");
-            dgvKits.AddColumn("name", "Name");
-            dgvKits.AddCheckedColumn("disabled", "Disabled");
-            dgvKits.AddColumn("last_modified", "Last Modified");
+            dgvKits.AddColumn("KitNo", "Kit #");
+            dgvKits.AddColumn("Name", "Name");
+            dgvKits.AddCheckedColumn("Disabled", "Disabled");
+            dgvKits.AddColumn("LastModified", "Last Modified");
 
             selectedOperation = operation;
         }
 
         private void OpenKitFrm_Load(object sender, EventArgs e)
         {
-            const string defaultSql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master order by last_modified DESC";
+            string whereSql = " where reference = 0";
 
-            string selectSql;
             switch (selectedOperation) {
                 case UIOperation.OPEN_KIT:
                     btnOpen.Text = "Open";
-                    selectSql = defaultSql;
                     break;
                 case UIOperation.SELECT_ONE_TO_MANY:
-                    btnOpen.Text = "Select";
-                    selectSql = defaultSql;
-                    break;
                 case UIOperation.SELECT_ADMIXTURE:
-                    btnOpen.Text = "Select";
-                    selectSql = @"SELECT kit_no,name,disabled,last_modified FROM kit_master WHERE reference=0 order by last_modified DESC";
-                    break;
                 case UIOperation.SELECT_ROH:
-                    btnOpen.Text = "Select";
-                    selectSql = defaultSql;
-                    break;
                 case UIOperation.SELECT_KIT:
                     btnOpen.Text = "Select";
-                    selectSql = defaultSql;
                     break;
                 case UIOperation.SELECT_MTPHYLOGENY:
-                    btnOpen.Text = "Select";
-                    selectSql = @"select kit_no,name,disabled,last_modified from kit_master where kit_no in (select distinct kit_no from kit_mtdna) order by last_modified DESC";
-                    break;
                 case UIOperation.SELECT_MITOMAP:
                     btnOpen.Text = "Select";
-                    selectSql = @"select kit_no,name,disabled,last_modified from kit_master where kit_no in (select distinct kit_no from kit_mtdna) order by last_modified DESC";
+                    whereSql = " where kit_no in (select distinct kit_no from kit_mtdna)";
                     break;
                 case UIOperation.SELECT_ISOGGYTREE:
                     btnOpen.Text = "Select";
-                    selectSql = @"select kit_no,name,disabled,last_modified from kit_master where kit_no in (select distinct kit_no from kit_ysnps) order by last_modified DESC";
+                    whereSql = " where kit_no in (select distinct kit_no from kit_ysnps)";
                     break;
                 default:
-                    selectSql = defaultSql;
                     break;
             }
 
-            var tbl = GKSqlFuncs.QueryTable(selectSql);
+            tbl = GKSqlFuncs.QueryKits(false, whereSql, "");
             dgvKits.DataSource = tbl;
 
             disabled.Clear();
-            foreach (DataRow row in tbl.Rows) {
-                if (Convert.ToInt16(row[2]) == 1) {
-                    disabled.Add(Convert.ToString(row[0]));
+            foreach (var row in tbl) {
+                if (row.Disabled) {
+                    disabled.Add(Convert.ToString(row.KitNo));
                 }
             }
 
-            if (dgvKits.Rows.Count == 0) {
+            if (tbl.Count == 0) {
                 MessageBox.Show("There are no kits available to open.", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 this.Close();
             }
@@ -99,10 +84,8 @@ namespace GenetixKit.Forms
         private void dgvKits_SelectionChanged(object sender, EventArgs e)
         {
             try {
-                if (dgvKits.SelectedRows.Count > 0) {
-                    var value = dgvKits.SelectedRows[0].Cells[0].Value;
-                    kitLbl.Text = value != null ? value.ToString() : string.Empty;
-                }
+                var value = dgvKits.GetSelectedObj<KitDTO>()?.KitNo;
+                kitLbl.Text = value != null ? value.ToString() : string.Empty;
             } catch (Exception) {
                 // ignore
             }
@@ -110,9 +93,8 @@ namespace GenetixKit.Forms
 
         private void dgvKits_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-            var row = ((DataTable)dgvKits.DataSource).Rows[e.RowIndex];
-            short val = Convert.ToInt16(row[2]);
-            e.CellStyle.ForeColor = (val != 1) ? Color.Black : Color.LightGray;
+            var row = tbl[e.RowIndex];
+            e.CellStyle.ForeColor = (!row.Disabled) ? Color.Black : Color.LightGray;
         }
 
         private void dgvKits_CellContentDoubleClick(object sender, DataGridViewCellEventArgs e)

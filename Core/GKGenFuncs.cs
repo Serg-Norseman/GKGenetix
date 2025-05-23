@@ -38,41 +38,31 @@ namespace GenetixKit.Core
         {
             double cm = 0.0;
             int chr_int = (chr == "X") ? 23 : int.Parse(chr);
-
             if (chr_int - 1 >= GKData.cM_Map.Length) return cm;
 
-            Dictionary<int, double> tmap = GKData.cM_Map[chr_int - 1];
+            SortedList<int, double> tmap = GKData.cM_Map[chr_int - 1];
+            if (tmap.TryGetValue(pos, out cm))
+                return cm;
 
-            if (!tmap.ContainsKey(pos)) {
-                var prev_pos = from p in tmap.Keys where p <= pos select p;
-                var next_pos = from p in tmap.Keys where p >= pos select p;
+            var positions = tmap.Keys.ToList(); // materialize once
+            int index = positions.BinarySearch(pos);
 
-                int prev_pos_key = prev_pos.Count() == 0 ? tmap.Keys.Min() : prev_pos.Max();
-                int next_pos_key = next_pos.Count() == 0 ? tmap.Keys.Max() : next_pos.Min();
+            if (index < 0)
+                index = ~index;
 
-                if (next_pos_key == prev_pos_key) {
-                    if (next_pos_key < pos) {
-                        prev_pos = from p in tmap.Keys where p < next_pos_key select p;
-                        prev_pos_key = prev_pos.Max();
+            if (index == 0)
+                return tmap[positions[0]];
 
-                        int diff = next_pos_key - prev_pos_key;
-                        double cm_diff = tmap[next_pos_key] - tmap[prev_pos_key];
-                        cm = tmap[next_pos_key] + cm_diff * (pos - next_pos_key) / diff;
-                    } else {
-                        next_pos = from p in tmap.Keys where p > prev_pos_key select p;
-                        next_pos_key = next_pos.Max();
+            if (index == positions.Count)
+                return tmap[positions.Last()];
 
-                        int diff = next_pos_key - prev_pos_key;
-                        double cm_diff = tmap[next_pos_key] - tmap[prev_pos_key];
-                        cm = tmap[prev_pos_key] - cm_diff * (prev_pos_key - pos) / diff;
-                    }
-                } else {
-                    int diff = next_pos_key - prev_pos_key;
-                    double cm_diff = tmap[next_pos_key] - tmap[prev_pos_key];
-                    cm = tmap[prev_pos_key] + cm_diff * (pos - prev_pos_key) / diff;
-                }
-            } else
-                cm = tmap[pos];
+            int prevPos = positions[index - 1];
+            int nextPos = positions[index];
+
+            int diff = nextPos - prevPos;
+            double cm_diff = tmap[nextPos] - tmap[prevPos];
+            cm = tmap[prevPos] + cm_diff * (pos - prevPos) / diff;
+
             return cm;
         }
 
@@ -170,7 +160,7 @@ namespace GenetixKit.Core
 
                 if (chr != "Y" && chr != "MT") {
                     if (chr != "0")
-                        rows.Add(new SingleSNP( rsid, chr, int.Parse(pos), genotype ));
+                        rows.Add(new SingleSNP(rsid, chr, int.Parse(pos), genotype));
                 } else {
                     if (chr == "Y") {
                         if (GKData.YMap.ContainsKey(pos)) {
@@ -444,23 +434,16 @@ namespace GenetixKit.Core
 
         public static void DontMatchProc(int start_pos, int end_pos, string prev_chr, string chromosome, IList<CmpSegment> segments_idx, ref List<CmpSegmentRow> tmp, bool reference)
         {
-            double cm_len;
-            double cm_th;
+            double cm_len, cm_th;
             int snp_th;
+            bool overTh;
+
+            int diffPos = (end_pos - start_pos);
+
             if (reference) {
                 snp_th = GKSettings.Admixture_Threshold_SNPs;
                 cm_th = GKSettings.Admixture_Threshold_cM;
-
-                if ((end_pos - start_pos) > 5000) {
-                    cm_len = GetLength_in_cM(chromosome, start_pos, end_pos);
-
-                    if (cm_len >= cm_th && tmp.Count >= snp_th) {
-                        if (prev_chr != chromosome)
-                            segments_idx.Add(new CmpSegment(prev_chr, start_pos, end_pos, cm_len, tmp.Count, tmp));
-                        else
-                            segments_idx.Add(new CmpSegment(chromosome, start_pos, end_pos, cm_len, tmp.Count, tmp));
-                    }
-                }
+                overTh = diffPos > 5000;
             } else {
                 if (chromosome == "X") {
                     cm_th = GKSettings.Compare_X_Threshold_cM;
@@ -469,16 +452,17 @@ namespace GenetixKit.Core
                     cm_th = GKSettings.Compare_Autosomal_Threshold_cM;
                     snp_th = GKSettings.Compare_Autosomal_Threshold_SNPs;
                 }
+                overTh = diffPos / 1000000.0 > GKSettings.MB_THRESHOLD;
+            }
 
-                if ((end_pos - start_pos) / 1000000.0 > GKSettings.MB_THRESHOLD) {
-                    cm_len = GetLength_in_cM(chromosome, start_pos, end_pos);
+            if (overTh) {
+                cm_len = GetLength_in_cM(chromosome, start_pos, end_pos);
 
-                    if (cm_len >= cm_th && tmp.Count >= snp_th) {
-                        if (prev_chr != chromosome)
-                            segments_idx.Add(new CmpSegment(prev_chr, start_pos, end_pos, cm_len, tmp.Count, tmp));
-                        else
-                            segments_idx.Add(new CmpSegment(chromosome, start_pos, end_pos, cm_len, tmp.Count, tmp));
-                    }
+                if (cm_len >= cm_th && tmp.Count >= snp_th) {
+                    if (prev_chr != chromosome)
+                        segments_idx.Add(new CmpSegment(prev_chr, start_pos, end_pos, cm_len, tmp));
+                    else
+                        segments_idx.Add(new CmpSegment(chromosome, start_pos, end_pos, cm_len, tmp));
                 }
             }
 
@@ -487,23 +471,16 @@ namespace GenetixKit.Core
 
         public static void DontMatchProcRoH(int start_pos, int end_pos, string prev_chr, string chromosome, IList<ROHSegment> segments_idx, ref List<SingleSNP> tmp, bool reference)
         {
-            double cm_len;
-            double cm_th;
+            double cm_len, cm_th;
             int snp_th;
+            bool overTh;
+
+            int diffPos = (end_pos - start_pos);
+
             if (reference) {
                 snp_th = GKSettings.Admixture_Threshold_SNPs;
                 cm_th = GKSettings.Admixture_Threshold_cM;
-
-                if ((end_pos - start_pos) > 5000) {
-                    cm_len = GetLength_in_cM(chromosome, start_pos, end_pos);
-
-                    if (cm_len >= cm_th && tmp.Count >= snp_th) {
-                        if (prev_chr != chromosome)
-                            segments_idx.Add(new ROHSegment(prev_chr, start_pos, end_pos, cm_len, tmp.Count, tmp));
-                        else
-                            segments_idx.Add(new ROHSegment(chromosome, start_pos, end_pos, cm_len, tmp.Count, tmp));
-                    }
-                }
+                overTh = diffPos > 5000;
             } else {
                 if (chromosome == "X") {
                     cm_th = GKSettings.Compare_X_Threshold_cM;
@@ -512,16 +489,17 @@ namespace GenetixKit.Core
                     cm_th = GKSettings.Compare_Autosomal_Threshold_cM;
                     snp_th = GKSettings.Compare_Autosomal_Threshold_SNPs;
                 }
+                overTh = diffPos / 1000000.0 > GKSettings.MB_THRESHOLD;
+            }
 
-                if ((end_pos - start_pos) / 1000000.0 > GKSettings.MB_THRESHOLD) {
-                    cm_len = GetLength_in_cM(chromosome, start_pos, end_pos);
+            if (overTh) {
+                cm_len = GetLength_in_cM(chromosome, start_pos, end_pos);
 
-                    if (cm_len >= cm_th && tmp.Count >= snp_th) {
-                        if (prev_chr != chromosome)
-                            segments_idx.Add(new ROHSegment(prev_chr, start_pos, end_pos, cm_len, tmp.Count, tmp));
-                        else
-                            segments_idx.Add(new ROHSegment(chromosome, start_pos, end_pos, cm_len, tmp.Count, tmp));
-                    }
+                if (cm_len >= cm_th && tmp.Count >= snp_th) {
+                    if (prev_chr != chromosome)
+                        segments_idx.Add(new ROHSegment(prev_chr, start_pos, end_pos, cm_len, tmp));
+                    else
+                        segments_idx.Add(new ROHSegment(chromosome, start_pos, end_pos, cm_len, tmp));
                 }
             }
 
@@ -547,9 +525,6 @@ namespace GenetixKit.Core
          */
         public static Image GetPhasedSegmentImage(IList<PhaseSegment> dt, string chromosome)
         {
-            int width = 600;
-            int height = 150;
-            Image img = new Bitmap(width, height);
             int paternal_error_position = 0;
             int maternal_error_position = 0;
             int snp_th;
@@ -567,6 +542,9 @@ namespace GenetixKit.Core
             int maternal_no_call_count = 0;
             int x = 0;
 
+            int width = 600;
+            int height = 150;
+            Image img = new Bitmap(width, height);
             Graphics g = Graphics.FromImage(img);
 
             int begin_maternal_pos = 0;
@@ -710,10 +688,10 @@ namespace GenetixKit.Core
                 return 'N';
         }
 
-        public static List<CmpSegment> CompareOneToOne(string kit1, string kit2, BackgroundWorker bwCompare, bool reference, bool justUpdate)
+        public static IList<CmpSegment> CompareOneToOne(string kit1, string kit2, BackgroundWorker bwCompare, bool reference, bool justUpdate)
         {
             // just_update - if parameter true, will update if record not found but will not return the existing record if found.
-            List<CmpSegment> segments_idx = new List<CmpSegment>();
+            IList<CmpSegment> segments_idx = new List<CmpSegment>();
 
             bool exists = GKSqlFuncs.CheckAlreadyCompared(kit1, kit2);
 
@@ -730,7 +708,6 @@ namespace GenetixKit.Core
                 }
             } else {
                 var otoRows = GKSqlFuncs.GetOTORows(kit1, kit2);
-                //var reader = GGKSqlFuncs.QueryReader(@"select rsid,chr,pos,gt1,gt2, count(*) FROM (SELECT kit1.rsid 'rsid',kit1.chromosome 'chr',kit1.position 'pos',kit1.genotype 'gt1',kit2.genotype 'gt2' FROM kit_autosomal kit1 LEFT JOIN kit_autosomal kit2 on kit1.rsid=kit2.rsid WHERE kit1.kit_no = '" + kit1 + "' AND kit2.kit_no = '" + kit2 + "' UNION SELECT kit1.rsid 'rsid',kit1.chromosome 'chr',kit1.position 'pos',kit1.genotype 'gt1', kit2.genotype 'gt2' FROM kit_autosomal kit1 LEFT JOIN kit_autosomal kit2 on kit1.rsid=kit2.rsid WHERE kit1.kit_no = '" + kit2 + "' AND kit2.kit_no = '" + kit1 + "') GROUP BY rsid ORDER BY CAST(chr as INTEGER),pos");
 
                 var tmp = new List<CmpSegmentRow>();
 
@@ -896,13 +873,15 @@ namespace GenetixKit.Core
                         else
                             errorRadius = GKSettings.Compare_Autosomal_Threshold_SNPs / 2;
 
-                        if (genotype[0] == genotype[1] && genotype[0] != '-' && genotype[0] != '?') {
+                        char gt0 = genotype[0];
+                        char gt1 = genotype[1];
+
+                        if (gt0 == gt1 && gt0 != '-' && gt0 != '?') {
                             // match 
                             tmp.Add(snp);
                             if (start_pos == 0)
                                 start_pos = position;
-                        } else if ((genotype[0] != '-' && genotype[0] != '?' && (genotype[1] == '-' || genotype[1] == '?')) ||
-                              (genotype[1] != '-' && genotype[1] != '?' && (genotype[0] == '-' || genotype[0] == '?'))) {
+                        } else if ((gt0 != '-' && gt0 != '?' && (gt1 == '-' || gt1 == '?')) || (gt1 != '-' && gt1 != '?' && (gt0 == '-' || gt0 == '?'))) {
                             no_call_counter++;
                             if (no_call_counter <= no_call_limit) {
                                 tmp.Add(snp);
@@ -946,7 +925,7 @@ namespace GenetixKit.Core
             return segments_idx;
         }
 
-        public static void DoPhasing(string fatherKit, string motherKit, string childKit, ref IList<PhaseRow> dt, bool male, BackgroundWorker bw)
+        public static void DoPhasing(string fatherKit, string motherKit, string childKit, ref IList<PhaseRow> dt, bool male)
         {
             const char ZeroChar = '\0';
 
@@ -1037,7 +1016,7 @@ namespace GenetixKit.Core
                 }
             }
 
-            bw.ReportProgress(-1, "Saving Phased Kit " + childKit + " ...");
+            Program.KitInstance.SetStatus("Saving Phased Kit " + childKit + " ...");
             GKSqlFuncs.SavePhasedKit(fatherKit, motherKit, childKit, dt);
         }
 

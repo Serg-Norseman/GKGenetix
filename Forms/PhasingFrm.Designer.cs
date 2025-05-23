@@ -6,7 +6,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.ComponentModel.BackgroundWorker bwPhasing;
         private System.Windows.Forms.Button btnFather;
         private System.Windows.Forms.Button btnMother;
         private System.Windows.Forms.Button btnChild;
@@ -19,7 +18,6 @@
 
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PhasingFrm));
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
@@ -28,7 +26,6 @@
             this.btnMother = new System.Windows.Forms.Button();
             this.btnChild = new System.Windows.Forms.Button();
             this.btnPhasing = new System.Windows.Forms.Button();
-            this.bwPhasing = new System.ComponentModel.BackgroundWorker();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.rbMale = new System.Windows.Forms.RadioButton();
@@ -149,14 +146,6 @@
             this.btnPhasing.Text = "Begin Phasing";
             this.btnPhasing.UseVisualStyleBackColor = true;
             this.btnPhasing.Click += new System.EventHandler(this.btnPhasing_Click);
-            // 
-            // bwPhasing
-            // 
-            this.bwPhasing.WorkerReportsProgress = true;
-            this.bwPhasing.WorkerSupportsCancellation = true;
-            this.bwPhasing.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwPhasing_DoWork);
-            this.bwPhasing.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bwPhasing_ProgressChanged);
-            this.bwPhasing.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwPhasing_RunWorkerCompleted);
             // 
             // tableLayoutPanel2
             // 

@@ -7,7 +7,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GenetixKit.Core.Model;
@@ -21,6 +20,7 @@ namespace GenetixKit.Forms
         private IList<CmpSegment> cmpResults;
         private bool redoAgain = false;
         private bool redoVisual = false;
+        private IList<KitDTO> dt;
 
         public ProcessKitsFrm()
         {
@@ -32,62 +32,37 @@ namespace GenetixKit.Forms
             if (redoAgain)
                 GKSqlFuncs.ClearAllComparisons(false);
 
-            DataTable dt = GKSqlFuncs.QueryTable("kit_master", new string[] { "kit_no", "reference", "name" }, "where disabled=0");
+            dt = GKSqlFuncs.QueryKits(true);
 
-            int progress = 0;
             int total = 0;
-            string ref1 = "0";
-            string ref2 = "0";
-
-            for (int i = 0; i < dt.Rows.Count; i++) {
-                for (int j = i; j < dt.Rows.Count; j++) {
-                    if (bwCompare.CancellationPending)
-                        break;
-
-                    kit1 = dt.Rows[i].ItemArray[0].ToString();
-                    kit2 = dt.Rows[j].ItemArray[0].ToString();
-                    if (kit1 == kit2)
-                        continue;
-
-                    ref1 = dt.Rows[i].ItemArray[1].ToString();
-                    ref2 = dt.Rows[j].ItemArray[1].ToString();
-
-                    if (ref1 == "1" && ref2 == "1")
-                        continue;
-                    total++;
+            for (int i = 0; i < dt.Count; i++) {
+                for (int j = i; j < dt.Count; j++) {
+                    if (dt[i].KitNo != dt[j].KitNo && (dt[i].Reference != 1 || dt[j].Reference != 1))
+                        total++;
                 }
-
-                if (bwCompare.CancellationPending)
-                    break;
             }
 
+            int progress = 0;
             int idx = 0;
-            string name1 = "";
-            string name2 = "";
-            bool reference = false;
-            for (int i = 0; i < dt.Rows.Count; i++) {
-                for (int j = i; j < dt.Rows.Count; j++) {
+            for (int i = 0; i < dt.Count; i++) {
+                for (int j = i; j < dt.Count; j++) {
                     if (bwCompare.CancellationPending)
                         break;
 
-                    kit1 = dt.Rows[i].ItemArray[0].ToString();
-                    kit2 = dt.Rows[j].ItemArray[0].ToString();
+                    kit1 = dt[i].KitNo;
+                    kit2 = dt[j].KitNo;
                     if (kit1 == kit2)
                         continue;
 
-                    ref1 = dt.Rows[i].ItemArray[1].ToString();
-                    ref2 = dt.Rows[j].ItemArray[1].ToString();
-
-                    if (ref1 == "1" && ref2 == "1")
+                    int ref1 = dt[i].Reference;
+                    int ref2 = dt[j].Reference;
+                    if (ref1 == 1 && ref2 == 1)
                         continue;
 
-                    if (ref1 == "1" || ref2 == "1")
-                        reference = true;
-                    else
-                        reference = false;
+                    bool reference = (ref1 == 1 || ref2 == 1);
 
-                    name1 = dt.Rows[i].ItemArray[2].ToString();
-                    name2 = dt.Rows[j].ItemArray[2].ToString();
+                    string name1 = dt[i].Name;
+                    string name2 = dt[j].Name;
                     idx++;
 
                     this.Invoke(new MethodInvoker(delegate {
@@ -207,20 +182,23 @@ namespace GenetixKit.Forms
 
         private void bwROH_DoWork(object sender, DoWorkEventArgs e)
         {
-            DataTable dt = GKSqlFuncs.QueryTable("select kit_no,roh_status from kit_master where disabled=0");
+            for (int i = 0; i < dt.Count; i++) {
+                KitDTO row = dt[i];
 
-            foreach (DataRow row in dt.Rows) {
                 if (bwROH.CancellationPending)
                     break;
 
-                string kit = row.ItemArray[0].ToString();
-                string roh = row.ItemArray[1].ToString();
+                string kit = row.KitNo;
+                int roh = row.RoH_Status;
 
-                if (roh == "0") {
-                    bwROH.ReportProgress(dt.Rows.IndexOf(row) * 100 / dt.Rows.Count, "Runs of Homozygosity for kit #" + kit + " (" + GKSqlFuncs.GetKitName(kit) + ") - Processing ...");
+                int progress = i * 100 / dt.Count;
+                string msg0 = $"Runs of Homozygosity for kit #{kit} ({GKSqlFuncs.GetKitName(kit)})";
+
+                if (roh == 0) {
+                    bwROH.ReportProgress(progress, msg0 + " - Processing ...");
                     GKGenFuncs.ROH(kit);
-                } else if (roh == "1") {
-                    bwROH.ReportProgress(dt.Rows.IndexOf(row) * 100 / dt.Rows.Count, "Runs of Homozygosity for kit #" + kit + " (" + GKSqlFuncs.GetKitName(kit) + ") - Already Exists. Skipping..");
+                } else if (roh == 1) {
+                    bwROH.ReportProgress(progress, msg0 + " - Already Exists. Skipping..");
                 }
             }
         }
@@ -253,36 +231,37 @@ namespace GenetixKit.Forms
 
         private void bwPhaseVisualizer_DoWork(object sender, DoWorkEventArgs e)
         {
-            DataTable dt2 = GKSqlFuncs.QueryTable("select distinct kit_no from kit_phased");
-            foreach (DataRow row in dt2.Rows) {
+            var phasedKits = GKSqlFuncs.GetPhasedKits();
+            for (int i = 0; i < phasedKits.Count; i++) {
+                string phased_kit = phasedKits[i];
+
                 if (bwPhaseVisualizer.CancellationPending)
                     break;
 
-                string phased_kit = row.ItemArray[0].ToString();
+                int percent = i * 100 / phasedKits.Count;
+                bwPhaseVisualizer.ReportProgress(percent, $"Phased Segments for kit #{phased_kit} ({GKSqlFuncs.GetKitName(phased_kit)}) - Processing ...");
 
-                int percent = dt2.Rows.IndexOf(row) * 100 / dt2.Rows.Count;
-                bwPhaseVisualizer.ReportProgress(percent, "Phased Segments for kit #" + phased_kit + " (" + GKSqlFuncs.GetKitName(phased_kit) + ") - Processing ...");
+                var unphasedSegments = GKSqlFuncs.GetUnphasedSegments(phased_kit);
 
-                DataTable dt3 = GKSqlFuncs.QueryTable("select unphased_kit,chromosome,start_position,end_position FROM (select kit1'unphased_kit',chromosome,start_position,end_position from cmp_autosomal where kit2='" + phased_kit + "' UNION select kit2'unphased_kit',chromosome,start_position,end_position from cmp_autosomal where kit1='" + phased_kit + "') order by cast(chromosome as integer),start_position");
-
-                foreach (DataRow row3 in dt3.Rows) {
+                foreach (var unphSeg in unphasedSegments) {
                     if (bwPhaseVisualizer.CancellationPending)
                         break;
 
-                    string unphased_kit = row3.ItemArray[0].ToString();
-                    string chromosome = row3.ItemArray[1].ToString();
-                    string start_position = row3.ItemArray[2].ToString();
-                    string end_position = row3.ItemArray[3].ToString();
+                    string unphased_kit = unphSeg.UnphasedKit;
+                    string chromosome = unphSeg.Chromosome;
+                    string start_position = unphSeg.StartPosition.ToString();
+                    string end_position = unphSeg.EndPosition.ToString();
 
-                    DataTable exists = GKSqlFuncs.QueryTable("select * from cmp_phased where phased_kit='" + phased_kit + "' and match_kit='" + unphased_kit + "' and chromosome='" + chromosome + "' and start_position=" + start_position + " and end_position=" + end_position);
+                    var exists = GKSqlFuncs.QueryValue(
+                        $"select phased_kit from cmp_phased where phased_kit='{phased_kit}' and match_kit='{unphased_kit}' and chromosome='{chromosome}' and start_position={start_position} and end_position={end_position}");
 
-                    if (exists.Rows.Count > 0) {
+                    if (!string.IsNullOrEmpty(exists)) {
                         //already exists...
                         if (!redoVisual) {
                             bwPhaseVisualizer.ReportProgress(percent, "Segment [" + GKSqlFuncs.GetKitName(phased_kit) + ":" + GKSqlFuncs.GetKitName(unphased_kit) + "] Chr " + chromosome + ": " + start_position + "-" + end_position + ", Already Processed. Skipping ...");
                             continue;
                         } else {
-                            GKSqlFuncs.UpdateDB("DELETE from cmp_phased where phased_kit='{0}'", phased_kit);
+                            GKSqlFuncs.DeletePhasedKit(phased_kit);
                         }
                     }
 

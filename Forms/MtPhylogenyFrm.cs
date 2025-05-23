@@ -38,7 +38,7 @@ namespace GenetixKit.Forms
         private void MainFrm_Load(object sender, EventArgs e)
         {
             label2.Text = kit + " - " + GKSqlFuncs.GetKitName(kit);
-            this.Text = "Mitocondrial Phylogeny - (" + kit + ")" + GKSqlFuncs.GetKitName(kit);
+            this.Text = $"Mitocondrial Phylogeny - {kit} ({GKSqlFuncs.GetKitName(kit)})";
             xmlPhylogeny = Properties.Resources.mtDNAPhylogeny;
 
             timer1.Enabled = true;
@@ -59,7 +59,7 @@ namespace GenetixKit.Forms
             root.Expand();
             treeView1.EndUpdate();
 
-            string mutations = GKSqlFuncs.QueryValue("kit_mtdna", new string[] { "mutations" }, "where kit_no='" + kit + "'");
+            GKSqlFuncs.GetMtDNA(kit, out string mutations, out _);
             txtSNPs.Text = mutations;
 
             MarkOnTree();

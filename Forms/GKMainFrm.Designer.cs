@@ -17,7 +17,6 @@
         private System.Windows.Forms.ToolStripMenuItem miDNA;
         private System.Windows.Forms.ToolStripMenuItem miOneToOne;
         private System.Windows.Forms.ToolStripMenuItem miOneToMany;
-        private System.ComponentModel.BackgroundWorker bwIChkAndFix;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem miProcessKits;
         private System.Windows.Forms.ToolStripMenuItem miQuickEdit;
@@ -32,7 +31,6 @@
 
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GKMainFrm));
             this.menuStripGGK = new System.Windows.Forms.MenuStrip();
             this.miFile = new System.Windows.Forms.ToolStripMenuItem();
             this.miNew = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,7 +56,6 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.progressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.statusLbl = new System.Windows.Forms.ToolStripStatusLabel();
-            this.bwIChkAndFix = new System.ComponentModel.BackgroundWorker();
             this.miPhasing = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStripGGK.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -268,11 +265,6 @@
             this.statusLbl.Name = "statusLbl";
             this.statusLbl.Size = new System.Drawing.Size(48, 20);
             this.statusLbl.Text = "Done.";
-            // 
-            // bwIChkAndFix
-            // 
-            this.bwIChkAndFix.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwIChkAndFix_DoWork);
-            this.bwIChkAndFix.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwIChkAndFix_RunWorkerCompleted);
             // 
             // GGKitFrmMain
             // 

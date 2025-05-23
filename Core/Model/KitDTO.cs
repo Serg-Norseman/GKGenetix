@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 
 namespace GenetixKit.Core.Model
 {
@@ -10,6 +11,9 @@ namespace GenetixKit.Core.Model
         public bool Disabled { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public DateTime LastModified { get; set; }
+        public int Reference { get; set; }
+        public int RoH_Status { get; set; }
 
 
         public string Location { get; set; }
@@ -24,6 +28,9 @@ namespace GenetixKit.Core.Model
             Disabled = values.GetBoolean(3);
             X = values.GetInt32(4);
             Y = values.GetInt32(5);
+            LastModified = values.GetDateTime(6);
+            Reference = values.GetInt32(7);
+            RoH_Status = values.GetInt32(8);
 
             if (convertSex) {
                 if (Sex == "U")

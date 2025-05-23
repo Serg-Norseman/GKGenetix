@@ -2,12 +2,17 @@
 
 namespace GenetixKit.Core.Model
 {
-    public class SingleSNP : ISNPHeader
+    public class SingleSNP : ISNPHeader, ITableRow
     {
-        public string RSID { get; }
-        public string Chromosome { get; }
-        public int Position { get; }
-        public string Genotype { get; }
+        public string RSID { get; private set; }
+        public string Chromosome { get; private set; }
+        public int Position { get; private set; }
+        public string Genotype { get; private set; }
+
+
+        public SingleSNP()
+        {
+        }
 
         public SingleSNP(string rsid, string chromosome, int position, string genotype)
         {
@@ -17,7 +22,7 @@ namespace GenetixKit.Core.Model
             Genotype = genotype;
         }
 
-        public SingleSNP(IDataRecord values)
+        public void Load(IDataRecord values)
         {
             RSID = values.GetString(0);
             Chromosome = values.GetString(1);

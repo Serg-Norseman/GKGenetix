@@ -43,7 +43,7 @@ namespace GenetixKit.Forms
             dgvNucleotides.AddColumn("ckit", "Kit");
 
             this.kit = kit;
-            label1.Text = " " + kit + " (" + GKSqlFuncs.GetKitName(kit) + ")";
+            label1.Text = $" {kit} ({GKSqlFuncs.GetKitName(kit)})";
         }
 
         private void MitoMapFrm_Load(object sender, EventArgs e)
@@ -73,7 +73,7 @@ namespace GenetixKit.Forms
             for (int i = 0; i < RSRS.Length; i++)
                 nucleotides.Add(i + 1, new string[] { (i + 1).ToString(), RSRS[i].ToString(), RSRS[i].ToString() });
 
-            mutations = GKSqlFuncs.QueryValue("kit_mtdna", new string[] { "mutations" }, "where kit_no='" + kit + "'");
+            GKSqlFuncs.GetMtDNA(kit, out mutations, out _);
             dgvNucleotides.Columns[2].HeaderText = GKSqlFuncs.GetKitName(kit) + " (" + kit + ")";
 
             dgvmtdna.Columns[3].Visible = false;
@@ -83,15 +83,14 @@ namespace GenetixKit.Forms
 
         private void dgvmtdna_SelectionChanged(object sender, EventArgs e)
         {
-            int start = int.Parse(dgvmtdna.SelectedRows[0].Cells[1].Value.ToString());
-            int end = int.Parse(dgvmtdna.SelectedRows[0].Cells[2].Value.ToString());
-            string title = dgvmtdna.SelectedRows[0].Cells[0].Value.ToString();
+            var selRowCells = dgvmtdna.SelectedRows[0].Cells;
+
+            int start = int.Parse(selRowCells[1].Value.ToString());
+            int end = int.Parse(selRowCells[2].Value.ToString());
+            string title = selRowCells[0].Value.ToString();
 
             foreach (DataPoint dp in mtdna_chart.Series[0].Points) {
-                if (dp.Label == title)
-                    dp.LabelBackColor = Color.LightBlue;
-                else
-                    dp.LabelBackColor = Color.White;
+                dp.LabelBackColor = (dp.Label == title) ? Color.LightBlue : Color.White;
             }
 
             tabControl2.TabPages[0].Text = "Nucleotides - " + title;

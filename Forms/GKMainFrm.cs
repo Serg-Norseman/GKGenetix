@@ -6,6 +6,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 
@@ -26,8 +27,17 @@ namespace GenetixKit.Forms
         {
             SetStatus("Checking Integrity of DB ...");
             this.Enabled = false;
-            bwIChkAndFix.RunWorkerAsync();
             this.Text = Application.ProductName + " v" + Application.ProductVersion.ToString();
+
+            // bwIChkAndFix.RunWorkerAsync();
+            Task.Factory.StartNew(() => {
+                GKSqlFuncs.CheckIntegrity();
+
+                this.Invoke(new MethodInvoker(delegate {
+                    SetStatus("Done.");
+                    this.Enabled = true;
+                }));
+            });
         }
 
         private void miExit_Click(object sender, EventArgs e)
@@ -69,17 +79,6 @@ namespace GenetixKit.Forms
         private void miOneToMany_Click(object sender, EventArgs e)
         {
             SelectOper(UIOperation.SELECT_ONE_TO_MANY);
-        }
-
-        private void bwIChkAndFix_DoWork(object sender, DoWorkEventArgs e)
-        {
-            GKSqlFuncs.CheckIntegrity();
-        }
-
-        private void bwIChkAndFix_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            SetStatus("Done.");
-            this.Enabled = true;
         }
 
         private void miProcessKits_Click(object sender, EventArgs e)
@@ -125,17 +124,10 @@ namespace GenetixKit.Forms
 
         #endregion
 
-        private void HideAllMdiChildren(string exceptFrm = "")
-        {
-            foreach (Form frm in MdiChildren) {
-                if (frm.Name != exceptFrm)
-                    frm.Dispose();
-            }
-        }
-
         private void ShowMdiChild(Form frm)
         {
-            HideAllMdiChildren();
+            foreach (Form fm in MdiChildren) fm.Dispose();
+
             frm.MdiParent = this;
             frm.Visible = true;
             frm.WindowState = FormWindowState.Maximized;
@@ -217,9 +209,8 @@ namespace GenetixKit.Forms
 
         public void ShowPhasedSegmentVisualizer(string kit1, string kit2, string chr, string start_pos, string end_pos)
         {
-            using (var frm = new PhasedSegmentFrm(kit1, kit2, chr, start_pos, end_pos)) {
+            using (var frm = new PhasedSegmentFrm(kit1, kit2, chr, start_pos, end_pos))
                 frm.ShowDialog(this);
-            }
         }
 
         public void SelectOper(UIOperation operation)
