@@ -3,13 +3,10 @@
     partial class QuickEditKit
     {
         private System.Windows.Forms.DataGridView dgvEditKit;
-        private System.ComponentModel.BackgroundWorker bwDelete;
 
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(QuickEditKit));
             this.dgvEditKit = new System.Windows.Forms.DataGridView();
-            this.bwDelete = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.dgvEditKit)).BeginInit();
             this.SuspendLayout();
             // 
@@ -27,13 +24,6 @@
             this.dgvEditKit.Size = new System.Drawing.Size(784, 562);
             this.dgvEditKit.TabIndex = 1;
             this.dgvEditKit.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvEditKit_CellContentClick);
-            // 
-            // bwDelete
-            // 
-            this.bwDelete.WorkerReportsProgress = true;
-            this.bwDelete.WorkerSupportsCancellation = true;
-            this.bwDelete.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwDelete_DoWork);
-            this.bwDelete.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwDelete_RunWorkerCompleted);
             // 
             // QuickEditKit
             // 

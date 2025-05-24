@@ -1042,5 +1042,56 @@ namespace GenetixKit.Core
                 row.PhasedMaternal = phased_maternal;
             }
         }
+
+        public static void DoPhaseVisualizer(bool redoVisual, BackgroundWorker bw)
+        {
+            var phasedKits = GKSqlFuncs.GetPhasedKits();
+            for (int i = 0; i < phasedKits.Count; i++) {
+                string phased_kit = phasedKits[i];
+
+                int percent = i * 100 / phasedKits.Count;
+                if (bw != null) {
+                    if (bw.CancellationPending) break;
+                    bw.ReportProgress(percent, $"Phased Segments for kit #{phased_kit} ({GKSqlFuncs.GetKitName(phased_kit)}) - Processing ...");
+                }
+
+                var unphasedSegments = GKSqlFuncs.GetUnphasedSegments(phased_kit);
+
+                foreach (var unphSeg in unphasedSegments) {
+                    if (bw != null && bw.CancellationPending)
+                        break;
+
+                    string unphased_kit = unphSeg.UnphasedKit;
+                    string chromosome = unphSeg.Chromosome;
+                    string start_position = unphSeg.StartPosition.ToString();
+                    string end_position = unphSeg.EndPosition.ToString();
+
+                    var exists = GKSqlFuncs.QueryValue(
+                        $"select phased_kit from cmp_phased where phased_kit='{phased_kit}' and match_kit='{unphased_kit}' and chromosome='{chromosome}' and start_position={start_position} and end_position={end_position}");
+
+                    if (!string.IsNullOrEmpty(exists)) {
+                        //already exists...
+                        if (!redoVisual) {
+                            if (bw != null)
+                                bw.ReportProgress(percent, $"Segment [{GKSqlFuncs.GetKitName(phased_kit)}:{GKSqlFuncs.GetKitName(unphased_kit)}] Chr {chromosome}: {start_position}-{end_position}, Already Processed. Skipping ...");
+                            continue;
+                        } else {
+                            GKSqlFuncs.DeletePhasedKit(phased_kit);
+                        }
+                    }
+
+                    if (bw != null)
+                        bw.ReportProgress(percent, $"Segment [{GKSqlFuncs.GetKitName(phased_kit)}:{GKSqlFuncs.GetKitName(unphased_kit)}] Chr {chromosome}: {start_position}-{end_position}, Processing ...");
+
+                    /*var dt = GGKSqlFuncs.GetPhaseSegments(unphased_kit, start_position, end_position, chromosome, phased_kit);
+                    if (dt.Count > 0) {
+                        if (bwPhaseVisualizer.CancellationPending)
+                            break;
+
+                        Image img = GGKGenFuncs.GetPhasedSegmentImage(dt, chromosome);
+                    }*/
+                }
+            }
+        }
     }
 }

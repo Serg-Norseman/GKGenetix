@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using GenetixKit.Core;
@@ -371,29 +372,27 @@ namespace GenetixKit.Forms
                 try {
                     string url = GKSettings.Phylogeny_mtDNA_URL;
                     Program.KitInstance.SetStatus("Fetching.. " + url);
-                    backgroundWorker1.RunWorkerAsync(url);
+
+                    Task.Factory.StartNew((object obj) => {
+                        string xurl = (string)obj;
+                        WebClient client = new WebClient();
+                        xmlPhylogeny = client.DownloadString(xurl);
+
+                        this.Invoke(new MethodInvoker(delegate {
+                            treeView1.Nodes.Clear();
+                            lblSb.Text = "";
+                            lblyhg.Text = "";
+                            mutationsMap.Clear();
+                            matchMap.Clear();
+                            Program.KitInstance.SetStatus("Done.");
+                            timer1.Enabled = true;
+                        }));
+                    }, url);
+
                 } catch (Exception ee) {
                     MessageBox.Show("Technical Details: " + ee.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-        }
-
-        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
-        {
-            string url = e.Argument.ToString();
-            WebClient client = new WebClient();
-            xmlPhylogeny = client.DownloadString(url);
-        }
-
-        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            treeView1.Nodes.Clear();
-            lblSb.Text = "";
-            lblyhg.Text = "";
-            mutationsMap.Clear();
-            matchMap.Clear();
-            Program.KitInstance.SetStatus("Done.");
-            timer1.Enabled = true;
         }
     }
 }

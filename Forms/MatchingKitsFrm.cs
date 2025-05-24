@@ -6,8 +6,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GenetixKit.Core.Model;
@@ -70,41 +70,31 @@ namespace GenetixKit.Forms
             dgvAlleles.Columns[2].HeaderText = $"{kit} ({lblName.Text})";
             dgvAlleles.Columns[3].HeaderText = $"{selMatchRow.Kit} ({selMatchRow.Name})";
 
-            BackgroundWorker bWorker = new BackgroundWorker();
-            bWorker.DoWork += bWorker_DoWork;
-            bWorker.RunWorkerCompleted += bWorker_RunWorkerCompleted;
-            bWorker.RunWorkerAsync(selMatchRow);
-        }
+            Task.Factory.StartNew((object obj) => {
+                var o = (MatchingKit)obj;
 
-        private void bWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            var o = (MatchingKit)e.Argument;
+                tblSegments = GKSqlFuncs.GetAutosomalCmp(o.CmpId);
 
-            tblSegments = GKSqlFuncs.GetAutosomalCmp(o.CmpId);
+                if (GKSqlFuncs.IsPhased(kit)) {
+                    phasedKit = kit;
+                    unphasedKit = o.Kit;
+                    phased = true;
+                } else if (GKSqlFuncs.IsPhased(o.Kit)) {
+                    phasedKit = o.Kit;
+                    unphasedKit = kit;
+                    phased = true;
+                } else
+                    phased = false;
 
-            if (GKSqlFuncs.IsPhased(kit)) {
-                phasedKit = kit;
-                unphasedKit = o.Kit;
-                phased = true;
-            } else if (GKSqlFuncs.IsPhased(o.Kit)) {
-                phasedKit = o.Kit;
-                unphasedKit = kit;
-                phased = true;
-            } else
-                phased = false;
+                this.Invoke(new MethodInvoker(delegate {
+                    if (tblSegments == null) return;
 
-            e.Result = o;
-        }
+                    lblSegLabel.Text = $"List of matching segments for kit {o.Kit} ({o.Name})";
 
-        private void bWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (tblSegments == null) return;
-
-            var o = (MatchingKit)e.Result;
-            lblSegLabel.Text = $"List of matching segments for kit {o.Kit} ({o.Name})";
-
-            dgvSegments.DataSource = tblSegments;
-            tblSegments = null;
+                    dgvSegments.DataSource = tblSegments;
+                    tblSegments = null;
+                }));
+            }, selMatchRow);
         }
 
         private void dgvSegments_SelectionChanged(object sender, EventArgs e)
@@ -112,21 +102,14 @@ namespace GenetixKit.Forms
             var segment = dgvSegments.GetSelectedObj<CmpSegment>();
             if (segment == null) return;
 
-            BackgroundWorker bWorker2 = new BackgroundWorker();
-            bWorker2.DoWork += bWorker2_DoWork;
-            bWorker2.RunWorkerCompleted += bWorker2_RunWorkerCompleted;
-            bWorker2.RunWorkerAsync(segment);
-        }
+            Task.Factory.StartNew((object obj) => {
+                var seg = (CmpSegment)obj;
+                tblAlleles = GKSqlFuncs.GetCmpSeg(seg.SegmentId);
 
-        private void bWorker2_DoWork(object sender, DoWorkEventArgs e)
-        {
-            var seg = (CmpSegment)e.Argument;
-            tblAlleles = GKSqlFuncs.GetCmpSeg(seg.SegmentId);
-        }
-
-        private void bWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            dgvAlleles.DataSource = tblAlleles;
+                this.Invoke(new MethodInvoker(delegate {
+                    dgvAlleles.DataSource = tblAlleles;
+                }));
+            }, segment);
         }
 
         private void dgvAlleles_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
