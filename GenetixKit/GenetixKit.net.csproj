@@ -25,4 +25,8 @@
 
     <Import Project="GenetixKit.props" />
 
+    <ItemGroup>
+        <ProjectReference Include="..\GKGenetix.Core\GKGenetix.Core.nstd.csproj" />
+    </ItemGroup>
+
 </Project>

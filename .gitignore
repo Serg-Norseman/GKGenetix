@@ -1,10 +1,11 @@
 **/.vs/
 **/[Bb]in/
 **/[Oo]bj/
-**/ProfilingSessions/
 
 *.suo
 *.userprefs
-*.DotSettings.user
+*.user
 
+/appdata/
 /temp/
+prepare.cmd
