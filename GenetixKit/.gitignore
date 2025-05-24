@@ -1,0 +1,10 @@
+**/.vs/
+**/[Bb]in/
+**/[Oo]bj/
+*.suo
+*.userprefs
+*.user
+
+/appdata/
+/temp/
+prepare.cmd
