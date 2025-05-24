@@ -188,6 +188,12 @@
   <ItemGroup>
     <Content Include="System.Data.SQLite.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GKGenetix.Core\GKGenetix.Core.csproj">
+      <Project>{78659756-b505-403b-9173-0965df601030}</Project>
+      <Name>GKGenetix.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="GenetixKit.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
