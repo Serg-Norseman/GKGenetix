@@ -6,7 +6,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GenetixKit.Core.Model;
@@ -67,12 +68,29 @@ namespace GenetixKit.Forms
 
         public void Delete()
         {
-            string selRowsCount = dgvEditKit.SelectedRows.Count.ToString();
-            if (MessageBox.Show("You had selected " + selRowsCount + " kits to be deleted. Are you sure?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-                Program.KitInstance.SetStatus("Deleting " + selRowsCount + " kit(s) and all it's associated data ...");
+            var rowsToDelete = dgvEditKit.SelectedRows.Cast<DataGridViewRow>().Select(x => { return ((KitDTO)x.DataBoundItem); }).ToList();
+
+            int selRowsCount = rowsToDelete.Count;
+            if (MessageBox.Show($"You had selected {selRowsCount} kits to be deleted. Are you sure?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+                Program.KitInstance.SetStatus($"Deleting {selRowsCount} kit(s) and all it's associated data ...");
                 this.Enabled = false;
                 Program.KitInstance.DisableToolbar();
-                bwDelete.RunWorkerAsync(dgvEditKit);
+
+                Task.Factory.StartNew((object obj) => {
+                    var rows2Del = (List<KitDTO>)obj;
+                    foreach (var row in rows2Del) {
+                        GKSqlFuncs.DeleteKit(row.KitNo);
+                        tblKits.Remove(row);
+                    }
+
+                    this.Invoke(new MethodInvoker(delegate {
+                        dgvEditKit.DataSource = tblKits;
+
+                        Program.KitInstance.SetStatus("Deleted.");
+                        this.Enabled = true;
+                        Program.KitInstance.EnableToolbar();
+                    }));
+                }, rowsToDelete);
             }
         }
 
@@ -94,28 +112,6 @@ namespace GenetixKit.Forms
 
                 senderGrid.Invalidate();
             }
-        }
-
-        private void bwDelete_DoWork(object sender, DoWorkEventArgs e)
-        {
-            DataGridView dgv = (DataGridView)e.Argument;
-            List<DataGridViewRow> rows = new List<DataGridViewRow>();
-            foreach (DataGridViewRow row in dgv.SelectedRows) {
-                GKSqlFuncs.DeleteKit(row.Cells[0].Value.ToString());
-                rows.Add(row);
-            }
-
-            this.Invoke(new MethodInvoker(delegate {
-                foreach (DataGridViewRow row in rows)
-                    dgvEditKit.Rows.Remove(row);
-            }));
-        }
-
-        private void bwDelete_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            Program.KitInstance.SetStatus("Deleted.");
-            this.Enabled = true;
-            Program.KitInstance.EnableToolbar();
         }
     }
 }

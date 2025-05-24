@@ -552,8 +552,7 @@ namespace GenetixKit.Forms
             string kit = (string)e.Argument;
 
             // kit master
-            string name, sex;
-            GKSqlFuncs.GetKit(kit, out name, out sex);
+            GKSqlFuncs.GetKit(kit, out string name, out string sex);
             this.Invoke(new MethodInvoker(delegate {
                 txtName.Text = name;
                 if (sex == "U")
@@ -592,12 +591,20 @@ namespace GenetixKit.Forms
             }));
 
             // kit - mtdna
-            string mut, fasta;
-            GKSqlFuncs.GetMtDNA(kit, out mut, out fasta);
+            GKSqlFuncs.GetMtDNA(kit, out string mut, out string fasta);
             this.Invoke(new MethodInvoker(delegate {
                 txtMtDNA.Text = mut;
                 txtFASTA.Text = !string.IsNullOrEmpty(fasta) ? fasta : string.Empty;
             }));
+        }
+
+        private void bwPopulate_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            foreach (Control ctrl in editableCtrls)
+                ctrl.Enabled = true;
+
+            SetControlActivities(kitDisabled);
+            Program.KitInstance.SetStatus("Done.");
         }
 
         private static void PopulateYGrid(string[] ydna, Dictionary<string, string> ystr_dict, DataGridView dgv)
@@ -609,15 +616,6 @@ namespace GenetixKit.Forms
                     ystr_dict.Remove(marker);
                 }
             }
-        }
-
-        private void bwPopulate_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            foreach (Control ctrl in editableCtrls)
-                ctrl.Enabled = true;
-
-            SetControlActivities(kitDisabled);
-            Program.KitInstance.SetStatus("Done.");
         }
 
         #endregion

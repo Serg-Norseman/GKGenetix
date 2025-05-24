@@ -27,6 +27,52 @@ namespace GenetixKit.Forms
             InitializeComponent();
         }
 
+        private void ProcessKitsFrm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (bwCompare.IsBusy || bwROH.IsBusy || bwPhaseVisualizer.IsBusy) {
+                Program.KitInstance.SetStatus("Cancelling...");
+                Program.KitInstance.SetProgress(-1);
+                btnStart.Text = "Cancelling";
+                btnStart.Enabled = false;
+                if (bwCompare.IsBusy)
+                    bwCompare.CancelAsync();
+                if (bwROH.IsBusy)
+                    bwROH.CancelAsync();
+                if (bwPhaseVisualizer.IsBusy)
+                    bwPhaseVisualizer.CancelAsync();
+                e.Cancel = true;
+                this.Close();
+            } else {
+                Program.KitInstance.SetStatus("Done.");
+                Program.KitInstance.SetProgress(-1);
+            }
+        }
+
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+            if (btnStart.Text == "Start") {
+                redoAgain = cbDontSkip.Checked;
+                redoVisual = cbRedoVisual.Checked;
+                Program.KitInstance.SetStatus("Processing Kits ...");
+                if (bwCompare.IsBusy) {
+                    MessageBox.Show("Process is busy!", "Please Wait!", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                } else {
+                    bwCompare.RunWorkerAsync();
+                    btnStart.Text = "Stop";
+                }
+            } else if (btnStart.Text == "Stop") {
+                if (MessageBox.Show("Are you sure you want to cancel the process?", "Cancel?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+                    Program.KitInstance.SetStatus("Done.");
+                    Program.KitInstance.SetProgress(-1);
+                    bwCompare.CancelAsync();
+                    bwROH.CancelAsync();
+                    bwPhaseVisualizer.CancelAsync();
+                    btnStart.Text = "Cancelling";
+                    btnStart.Enabled = false;
+                }
+            }
+        }
+
         private void bwCompare_DoWork(object sender, DoWorkEventArgs e)
         {
             if (redoAgain)
@@ -67,14 +113,10 @@ namespace GenetixKit.Forms
 
                     this.Invoke(new MethodInvoker(delegate {
                         if (reference) {
-                            lblComparing.Text = "Comparing Reference " + kit1 + " (" + name1 + ") and " + kit2 + " (" + name2 + ") ... " + progress.ToString() + "%";
-                            tbStatus.Text += ("Comparing Reference " + kit1 + " (" + name1 + ") and " + kit2 + " (" + name2 + "): ");
+                            WriteStatusMsg("Comparing Reference " + kit1 + " (" + name1 + ") and " + kit2 + " (" + name2 + ")", true);
                         } else {
-                            lblComparing.Text = "Comparing Kits " + kit1 + " (" + name1 + ") and " + kit2 + " (" + name2 + ") ... " + progress.ToString() + "%";
-                            tbStatus.Text += ("Comparing Kits " + kit1 + " (" + name1 + ") and " + kit2 + " (" + name2 + "): ");
+                            WriteStatusMsg("Comparing Kits " + kit1 + " (" + name1 + ") and " + kit2 + " (" + name2 + ")", true);
                         }
-                        tbStatus.Select(tbStatus.Text.Length - 1, 0);
-                        tbStatus.ScrollToCaret();
                     }));
 
                     progress = idx * 100 / total;
@@ -90,17 +132,13 @@ namespace GenetixKit.Forms
 
                         this.Invoke(new MethodInvoker(delegate {
                             if (reference)
-                                tbStatus.Text += cmpResults.Count.ToString() + " compound segments found.\r\n";
+                                WriteStatusMsg(cmpResults.Count.ToString() + " compound segments found.", true);
                             else
-                                tbStatus.Text += cmpResults.Count.ToString() + " matching segments found.\r\n";
-                            tbStatus.Select(tbStatus.Text.Length - 1, 0);
-                            tbStatus.ScrollToCaret();
+                                WriteStatusMsg(cmpResults.Count.ToString() + " matching segments found.", true);
                         }));
                     } else {
                         this.Invoke(new MethodInvoker(delegate {
-                            tbStatus.Text += "Earlier comparison exists. Skipping.\r\n";
-                            tbStatus.Select(tbStatus.Text.Length - 1, 0);
-                            tbStatus.ScrollToCaret();
+                            WriteStatusMsg("Earlier comparison exists. Skipping.", true);
                         }));
                     }
                     bwCompare.ReportProgress(progress, progress.ToString() + "%");
@@ -114,42 +152,26 @@ namespace GenetixKit.Forms
                 bwCompare.ReportProgress(100, "Done.");
         }
 
+        private void WriteStatusMsg(string msg, bool onlyLocal = false)
+        {
+            if (!onlyLocal) Program.KitInstance.SetStatus(msg);
+
+            lblComparing.Text = msg;
+
+            tbStatus.Text += "{msg}\r\n";
+            tbStatus.Select(tbStatus.Text.Length - 1, 0);
+            tbStatus.ScrollToCaret();
+        }
+
         private void bwCompare_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (!this.IsHandleCreated)
                 return;
-            lblComparing.Text = "Comparison Completed.";
-            tbStatus.Text += "Comparison Completed.\r\n";
-            tbStatus.Select(tbStatus.Text.Length - 1, 0);
-            tbStatus.ScrollToCaret();
+
+            WriteStatusMsg("Comparison Completed.", true);
 
             bwROH.RunWorkerAsync();
             progressBar.Value = 0;
-        }
-
-        private void btnStart_Click(object sender, EventArgs e)
-        {
-            if (btnStart.Text == "Start") {
-                redoAgain = cbDontSkip.Checked;
-                redoVisual = cbRedoVisual.Checked;
-                Program.KitInstance.SetStatus("Processing Kits ...");
-                if (bwCompare.IsBusy) {
-                    MessageBox.Show("Process is busy!", "Please Wait!", MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                } else {
-                    bwCompare.RunWorkerAsync();
-                    btnStart.Text = "Stop";
-                }
-            } else if (btnStart.Text == "Stop") {
-                if (MessageBox.Show("Are you sure you want to cancel the process?", "Cancel?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-                    Program.KitInstance.SetStatus("Done.");
-                    Program.KitInstance.SetProgress(-1);
-                    bwCompare.CancelAsync();
-                    bwROH.CancelAsync();
-                    bwPhaseVisualizer.CancelAsync();
-                    btnStart.Text = "Cancelling";
-                    btnStart.Enabled = false;
-                }
-            }
         }
 
         private void bwCompare_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -157,27 +179,6 @@ namespace GenetixKit.Forms
             Program.KitInstance.SetProgress(e.ProgressPercentage);
             Program.KitInstance.SetStatus(e.UserState.ToString());
             progressBar.Value = e.ProgressPercentage;
-        }
-
-        private void ProcessKitsFrm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (bwCompare.IsBusy || bwROH.IsBusy || bwPhaseVisualizer.IsBusy) {
-                Program.KitInstance.SetStatus("Cancelling...");
-                Program.KitInstance.SetProgress(-1);
-                btnStart.Text = "Cancelling";
-                btnStart.Enabled = false;
-                if (bwCompare.IsBusy)
-                    bwCompare.CancelAsync();
-                if (bwROH.IsBusy)
-                    bwROH.CancelAsync();
-                if (bwPhaseVisualizer.IsBusy)
-                    bwPhaseVisualizer.CancelAsync();
-                e.Cancel = true;
-                this.Close();
-            } else {
-                Program.KitInstance.SetStatus("Done.");
-                Program.KitInstance.SetProgress(-1);
-            }
         }
 
         private void bwROH_DoWork(object sender, DoWorkEventArgs e)
@@ -205,77 +206,27 @@ namespace GenetixKit.Forms
 
         private void bwROH_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            lblComparing.Text = e.UserState.ToString();
+            string rohStatus = e.UserState.ToString();
+
             Program.KitInstance.SetProgress(e.ProgressPercentage);
-            Program.KitInstance.SetStatus(e.UserState.ToString());
             progressBar.Value = e.ProgressPercentage;
 
-            lblComparing.Text = e.UserState.ToString();
-            tbStatus.Text += e.UserState.ToString() + "\r\n";
-            tbStatus.Select(tbStatus.Text.Length - 1, 0);
-            tbStatus.ScrollToCaret();
+            WriteStatusMsg(rohStatus);
         }
 
         private void bwROH_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             progressBar.Value = 0;
             Program.KitInstance.SetProgress(-1);
-            Program.KitInstance.SetStatus("Runs of Homozygosity Processing Completed.");
-            lblComparing.Text = "Processing Completed.";
-            tbStatus.Text += "Runs of Homozygosity Processing Completed.\r\n";
-            tbStatus.Select(tbStatus.Text.Length - 1, 0);
-            tbStatus.ScrollToCaret();
+
+            WriteStatusMsg("Runs of Homozygosity Processing Completed.");
 
             bwPhaseVisualizer.RunWorkerAsync();
         }
 
         private void bwPhaseVisualizer_DoWork(object sender, DoWorkEventArgs e)
         {
-            var phasedKits = GKSqlFuncs.GetPhasedKits();
-            for (int i = 0; i < phasedKits.Count; i++) {
-                string phased_kit = phasedKits[i];
-
-                if (bwPhaseVisualizer.CancellationPending)
-                    break;
-
-                int percent = i * 100 / phasedKits.Count;
-                bwPhaseVisualizer.ReportProgress(percent, $"Phased Segments for kit #{phased_kit} ({GKSqlFuncs.GetKitName(phased_kit)}) - Processing ...");
-
-                var unphasedSegments = GKSqlFuncs.GetUnphasedSegments(phased_kit);
-
-                foreach (var unphSeg in unphasedSegments) {
-                    if (bwPhaseVisualizer.CancellationPending)
-                        break;
-
-                    string unphased_kit = unphSeg.UnphasedKit;
-                    string chromosome = unphSeg.Chromosome;
-                    string start_position = unphSeg.StartPosition.ToString();
-                    string end_position = unphSeg.EndPosition.ToString();
-
-                    var exists = GKSqlFuncs.QueryValue(
-                        $"select phased_kit from cmp_phased where phased_kit='{phased_kit}' and match_kit='{unphased_kit}' and chromosome='{chromosome}' and start_position={start_position} and end_position={end_position}");
-
-                    if (!string.IsNullOrEmpty(exists)) {
-                        //already exists...
-                        if (!redoVisual) {
-                            bwPhaseVisualizer.ReportProgress(percent, "Segment [" + GKSqlFuncs.GetKitName(phased_kit) + ":" + GKSqlFuncs.GetKitName(unphased_kit) + "] Chr " + chromosome + ": " + start_position + "-" + end_position + ", Already Processed. Skipping ...");
-                            continue;
-                        } else {
-                            GKSqlFuncs.DeletePhasedKit(phased_kit);
-                        }
-                    }
-
-                    bwPhaseVisualizer.ReportProgress(percent, "Segment [" + GKSqlFuncs.GetKitName(phased_kit) + ":" + GKSqlFuncs.GetKitName(unphased_kit) + "] Chr " + chromosome + ": " + start_position + "-" + end_position + ", Processing ...");
-
-                    /*var dt = GGKSqlFuncs.GetPhaseSegments(unphased_kit, start_position, end_position, chromosome, phased_kit);
-                    if (dt.Count > 0) {
-                        if (bwPhaseVisualizer.CancellationPending)
-                            break;
-
-                        Image img = GGKGenFuncs.GetPhasedSegmentImage(dt, chromosome);
-                    }*/
-                }
-            }
+            GKGenFuncs.DoPhaseVisualizer(redoVisual, bwPhaseVisualizer);
         }
 
         private void bwPhaseVisualizer_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -284,24 +235,18 @@ namespace GenetixKit.Forms
             btnStart.Text = "Start";
             btnStart.Enabled = true;
             Program.KitInstance.SetProgress(-1);
-            Program.KitInstance.SetStatus("Phased Segment Processing Completed.");
-            lblComparing.Text = "Processing Completed.";
-            tbStatus.Text += "Phased Segment Processing Completed.\r\n";
-            tbStatus.Select(tbStatus.Text.Length - 1, 0);
-            tbStatus.ScrollToCaret();
+
+            WriteStatusMsg("Phased Segment Processing Completed.");
         }
 
         private void bwPhaseVisualizer_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            lblComparing.Text = e.UserState.ToString();
+            string phStatus = e.UserState.ToString();
+
             Program.KitInstance.SetProgress(e.ProgressPercentage);
-            Program.KitInstance.SetStatus(e.UserState.ToString());
             progressBar.Value = e.ProgressPercentage;
 
-            lblComparing.Text = e.UserState.ToString();
-            tbStatus.Text += e.UserState.ToString() + "\r\n";
-            tbStatus.Select(tbStatus.Text.Length - 1, 0);
-            tbStatus.ScrollToCaret();
+            WriteStatusMsg(phStatus);
         }
     }
 }

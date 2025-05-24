@@ -5,7 +5,6 @@
  */
 
 using System;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
@@ -27,7 +26,7 @@ namespace GenetixKit.Forms
         {
             SetStatus("Checking Integrity of DB ...");
             this.Enabled = false;
-            this.Text = Application.ProductName + " v" + Application.ProductVersion.ToString();
+            this.Text = Application.ProductName;
 
             // bwIChkAndFix.RunWorkerAsync();
             Task.Factory.StartNew(() => {
