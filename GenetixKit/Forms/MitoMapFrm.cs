@@ -7,11 +7,11 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using GenetixKit.Core;
+using GenetixKit.Core.Model;
 
 namespace GenetixKit.Forms
 {
@@ -30,12 +30,12 @@ namespace GenetixKit.Forms
             InitializeComponent();
 
             GKUIFuncs.FixGridView(dgvmtdna);
-            dgvmtdna.AddColumn("map_locus", "Map Locus");
-            dgvmtdna.AddColumn("start", "Start Position");
-            dgvmtdna.AddColumn("end", "End Position");
-            dgvmtdna.AddColumn("total", "Total Nucleotides");
-            dgvmtdna.AddColumn("shorthand", "Shorthand");
-            dgvmtdna.AddColumn("description", "Description");
+            dgvmtdna.AddColumn("MapLocus", "Map Locus");
+            dgvmtdna.AddColumn("Starting", "Start Position");
+            dgvmtdna.AddColumn("Ending", "End Position");
+            //dgvmtdna.AddColumn("bpLength", "Total Nucleotides");
+            dgvmtdna.AddColumn("Shorthand", "Shorthand");
+            dgvmtdna.AddColumn("Description", "Description");
 
             GKUIFuncs.FixGridView(dgvNucleotides);
             dgvNucleotides.AddColumn("pos", "Position");
@@ -48,26 +48,18 @@ namespace GenetixKit.Forms
 
         private void MitoMapFrm_Load(object sender, EventArgs e)
         {
-            string csv = Properties.Resources.mtdna_map;
-            StreamReader reader = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(csv)));
             Series series = mtdna_chart.Series[0];
-            //Map Locus	 Starting	 Ending	bp Length	 Shorthand	 Description
-            dgvmtdna.Rows.Clear();
 
-            string line;
-            while ((line = reader.ReadLine()) != null) {
-                string[] data = line.Split(new char[] { ',' });
-
+            var mtdna_map = GKData.MtDnaMap;
+            foreach (var mdm in mtdna_map) {
                 DataPoint dp = new DataPoint();
                 dp.IsVisibleInLegend = false;
-                dp.Label = data[0];
-                dp.YValues = new double[] { int.Parse(data[3]) };
+                dp.Label = mdm.MapLocus;
+                dp.YValues = new double[] { int.Parse(mdm.bpLength) };
                 dp.CustomProperties = "PieLineColor=Black, PieLabelStyle=Outside, Exploded=True";
                 series.Points.Add(dp);
-
-                dgvmtdna.Rows.Add(new object[] { data[0], data[1], data[2], data[3], data[4], data[5] });
             }
-            reader.Close();
+            dgvmtdna.DataSource = mtdna_map;
 
             RSRS = GKData.RSRS;
             for (int i = 0; i < RSRS.Length; i++)
@@ -76,18 +68,16 @@ namespace GenetixKit.Forms
             GKSqlFuncs.GetMtDNA(kit, out mutations, out _);
             dgvNucleotides.Columns[2].HeaderText = GKSqlFuncs.GetKitName(kit) + " (" + kit + ")";
 
-            dgvmtdna.Columns[3].Visible = false;
-
             LoadKitMutations();
         }
 
         private void dgvmtdna_SelectionChanged(object sender, EventArgs e)
         {
-            var selRowCells = dgvmtdna.SelectedRows[0].Cells;
-
-            int start = int.Parse(selRowCells[1].Value.ToString());
-            int end = int.Parse(selRowCells[2].Value.ToString());
-            string title = selRowCells[0].Value.ToString();
+            if (dgvmtdna.SelectedRows.Count < 1) return;
+            var selRow = (MDMapRow)dgvmtdna.SelectedRows[0].DataBoundItem;
+            int start = int.Parse(selRow.Starting);
+            int end = int.Parse(selRow.Ending);
+            string title = selRow.MapLocus;
 
             foreach (DataPoint dp in mtdna_chart.Series[0].Points) {
                 dp.LabelBackColor = (dp.Label == title) ? Color.LightBlue : Color.White;
@@ -148,24 +138,29 @@ namespace GenetixKit.Forms
                 string mut = mutation.Trim();
                 string allele;
                 List<string> alleles;
+
                 if (mut.IndexOf(".") != -1) {
                     // insert
                     allele = mut[mut.Length - 1].ToString();
                     int pos = int.Parse(mut.Substring(0, mut.IndexOf(".")));
+
                     if (!kitInsertions.ContainsKey(pos))
                         alleles = new List<string>();
                     else
                         alleles = kitInsertions[pos];
+
                     alleles.Add(allele);
                     kitInsertions.Remove(pos);
                     kitInsertions.Add(pos, alleles);
                 } else {
                     allele = mut[mut.Length - 1].ToString();
                     int pos = int.Parse(mut.Substring(1, mut.Length - 2));
+
                     if (!kitMutations.ContainsKey(pos))
                         alleles = new List<string>();
                     else
                         alleles = kitMutations[pos];
+
                     alleles.Add(allele);
                     kitMutations.Remove(pos);
                     kitMutations.Add(pos, alleles);
@@ -196,6 +191,7 @@ namespace GenetixKit.Forms
 
                     mtdna_chart.ChartAreas[0].Area3DStyle.Inclination = new_degree;
                 }
+
                 if (e.Button == MouseButtons.Right) {
                     int new_y = e.Y - initialValue;
 
@@ -216,6 +212,7 @@ namespace GenetixKit.Forms
 
                     if (new_degree > 180)
                         new_degree = -180 + (new_degree - 180);
+
                     //PieLineColor=Black, CollectedSliceExploded=True, DoughnutRadius=5, PieDrawingStyle=SoftEdge, PieLabelStyle=Outside, PieStartAngle=300
                     mtdna_chart.Series[0].CustomProperties = "PieLineColor=Black, CollectedSliceExploded=True, DoughnutRadius=5, PieDrawingStyle=SoftEdge, PieLabelStyle=Outside, PieStartAngle=" + new_degree;
                 }
@@ -242,9 +239,10 @@ namespace GenetixKit.Forms
                 dp.LabelBackColor = Color.LightBlue;
                 Program.KitInstance.SetStatus("Selected " + dp.Label);
 
-                foreach (DataGridViewRow row in dgvmtdna.Rows) {
-                    if (row.Cells[0].Value.ToString() == dp.Label) {
-                        row.Selected = true;
+                foreach (DataGridViewRow dgvRow in dgvmtdna.Rows) {
+                    var row = (MDMapRow)dgvRow.DataBoundItem;
+                    if (row.MapLocus == dp.Label) {
+                        dgvRow.Selected = true;
                         break;
                     }
                 }
@@ -257,17 +255,21 @@ namespace GenetixKit.Forms
             int width = 0;
             Dictionary<int, Color> list = new Dictionary<int, Color>();
             sb.Append(">" + kit + "|" + locus + "|" + start + "-" + end + "\r\n");
+
             foreach (DataGridViewRow row in dgvNucleotides.Rows) {
+                string val = row.Cells[2].Value.ToString();
+
                 if (width % 50 == 0 && width != 0)
                     sb.Append("\r\n");
                 if (row.DefaultCellStyle.BackColor == Color.Blue || row.DefaultCellStyle.BackColor == Color.Green) {
-                    sb.Append(row.Cells[2].Value.ToString());
+                    sb.Append(val);
                     list.Add(sb.Length - 1, row.DefaultCellStyle.BackColor);
                 } else
-                    sb.Append(row.Cells[2].Value.ToString());
-                width++;
+                    sb.Append(val);
 
+                width++;
             }
+
             rtbFASTA.Text = sb.ToString();
             foreach (KeyValuePair<int, Color> a in list) {
                 rtbFASTA.SelectionStart = a.Key;

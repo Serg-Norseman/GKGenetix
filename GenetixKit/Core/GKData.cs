@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using GenetixKit.Core.Model;
 
 namespace GenetixKit.Core
 {
@@ -19,8 +20,6 @@ namespace GenetixKit.Core
         public static readonly string[] ydna111 = new string[] { "DYS710", "DYS485", "DYS632", "DYS495", "DYS540", "DYS714", "DYS716", "DYS717", "DYS505", "DYS556", "DYS549", "DYS589", "DYS522", "DYS494", "DYS533", "DYS636", "DYS575", "DYS638", "DYS462", "DYS452", "DYS445", "Y-GATA-A10", "DYS463", "DYS441", "Y-GGAAT-1B07", "DYS525", "DYS712", "DYS593", "DYS650", "DYS532", "DYS715", "DYS504", "DYS513", "DYS561", "DYS552", "DYS726", "DYS635", "DYS587", "DYS643", "DYS497", "DYS510", "DYS434", "DYS461", "DYS435" };
 
         private static SortedList<int, double>[] cM_map = null;
-        private static Dictionary<string, string[]> ymap = null;
-        private static char[] rsrs = null;
 
         // required for cM calculation
         public static SortedList<int, double>[] cM_Map
@@ -52,6 +51,8 @@ namespace GenetixKit.Core
             }
         }
 
+        private static char[] rsrs = null;
+
         public static char[] RSRS
         {
             get {
@@ -61,6 +62,8 @@ namespace GenetixKit.Core
                 return rsrs;
             }
         }
+
+        private static Dictionary<string, string[]> ymap = null;
 
         public static Dictionary<string, string[]> YMap
         {
@@ -81,6 +84,29 @@ namespace GenetixKit.Core
                 }
 
                 return ymap;
+            }
+        }
+
+        private static List<MDMapRow> mtdna_map = null;
+
+        public static List<MDMapRow> MtDnaMap
+        {
+            get {
+                if (mtdna_map == null) {
+                    mtdna_map = new List<MDMapRow>();
+
+                    // Map Locus (0), Starting (1), Ending (2), bp Length (3), Shorthand (4), Description (5)
+                    string csv = Properties.Resources.mtdna_map;
+                    using (StreamReader reader = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(csv)))) {
+                        string line;
+                        while ((line = reader.ReadLine()) != null) {
+                            string[] data = line.Split(new char[] { ',' });
+                            mtdna_map.Add(new MDMapRow(data[0], data[1], data[2], data[3], data[4], data[5]));
+                        }
+                    }
+                }
+
+                return mtdna_map;
             }
         }
     }

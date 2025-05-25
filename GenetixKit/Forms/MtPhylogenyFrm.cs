@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Net;
@@ -69,14 +68,16 @@ namespace GenetixKit.Forms
         private void BuildTree(TreeNode parent, XElement elmt)
         {
             TreeNode tn = null;
-            XAttribute attrib = elmt.Attribute("Id");
-            string attrib_value = attrib.Value.Trim();
-            XAttribute attrib_val = elmt.Attribute("HG");
-            string value = attrib_val.Value.Trim();
 
-            if (attrib_value != "") {
-                tn = new TreeNode(attrib_value);
-                mutationsMap.Add(tn, value);
+            XAttribute attrName = elmt.Attribute("Id");
+            XAttribute attrMarkers = elmt.Attribute("HG");
+
+            string pnName = attrName.Value.Trim();
+            string pnMarkers = attrMarkers.Value.Trim();
+
+            if (pnName != "") {
+                tn = new TreeNode(pnName);
+                mutationsMap.Add(tn, pnMarkers);
                 parent.Nodes.Add(tn);
             }
 

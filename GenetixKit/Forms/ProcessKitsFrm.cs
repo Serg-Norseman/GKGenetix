@@ -113,9 +113,9 @@ namespace GenetixKit.Forms
 
                     this.Invoke(new MethodInvoker(delegate {
                         if (reference) {
-                            WriteStatusMsg("Comparing Reference " + kit1 + " (" + name1 + ") and " + kit2 + " (" + name2 + ")", true);
+                            WriteStatusMsg($"Comparing Reference {kit1} ({name1}) and {kit2} ({name2})", true);
                         } else {
-                            WriteStatusMsg("Comparing Kits " + kit1 + " (" + name1 + ") and " + kit2 + " (" + name2 + ")", true);
+                            WriteStatusMsg($"Comparing Kits {kit1} ({name1}) and {kit2} ({name2})", true);
                         }
                     }));
 
@@ -132,9 +132,9 @@ namespace GenetixKit.Forms
 
                         this.Invoke(new MethodInvoker(delegate {
                             if (reference)
-                                WriteStatusMsg(cmpResults.Count.ToString() + " compound segments found.", true);
+                                WriteStatusMsg($"{cmpResults.Count} compound segments found.", true);
                             else
-                                WriteStatusMsg(cmpResults.Count.ToString() + " matching segments found.", true);
+                                WriteStatusMsg($"{cmpResults.Count} matching segments found.", true);
                         }));
                     } else {
                         this.Invoke(new MethodInvoker(delegate {
