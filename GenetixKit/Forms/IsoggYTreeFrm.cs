@@ -55,19 +55,21 @@ namespace GenetixKit.Forms
         private void BuildTree(TreeNode parent, XElement elmt)
         {
             TreeNode tn = null;
-            XAttribute attrib_name = elmt.Attribute("name");
-            XAttribute attrib_markers = elmt.Attribute("markers");
-            if (attrib_name != null) {
-                string attrib_value = attrib_name.Value.Trim();
-                string value = attrib_markers.Value.Trim();
-                value = value.Replace(",", ", ");
 
-                if (attrib_value.IndexOf(',') != -1)
-                    attrib_value = GKUtils.RemoveDuplicates(attrib_value);
+            XAttribute attrName = elmt.Attribute("name");
+            XAttribute attrMarkers = elmt.Attribute("markers");
 
-                if (attrib_value != "") {
-                    tn = new TreeNode(attrib_value);
-                    snpMap.Add(tn, value);
+            if (attrName != null) {
+                string pnName = attrName.Value.Trim();
+                if (pnName.IndexOf(',') != -1)
+                    pnName = GKUtils.RemoveDuplicates(pnName);
+
+                string pnMarkers = attrMarkers.Value.Trim();
+                pnMarkers = pnMarkers.Replace(",", ", ");
+
+                if (pnName != "") {
+                    tn = new TreeNode(pnName);
+                    snpMap.Add(tn, pnMarkers);
                     parent.Nodes.Add(tn);
                 }
 

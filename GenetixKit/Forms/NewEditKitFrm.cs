@@ -20,6 +20,7 @@ namespace GenetixKit.Forms
         private bool saveSuccess = false;
         private string ysnps = null;
         private string mtdna = null;
+        private readonly string kit;
         private readonly bool kitDisabled = false;
         private readonly Control[] editableCtrls = null;
 
@@ -43,21 +44,22 @@ namespace GenetixKit.Forms
             editableCtrls = new Control[] { txtFASTA, txtName, cbSex, dgvAutosomal, txtYDNA, dgvY12, dgvY25, dgvY37, dgvY67, dgvY111, dgvYMisc, txtMtDNA, btnPasteY, btnClearY };
             cbSex.SelectedIndex = 0;
 
+            this.kit = kit;
+            kitDisabled = disabled;
+        }
+
+        private void NewKitFrm_Load(object sender, EventArgs e)
+        {
             if (kit == null) {
                 this.Text = "New Kit";
                 txtKit.Enabled = true;
                 Program.KitInstance.EnableSave();
             } else {
-                kitDisabled = disabled;
                 this.Text = "Edit Kit";
                 txtKit.Text = kit;
                 txtKit.Enabled = false;
                 PopulateFields(kit);
             }
-        }
-
-        private void NewKitFrm_Load(object sender, EventArgs e)
-        {
         }
 
         private void NewKitFrm_FormClosing(object sender, FormClosingEventArgs e)

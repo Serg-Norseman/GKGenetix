@@ -114,7 +114,7 @@ namespace GKGenetix.Core
                     int chrNumVCF = int.Parse(s.Substring(3));
                     return (Chromosome)chrNumVCF;
 
-                case "23":
+                case "23": // [AncestryDNA]
                 case "X": // [23AndMe, deCODEme, VCF]
                 case "chrX": // [VCF]
                     return Chromosome.CHR_X;

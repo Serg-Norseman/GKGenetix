@@ -19,12 +19,12 @@ namespace GenetixKit.Forms
         private readonly string phasedKit = null;
         private readonly string unphasedKit = null;
         private readonly string chromosome = null;
-        private readonly string startPosition = null;
-        private readonly string endPosition = null;
+        private readonly int startPosition;
+        private readonly int endPosition;
         private Image original = null;
         private IList<PhaseSegment> tblSegments = null;
 
-        public PhasedSegmentFrm(string phased_kit, string unphased_kit, string chr, string startPos, string endPos)
+        public PhasedSegmentFrm(string phased_kit, string unphased_kit, string chr, int startPos, int endPos)
         {
             InitializeComponent();
 

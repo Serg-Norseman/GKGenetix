@@ -206,9 +206,9 @@ namespace GenetixKit.Forms
             ShowMdiChild(new QuickEditKit());
         }
 
-        public void ShowPhasedSegmentVisualizer(string kit1, string kit2, string chr, string start_pos, string end_pos)
+        public void ShowPhasedSegmentVisualizer(string kit1, string kit2, string chr, int startPos, int endPos)
         {
-            using (var frm = new PhasedSegmentFrm(kit1, kit2, chr, start_pos, end_pos))
+            using (var frm = new PhasedSegmentFrm(kit1, kit2, chr, startPos, endPos))
                 frm.ShowDialog(this);
         }
 

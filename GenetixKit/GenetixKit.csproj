@@ -63,6 +63,8 @@
     <Compile Include="Core\Model\ITableRow.cs" />
     <Compile Include="Core\Model\KitDTO.cs" />
     <Compile Include="Core\Model\MatchingKit.cs" />
+    <Compile Include="Core\Model\MDMapRow.cs" />
+    <Compile Include="Core\Model\PhylogenyNode.cs" />
     <Compile Include="Core\Model\OTORow.cs" />
     <Compile Include="Core\Model\PhaseSegment.cs" />
     <Compile Include="Core\Model\ROHSegment.cs" />

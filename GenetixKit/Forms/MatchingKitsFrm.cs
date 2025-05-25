@@ -135,11 +135,7 @@ namespace GenetixKit.Forms
             var segment = dgvSegments.GetSelectedObj<CmpSegment>();
             if (segment == null) return;
 
-            string chr = segment.Chromosome.ToString();
-            string startPos = segment.StartPosition.ToString();
-            string endPos = segment.EndPosition.ToString();
-
-            Program.KitInstance.ShowPhasedSegmentVisualizer(phasedKit, unphasedKit, chr, startPos, endPos);
+            Program.KitInstance.ShowPhasedSegmentVisualizer(phasedKit, unphasedKit, segment.Chromosome, segment.StartPosition, segment.EndPosition);
         }
     }
 }

@@ -12,7 +12,7 @@
         void DisableDelete();
 
         void ShowAdmixture(string kit);
-        void ShowPhasedSegmentVisualizer(string kit1, string kit2, string chr, string start_pos, string end_pos);
+        void ShowPhasedSegmentVisualizer(string kit1, string kit2, string chr, int startPos, int endPos);
         void ShowProcessKits();
         void ShowQuickEdit();
         void ShowMatchingKits(string kit);

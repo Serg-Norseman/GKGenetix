@@ -499,7 +499,7 @@ namespace GenetixKit.Core
                 ") order by cast(chromosome as integer), start_position");
         }
 
-        public static IList<PhaseSegment> GetPhaseSegments(string unphased_kit, string start_position, string end_position, string chromosome, string phased_kit)
+        public static IList<PhaseSegment> GetPhaseSegments(string unphased_kit, int start_position, int end_position, string chromosome, string phased_kit)
         {
             return GetRows<PhaseSegment>(
                 $"select a.position, a.genotype, p.paternal_genotype, p.maternal_genotype from kit_autosomal a, kit_phased p where a.kit_no = '{unphased_kit}' " +

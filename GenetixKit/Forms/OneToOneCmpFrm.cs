@@ -62,11 +62,7 @@ namespace GenetixKit.Forms
         {
             var selRow = dgvSegmentIdx.GetSelectedObj<CmpSegment>();
             if (phased && selRow != null) {
-                string chr = selRow.Chromosome;
-                string startPos = selRow.StartPosition.ToString();
-                string endPos = selRow.EndPosition.ToString();
-
-                Program.KitInstance.ShowPhasedSegmentVisualizer(kit1, kit2, chr, startPos, endPos);
+                Program.KitInstance.ShowPhasedSegmentVisualizer(kit1, kit2, selRow.Chromosome, selRow.StartPosition, selRow.EndPosition);
             }
         }
     }
