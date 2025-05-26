@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
-using GenetixKit.Core.Model;
+using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {

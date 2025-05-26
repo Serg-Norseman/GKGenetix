@@ -10,7 +10,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using GenetixKit.Core;
-using GenetixKit.Core.Model;
+using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {

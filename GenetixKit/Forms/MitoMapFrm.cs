@@ -11,7 +11,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using GenetixKit.Core;
-using GenetixKit.Core.Model;
+using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
@@ -73,8 +73,9 @@ namespace GenetixKit.Forms
 
         private void dgvmtdna_SelectionChanged(object sender, EventArgs e)
         {
-            if (dgvmtdna.SelectedRows.Count < 1) return;
-            var selRow = (MDMapRow)dgvmtdna.SelectedRows[0].DataBoundItem;
+            var selRow = dgvmtdna.GetSelectedObj<MDMapRow>();
+            if (selRow == null) return;
+
             int start = int.Parse(selRow.Starting);
             int end = int.Parse(selRow.Ending);
             string title = selRow.MapLocus;

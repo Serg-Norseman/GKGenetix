@@ -18,10 +18,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace GKGenetix.Core
+using System.Data;
+
+namespace GKGenetix.Core.Model
 {
-    public interface IDisplay
+    public interface ITableRow
     {
-        void WriteLine(string value);
+        void Load(IDataRecord values);
     }
 }

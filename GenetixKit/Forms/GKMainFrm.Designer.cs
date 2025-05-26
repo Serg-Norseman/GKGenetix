@@ -270,7 +270,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1045, 692);
+            this.ClientSize = new System.Drawing.Size(1480, 692);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStripGGK);
             this.IsMdiContainer = true;

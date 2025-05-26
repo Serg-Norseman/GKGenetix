@@ -22,6 +22,7 @@ namespace GenetixKit.Core
             if (!string.IsNullOrEmpty(format)) column.DefaultCellStyle.Format = format;
             column.Visible = visible;
             column.ReadOnly = readOnly;
+            column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             dataGridView.Columns.Add(column);
         }
 

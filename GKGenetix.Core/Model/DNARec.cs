@@ -18,10 +18,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace GKGenetix.Core
+using System.Collections.Generic;
+
+namespace GKGenetix.Core.Model
 {
-    public interface IDisplay
+    public class DNARec
     {
-        void WriteLine(string value);
+        public DNARec(List<SingleSNP> atdna, List<string> ydna, List<string> mtdna)
+        {
+            this.atdna = atdna;
+            this.ydna = ydna;
+            this.mtdna = mtdna;
+        }
+
+        public List<SingleSNP> atdna { get; private set; } // 0
+        public List<string> ydna { get; private set; } // 1
+        public List<string> mtdna { get; private set; } // 2
     }
 }

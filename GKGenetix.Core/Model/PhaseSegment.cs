@@ -1,8 +1,28 @@
-﻿using System.Data;
+﻿/*
+ *  "GKGenetix", the simple DNA analysis kit.
+ *  Copyright (C) 2022-2025 by Sergey V. Zhdanovskih.
+ *
+ *  This file is part of "GKGenetix".
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-namespace GenetixKit.Core.Model
+using System.Data;
+
+namespace GKGenetix.Core.Model
 {
-    internal class PhaseSegment : ITableRow
+    public class PhaseSegment : ITableRow
     {
         public int Position { get; private set; }
         public string Genotype { get; private set; }
@@ -24,7 +44,7 @@ namespace GenetixKit.Core.Model
     }
 
 
-    internal class PhaseRow : ISNPHeader, ITableRow
+    public class PhaseRow : ISNPHeader, ITableRow
     {
         public string RSID { get; private set; } // 0
         public string Chromosome { get; private set; } // 1
@@ -57,7 +77,7 @@ namespace GenetixKit.Core.Model
     }
 
 
-    internal class UnphasedSegment : ITableRow
+    public class UnphasedSegment : ITableRow
     {
         public string UnphasedKit { get; private set; }
         public string Chromosome { get; private set; }

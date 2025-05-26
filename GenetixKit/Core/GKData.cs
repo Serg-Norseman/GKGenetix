@@ -7,7 +7,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using GenetixKit.Core.Model;
+using System.Xml.Linq;
+using GKGenetix.Core;
+using GKGenetix.Core.Model;
 
 namespace GenetixKit.Core
 {
@@ -19,6 +21,9 @@ namespace GenetixKit.Core
         public static readonly string[] ydna67 = new string[] { "DYS531", "DYS578", "DYF395S1", "DYS590", "DYS537", "DYS641", "DYS472", "DYF406S1", "DYS511", "DYS425", "DYS413", "DYS557", "DYS594", "DYS436", "DYS490", "DYS534", "DYS450", "DYS444", "DYS481", "DYS520", "DYS446", "DYS617", "DYS568", "DYS487", "DYS572", "DYS640", "DYS492", "DYS565" };
         public static readonly string[] ydna111 = new string[] { "DYS710", "DYS485", "DYS632", "DYS495", "DYS540", "DYS714", "DYS716", "DYS717", "DYS505", "DYS556", "DYS549", "DYS589", "DYS522", "DYS494", "DYS533", "DYS636", "DYS575", "DYS638", "DYS462", "DYS452", "DYS445", "Y-GATA-A10", "DYS463", "DYS441", "Y-GGAAT-1B07", "DYS525", "DYS712", "DYS593", "DYS650", "DYS532", "DYS715", "DYS504", "DYS513", "DYS561", "DYS552", "DYS726", "DYS635", "DYS587", "DYS643", "DYS497", "DYS510", "DYS434", "DYS461", "DYS435" };
 
+        public static readonly string[] MtIgnoreList = new string[] { "309.1C", "315.1C", "515", "516", "517", "518", "519", "520", "521", "522", "16182C", "16183C", "16193.1C", "16519" };
+
+
         private static SortedList<int, double>[] cM_map = null;
 
         // required for cM calculation
@@ -28,7 +33,7 @@ namespace GenetixKit.Core
                 if (cM_map == null) {
                     cM_map = new SortedList<int, double>[23];
 
-                    using (var ms = GKUtils.GUnzip2Stream(Properties.Resources.map_csv)) {
+                    using (var ms = Utilities.GUnzip2Stream(Properties.Resources.map_csv)) {
                         StreamReader reader = new StreamReader(ms);
                         string line = reader.ReadLine(); //header
                         string[] data = null;
@@ -39,7 +44,7 @@ namespace GenetixKit.Core
                             data = line.Split(new char[] { ',' });
                             chr = int.Parse(data[1]);
                             pos = int.Parse(data[2]);
-                            cm = GKUtils.ParseFloat(data[3]);
+                            cm = Utilities.ParseFloat(data[3]);
                             if (cM_map[chr - 1] == null)
                                 cM_map[chr - 1] = new SortedList<int, double>();
                             cM_map[chr - 1].Add(pos, cm);
@@ -57,7 +62,7 @@ namespace GenetixKit.Core
         {
             get {
                 if (rsrs == null)
-                    rsrs = Encoding.ASCII.GetString(GKUtils.GUnzip2Bytes(Properties.Resources.RSRS)).ToCharArray();
+                    rsrs = Encoding.ASCII.GetString(Utilities.GUnzip2Bytes(Properties.Resources.RSRS)).ToCharArray();
 
                 return rsrs;
             }
@@ -71,7 +76,7 @@ namespace GenetixKit.Core
                 if (ymap == null) {
                     ymap = new Dictionary<string, string[]>();
 
-                    var stm = GKUtils.GUnzip2Stream(Properties.Resources.ysnp_hg19);
+                    var stm = Utilities.GUnzip2Stream(Properties.Resources.ysnp_hg19);
                     using (var reader = new StreamReader(stm, Encoding.UTF8)) {
                         string l = reader.ReadLine();
                         //snp;snp,pos,mutation
@@ -107,6 +112,96 @@ namespace GenetixKit.Core
                 }
 
                 return mtdna_map;
+            }
+        }
+
+
+        private static ISOGGYTreeNode isoggYTree = null;
+
+        public static ISOGGYTreeNode ISOGGYTree
+        {
+            get {
+                if (isoggYTree == null) {
+                    XDocument doc = XDocument.Parse(Properties.Resources.ytree);
+
+                    isoggYTree = new ISOGGYTreeNode("Adam");
+                    foreach (XElement el in doc.Root.Elements()) {
+                        BuildYTree(isoggYTree, el);
+                    }
+                }
+
+                return isoggYTree;
+            }
+        }
+
+        private static void BuildYTree(ISOGGYTreeNode parent, XElement elmt)
+        {
+            ISOGGYTreeNode tn = null;
+
+            XAttribute attrName = elmt.Attribute("name");
+            XAttribute attrMarkers = elmt.Attribute("markers");
+
+            if (attrName != null) {
+                string pnName = attrName.Value.Trim();
+                if (pnName.IndexOf(',') != -1)
+                    pnName = Utilities.RemoveDuplicates(pnName);
+
+                string pnMarkers = attrMarkers.Value.Trim();
+                pnMarkers = pnMarkers.Replace(",", ", ");
+
+                if (pnName != "") {
+                    tn = new ISOGGYTreeNode(pnName, pnMarkers);
+                    parent.Children.Add(tn);
+                }
+
+                foreach (XElement el in elmt.Elements()) {
+                    if (tn != null)
+                        BuildYTree(tn, el);
+                    else
+                        BuildYTree(parent, el);
+                }
+            }
+        }
+
+
+        private static MtDNAPhylogenyNode mtTree = null;
+
+        public static MtDNAPhylogenyNode MtTree
+        {
+            get {
+                if (mtTree == null) {
+                    XDocument doc = XDocument.Parse(Properties.Resources.mtDNAPhylogeny);
+
+                    mtTree = new MtDNAPhylogenyNode("Eve");
+                    foreach (XElement el in doc.Root.Elements()) {
+                        BuildMtTree(mtTree, el);
+                    }
+                }
+
+                return mtTree;
+            }
+        }
+
+        private static void BuildMtTree(MtDNAPhylogenyNode parent, XElement elmt)
+        {
+            MtDNAPhylogenyNode tn = null;
+
+            XAttribute attrName = elmt.Attribute("Id");
+            XAttribute attrMarkers = elmt.Attribute("HG");
+
+            string pnName = attrName.Value.Trim();
+            string pnMarkers = attrMarkers.Value.Trim();
+
+            if (pnName != "") {
+                tn = new MtDNAPhylogenyNode(pnName, pnMarkers);
+                parent.Children.Add(tn);
+            }
+
+            foreach (XElement el in elmt.Elements()) {
+                if (tn != null)
+                    BuildMtTree(tn, el);
+                else
+                    BuildMtTree(parent, el);
             }
         }
     }

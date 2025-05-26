@@ -9,7 +9,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.TreeView treeView1;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lblKitName;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtSNPs;
@@ -18,7 +18,6 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.RichTextBox snpTextBox;
         private System.Windows.Forms.Timer timer2;
-        private System.Windows.Forms.Timer timer3;
 
         protected override void Dispose(bool disposing)
         {
@@ -31,12 +30,11 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(IsoggYTreeFrm));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.treeView1 = new System.Windows.Forms.TreeView();
-            this.label2 = new System.Windows.Forms.Label();
+            this.lblKitName = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
             this.snpTextBox = new System.Windows.Forms.RichTextBox();
@@ -47,7 +45,6 @@
             this.lblyhg = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.timer2 = new System.Windows.Forms.Timer(this.components);
-            this.timer3 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -106,7 +103,7 @@
             this.tableLayoutPanel2.ColumnCount = 1;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.Controls.Add(this.treeView1, 0, 1);
-            this.tableLayoutPanel2.Controls.Add(this.label2, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.lblKitName, 0, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(2);
@@ -127,16 +124,16 @@
             this.treeView1.TabIndex = 2;
             this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
-            // label2
+            // lblKitName
             // 
-            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(2, 13);
-            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(13, 13);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "..";
+            this.lblKitName.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.lblKitName.AutoSize = true;
+            this.lblKitName.Location = new System.Drawing.Point(2, 13);
+            this.lblKitName.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblKitName.Name = "lblKitName";
+            this.lblKitName.Size = new System.Drawing.Size(13, 13);
+            this.lblKitName.TabIndex = 0;
+            this.lblKitName.Text = "..";
             // 
             // tableLayoutPanel1
             // 
@@ -254,10 +251,6 @@
             // timer2
             // 
             this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
-            // 
-            // timer3
-            // 
-            this.timer3.Tick += new System.EventHandler(this.timer3_Tick);
             // 
             // IsoggYTreeFrm
             // 

@@ -18,10 +18,30 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace GKGenetix.Core
+using System.Data;
+
+namespace GKGenetix.Core.Model
 {
-    public interface IDisplay
+    public class YSTR : ITableRow
     {
-        void WriteLine(string value);
+        public string Marker { get; private set; }
+        public string Repeats { get; private set; }
+
+
+        public YSTR()
+        {
+        }
+
+        public YSTR(string marker, string value)
+        {
+            Marker = marker;
+            Repeats = value;
+        }
+
+        public void Load(IDataRecord values)
+        {
+            Marker = values.GetString(0);
+            Repeats = values.GetString(1);
+        }
     }
 }

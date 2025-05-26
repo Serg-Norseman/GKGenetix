@@ -14,7 +14,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using GenetixKit.Core.Model;
+using GKGenetix.Core;
+using GKGenetix.Core.Model;
 
 namespace GenetixKit.Core
 {
@@ -73,7 +74,7 @@ namespace GenetixKit.Core
             char[] rsrs = GKData.RSRS;
             string[] lines;
             if (file.EndsWith(".gz")) {
-                string tmp = Encoding.UTF8.GetString(GKUtils.GUnzip2Bytes(File.ReadAllBytes(file)));
+                string tmp = Encoding.UTF8.GetString(Utilities.GUnzip2Bytes(File.ReadAllBytes(file)));
 
                 // ugly but required 
                 tmp = tmp.Replace("\r\n", "\r");
@@ -239,7 +240,7 @@ namespace GenetixKit.Core
             File.WriteAllText(diff_work_dir + "user.txt", user);
 
             File.WriteAllBytes(diff_work_dir + "diff.exe", Properties.Resources.diff);
-            Process p = GKUtils.Execute(diff_work_dir + "rsrs.txt", diff_work_dir + "user.txt", diff_work_dir);
+            Process p = Utilities.Execute(diff_work_dir + "rsrs.txt", diff_work_dir + "user.txt", diff_work_dir);
             StringBuilder sb = new StringBuilder();
             while (!p.StandardOutput.EndOfStream) {
                 string line = p.StandardOutput.ReadLine();
@@ -743,7 +744,7 @@ namespace GenetixKit.Core
                                 start_pos = position;
                         } else if (cnt == 2) {
                             // match 1 allele
-                            if (gt1 == GKUtils.Reverse(gt2)) {
+                            if (gt1 == Utilities.Reverse(gt2)) {
                                 tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt1));
                                 if (start_pos == 0)
                                     start_pos = position;
