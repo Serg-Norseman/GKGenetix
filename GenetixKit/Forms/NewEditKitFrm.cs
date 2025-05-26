@@ -11,7 +11,8 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using GenetixKit.Core;
-using GenetixKit.Core.Model;
+using GKGenetix.Core;
+using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
@@ -461,7 +462,7 @@ namespace GenetixKit.Forms
                 return;
 
             DataGridViewRow[] yRows;
-            yRows = GKUtils.MergeArrays(dgvY12.Rows.GetArray(), dgvY25.Rows.GetArray(), dgvY37.Rows.GetArray(), dgvY67.Rows.GetArray(), dgvY111.Rows.GetArray(), dgvYMisc.Rows.GetArray());
+            yRows = Utilities.MergeArrays(dgvY12.Rows.GetArray(), dgvY25.Rows.GetArray(), dgvY37.Rows.GetArray(), dgvY67.Rows.GetArray(), dgvY111.Rows.GetArray(), dgvYMisc.Rows.GetArray());
 
             object[] args = new object[] {
                 txtKit.Text, txtName.Text, dgvAutosomal.Rows, txtYDNA.Text, txtMtDNA.Text, yRows, cbSex.Text, txtFASTA.Text
@@ -581,7 +582,7 @@ namespace GenetixKit.Forms
             var ystrList = GKSqlFuncs.GetYSTR(kit);
             Dictionary<string, string> ystr_dict = new Dictionary<string, string>();
             foreach (var str in ystrList) {
-                ystr_dict.Add(str.Marker, str.Value);
+                ystr_dict.Add(str.Marker, str.Repeats);
             }
             this.Invoke(new MethodInvoker(delegate {
                 PopulateYGrid(GKData.ydna12, ystr_dict, dgvY12);

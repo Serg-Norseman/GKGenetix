@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Windows.Forms;
-using GenetixKit.Core.Model;
+using GKGenetix.Core.Model;
 
 namespace GenetixKit.Core
 {

@@ -18,10 +18,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace GKGenetix.Core
+namespace GKGenetix.Core.Model
 {
-    public interface IDisplay
+    public class MDMapRow
     {
-        void WriteLine(string value);
+        public string MapLocus { get; }
+        public string Starting { get; }
+        public string Ending { get; }
+        public string bpLength { get; }
+        public string Shorthand { get; }
+        public string Description { get; }
+
+        public MDMapRow(string mapLocus, string starting, string ending, string bpLength, string shorthand, string description)
+        {
+            MapLocus = mapLocus;
+            Starting = starting;
+            Ending = ending;
+            this.bpLength = bpLength;
+            Shorthand = shorthand;
+            Description = description;
+        }
     }
 }

@@ -18,10 +18,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace GKGenetix.Core
+namespace GKGenetix.Core.Model
 {
-    public interface IDisplay
+    public interface ISNPSegment
     {
-        void WriteLine(string value);
+        string Chromosome { get; }
+        int StartPosition { get; }
+        int EndPosition { get; }
+        double SegmentLength_cm { get; }
+        int SNPCount { get; }
     }
 }

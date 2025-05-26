@@ -4,7 +4,6 @@
     {
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.TreeView treeView1;
@@ -19,8 +18,7 @@
         private System.Windows.Forms.RichTextBox snpTextBox;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button btnRefresh;
+        private System.Windows.Forms.Label lblKit;
 
         protected override void Dispose(bool disposing)
         {
@@ -38,8 +36,7 @@
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.btnRefresh = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
+            this.lblKit = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.snpTextBox = new System.Windows.Forms.RichTextBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
@@ -51,7 +48,6 @@
             this.label5 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -110,32 +106,20 @@
             // 
             // panel3
             // 
-            this.panel3.Controls.Add(this.btnRefresh);
-            this.panel3.Controls.Add(this.label2);
+            this.panel3.Controls.Add(this.lblKit);
             this.panel3.Location = new System.Drawing.Point(3, 3);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(379, 34);
             this.panel3.TabIndex = 3;
             // 
-            // btnRefresh
+            // lblKit
             // 
-            this.btnRefresh.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.btnRefresh.Image = global::GenetixKit.Properties.Resources.refresh;
-            this.btnRefresh.Location = new System.Drawing.Point(347, 3);
-            this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(29, 28);
-            this.btnRefresh.TabIndex = 1;
-            this.btnRefresh.UseVisualStyleBackColor = true;
-            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 11);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(13, 13);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "..";
+            this.lblKit.AutoSize = true;
+            this.lblKit.Location = new System.Drawing.Point(9, 11);
+            this.lblKit.Name = "lblKit";
+            this.lblKit.Size = new System.Drawing.Size(13, 13);
+            this.lblKit.TabIndex = 0;
+            this.lblKit.Text = "..";
             // 
             // label1
             // 
@@ -264,10 +248,6 @@
             this.label3.Size = new System.Drawing.Size(56, 13);
             this.label3.TabIndex = 0;
             this.label3.Text = "Mutations:";
-            // 
-            // timer1
-            // 
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // MtPhylogenyFrm
             // 

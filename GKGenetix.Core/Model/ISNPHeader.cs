@@ -18,10 +18,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace GKGenetix.Core
+namespace GKGenetix.Core.Model
 {
-    public interface IDisplay
+    public interface ISNPHeader
     {
-        void WriteLine(string value);
+        string RSID { get; }
+        string Chromosome { get; }
+        int Position { get; }
     }
 }

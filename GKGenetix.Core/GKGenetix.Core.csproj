@@ -26,6 +26,7 @@
       <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analytics.cs" />
@@ -41,6 +42,22 @@
     <Compile Include="Genotype.cs" />
     <Compile Include="IDisplay.cs" />
     <Compile Include="JsonHelper.cs" />
+    <Compile Include="Model\AdmixtureRec.cs" />
+    <Compile Include="Model\CmpSegment.cs" />
+    <Compile Include="Model\DNARec.cs" />
+    <Compile Include="Model\ISNPHeader.cs" />
+    <Compile Include="Model\ISNPSegment.cs" />
+    <Compile Include="Model\ITableRow.cs" />
+    <Compile Include="Model\KitDTO.cs" />
+    <Compile Include="Model\MatchingKit.cs" />
+    <Compile Include="Model\MDMapRow.cs" />
+    <Compile Include="Model\OTORow.cs" />
+    <Compile Include="Model\PhaseSegment.cs" />
+    <Compile Include="Model\PhylogenyNode.cs" />
+    <Compile Include="Model\ROHSegment.cs" />
+    <Compile Include="Model\SegmentStats.cs" />
+    <Compile Include="Model\SingleSNP.cs" />
+    <Compile Include="Model\YSTR.cs" />
     <Compile Include="Nucleotide.cs" />
     <Compile Include="Orientation.cs" />
     <Compile Include="ParseException.cs" />

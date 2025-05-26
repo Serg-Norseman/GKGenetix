@@ -53,24 +53,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\GKUtils.cs" />
     <Compile Include="Core\IKitHost.cs" />
-    <Compile Include="Core\Model\AdmixtureRec.cs" />
-    <Compile Include="Core\Model\CmpSegment.cs" />
-    <Compile Include="Core\Model\DNARec.cs" />
-    <Compile Include="Core\Model\ISNPHeader.cs" />
-    <Compile Include="Core\Model\ISNPSegment.cs" />
-    <Compile Include="Core\Model\ITableRow.cs" />
-    <Compile Include="Core\Model\KitDTO.cs" />
-    <Compile Include="Core\Model\MatchingKit.cs" />
-    <Compile Include="Core\Model\MDMapRow.cs" />
-    <Compile Include="Core\Model\PhylogenyNode.cs" />
-    <Compile Include="Core\Model\OTORow.cs" />
-    <Compile Include="Core\Model\PhaseSegment.cs" />
-    <Compile Include="Core\Model\ROHSegment.cs" />
-    <Compile Include="Core\Model\SegmentStats.cs" />
-    <Compile Include="Core\Model\SingleSNP.cs" />
-    <Compile Include="Core\Model\YSTR.cs" />
     <Compile Include="Forms\AdmixtureFrm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -106,7 +89,6 @@
     <Compile Include="Forms\MitoMapFrm.Designer.cs">
       <DependentUpon>MitoMapFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Core\UIOperation.cs" />
     <Compile Include="Forms\MtPhylogenyFrm.cs">
       <SubType>Form</SubType>
     </Compile>

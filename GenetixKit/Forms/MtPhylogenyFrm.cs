@@ -8,13 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
 using GenetixKit.Core;
+using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
@@ -22,12 +20,10 @@ namespace GenetixKit.Forms
     {
         private readonly Dictionary<TreeNode, string> mutationsMap = new Dictionary<TreeNode, string>();
         private readonly Dictionary<TreeNode, string> matchMap = new Dictionary<TreeNode, string>();
-        private readonly string[] ignoreList = new string[] { "309.1C", "315.1C", "515", "516", "517", "518", "519", "520", "521", "522", "16182C", "16183C", "16193.1C", "16519" };
         private readonly StringBuilder report = new StringBuilder();
         private readonly SortedDictionary<int, List<string>> sorted_report_array = new SortedDictionary<int, List<string>>();
         private readonly SortedDictionary<int, List<TreeNode>> sorted_hg_readjustment = new SortedDictionary<int, List<TreeNode>>();
         private readonly string kit = null;
-        private string xmlPhylogeny = null;
 
         public MtPhylogenyFrm(string kit)
         {
@@ -37,26 +33,15 @@ namespace GenetixKit.Forms
 
         private void MainFrm_Load(object sender, EventArgs e)
         {
-            label2.Text = kit + " - " + GKSqlFuncs.GetKitName(kit);
+            lblKit.Text = kit + " - " + GKSqlFuncs.GetKitName(kit);
             this.Text = $"Mitocondrial Phylogeny - {kit} ({GKSqlFuncs.GetKitName(kit)})";
-            xmlPhylogeny = Properties.Resources.mtDNAPhylogeny;
-
-            timer1.Enabled = true;
-        }
-
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            timer1.Enabled = false;
-            Program.KitInstance.EnableSave();
-            XDocument doc = XDocument.Parse(xmlPhylogeny);
 
             treeView1.BeginUpdate();
+            var mtTree = GKData.MtTree;
             TreeNode root = new TreeNode("Eve");
             treeView1.Nodes.Add(root);
-            foreach (XElement el in doc.Root.Elements()) {
-                BuildTree(root, el);
-            }
-            root.Expand();
+            BuildTree(treeView1, root, mtTree);
+            treeView1.CollapseAll();
             treeView1.EndUpdate();
 
             GKSqlFuncs.GetMtDNA(kit, out string mutations, out _);
@@ -65,35 +50,22 @@ namespace GenetixKit.Forms
             MarkOnTree();
         }
 
-        private void BuildTree(TreeNode parent, XElement elmt)
+        private void BuildTree(TreeView treeView, TreeNode treeNode, MtDNAPhylogenyNode pnNode)
         {
-            TreeNode tn = null;
-
-            XAttribute attrName = elmt.Attribute("Id");
-            XAttribute attrMarkers = elmt.Attribute("HG");
-
-            string pnName = attrName.Value.Trim();
-            string pnMarkers = attrMarkers.Value.Trim();
-
-            if (pnName != "") {
-                tn = new TreeNode(pnName);
-                mutationsMap.Add(tn, pnMarkers);
-                parent.Nodes.Add(tn);
+            treeNode.Tag = pnNode;
+            foreach (var subnode in pnNode.Children) {
+                var tn = new TreeNode(subnode.Name);
+                treeNode.Nodes.Add(tn);
+                BuildTree(treeView, tn, subnode);
             }
-
-            foreach (XElement el in elmt.Elements()) {
-                if (tn != null)
-                    BuildTree(tn, el);
-                else
-                    BuildTree(parent, el);
-            }
+            mutationsMap.Add(treeNode, pnNode.Markers);
         }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
             TreeNode node = treeView1.SelectedNode;
             snpTextBox.Clear();
-            snpTextBox.Text = (string)mutationsMap[node];
+            snpTextBox.Text = mutationsMap[node];
             string[] snps = txtSNPs.Text.Split(new char[] { ',' });
             foreach (string mutation in snps) {
                 int loc = snpTextBox.Find(mutation.Trim());
@@ -115,21 +87,22 @@ namespace GenetixKit.Forms
             treeView1.CollapseAll();
             TreeNode name_maxpath = null;
 
-            string my_marker = txtSNPs.Text;
-            //dirty but ok for now
-            my_marker = my_marker.Replace(",", " ").Replace("\t", " ").Replace("\r", " ").Replace("\n", " ");
-            RegexOptions options = RegexOptions.None;
-            Regex regex = new Regex(@"[ ]{2,}", options);
-            my_marker = regex.Replace(my_marker, @" ");
-            my_marker = my_marker.Replace(" ", ",");
-            string[] marker_array = my_marker.Split(",".ToCharArray());
+            string kitMarkers = txtSNPs.Text;
+            // dirty but ok for now
+            kitMarkers = kitMarkers.Replace(",", " ").Replace("\t", " ").Replace("\r", " ").Replace("\n", " ");
+
+            Regex regex = new Regex(@"[ ]{2,}", RegexOptions.None);
+            kitMarkers = regex.Replace(kitMarkers, @" ");
+
+            kitMarkers = kitMarkers.Replace(" ", ",");
+            string[] marker_array = kitMarkers.Split(",".ToCharArray());
             string marker_names = "";
             string m_name = "";
 
             string[] marker_names_on_hg = null;
             var list = new List<TreeNode>();
             foreach (TreeNode key in mutationsMap.Keys) {
-                marker_names = (string)mutationsMap[key];
+                marker_names = mutationsMap[key];
                 marker_names_on_hg = marker_names.Split(",".ToCharArray());
                 foreach (string marker_name in marker_names_on_hg) {
                     m_name = marker_name.Replace("(", "").Replace(")", "").Replace("!", "");
@@ -170,13 +143,11 @@ namespace GenetixKit.Forms
             report.Clear();
             report.Append("<html><head><title>mtDNA Report for " + GKSqlFuncs.GetKitName(kit) + " (" + kit + ")</title></head><body>");
             report.Append("<h1>mtDNA Report for " + GKSqlFuncs.GetKitName(kit) + " (" + kit + ")</h2>");
-            report.Append("<b>User Entered Markers: </b>" + my_marker);
+            report.Append("<b>User Entered Markers: </b>" + kitMarkers);
 
             sorted_report_array.Clear();
             sorted_hg_readjustment.Clear();
-            foreach (var item in desc) {
-                KeyValuePair<int, List<TreeNode>> kvp = item;
-
+            foreach (KeyValuePair<int, List<TreeNode>> kvp in desc) {
                 mlist = kvp.Value;
                 string str = "";
                 if (!found_first) {
@@ -215,7 +186,7 @@ namespace GenetixKit.Forms
                     mstr = mstr + " " + mhg.Text;
 
                 if (!found_first) {
-                    name_maxpath = (TreeNode)m_list[0];
+                    name_maxpath = m_list[0];
                     lblyhg.Text = mstr.Trim().Replace(" ", ", ");
                     found_first = true;
                     mstr = "";
@@ -230,23 +201,26 @@ namespace GenetixKit.Forms
                     node.ForeColor = Color.LightGray;
                 }
             }
+
             if (name_maxpath != null) {
                 name_maxpath.EnsureVisible();
                 treeView1.SelectedNode = name_maxpath;
             }
         }
 
-        private bool IsMatchingAll(TreeNode key, string[] user_markers)
+        private bool IsMatchingAll(TreeNode key, string[] kitMarkers)
         {
             var hgs = GetAllMatchingInParent(key);
+
             var hgs_found = new List<string>();
             var report_stmt = new Dictionary<string, string>();
             StringBuilder report = new StringBuilder(); //local variable
             var mismatches = new List<string>();
             var matches = new List<string>();
-            foreach (string u_marker in user_markers) {
+
+            foreach (string u_marker in kitMarkers) {
                 bool ignore_found = false;
-                foreach (string i_marker in ignoreList) {
+                foreach (string i_marker in GKData.MtIgnoreList) {
                     if (u_marker == i_marker || u_marker.StartsWith(i_marker) || u_marker.Substring(1).StartsWith(i_marker)) {
                         ignore_found = true;
                         break;
@@ -266,7 +240,7 @@ namespace GenetixKit.Forms
                     if (parent_markers.IndexOf(u_marker) != -1) {
                         found = true;
                         hg_found = markers;
-                        string rpt_markers = report_stmt.ContainsKey(parent_hg) ? (string)report_stmt[parent_hg] : parent_markers;
+                        string rpt_markers = report_stmt.ContainsKey(parent_hg) ? report_stmt[parent_hg] : parent_markers;
                         rpt_markers = rpt_markers.Replace(u_marker, "<font color='darkgreen'><b>" + u_marker + "</b></font>");
                         report_stmt.Remove(parent_hg);
                         report_stmt.Add(parent_hg, rpt_markers);
@@ -365,35 +339,6 @@ namespace GenetixKit.Forms
                 return match + GetParentMatches(key.Parent);
             else
                 return match;
-        }
-
-        private void btnRefresh_Click(object sender, EventArgs e)
-        {
-            if (MessageBox.Show("Genetic Genealogy Kit (GGK) will try to use the internet and connect to mtdnacommunity.org to fetch the latest Human mtDNA Phylogeny XML. Are you sure you want to do this?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-                try {
-                    string url = GKSettings.Phylogeny_mtDNA_URL;
-                    Program.KitInstance.SetStatus("Fetching.. " + url);
-
-                    Task.Factory.StartNew((object obj) => {
-                        string xurl = (string)obj;
-                        WebClient client = new WebClient();
-                        xmlPhylogeny = client.DownloadString(xurl);
-
-                        this.Invoke(new MethodInvoker(delegate {
-                            treeView1.Nodes.Clear();
-                            lblSb.Text = "";
-                            lblyhg.Text = "";
-                            mutationsMap.Clear();
-                            matchMap.Clear();
-                            Program.KitInstance.SetStatus("Done.");
-                            timer1.Enabled = true;
-                        }));
-                    }, url);
-
-                } catch (Exception ee) {
-                    MessageBox.Show("Technical Details: " + ee.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
         }
     }
 }
