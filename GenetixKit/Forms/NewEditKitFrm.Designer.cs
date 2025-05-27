@@ -662,12 +662,9 @@
             this.Controls.Add(this.tabsNewKit);
             this.Controls.Add(this.lblKitNo);
             this.Controls.Add(this.lblName);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "NewEditKitFrm";
-            this.ShowInTaskbar = false;
             this.Text = "New/Edit Kit";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NewKitFrm_FormClosing);
+            this.Closing += new System.EventHandler(this.NewKitFrm_FormClosing);
             this.Load += new System.EventHandler(this.NewKitFrm_Load);
             this.tabsNewKit.ResumeLayout(false);
             this.tabAutosomal.ResumeLayout(false);

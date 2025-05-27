@@ -24,6 +24,7 @@ namespace GenetixKit.Forms
         private Image original = null;
         private IList<PhaseSegment> tblSegments = null;
 
+
         public PhasedSegmentFrm(string phased_kit, string unphased_kit, string chr, int startPos, int endPos)
         {
             InitializeComponent();

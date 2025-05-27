@@ -12,12 +12,22 @@ using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
-    public partial class OneToOneCmpFrm : Form
+    public partial class OneToOneCmpFrm : GKWidget
     {
         private readonly string kit1 = null;
         private readonly string kit2 = null;
-        private bool phased = false;
         private IList<CmpSegment> segmentsRes;
+
+
+        public static bool CanBeUsed(IList<KitDTO> selectedKits)
+        {
+            return (selectedKits != null && selectedKits.Count == 2 && !selectedKits[0].Disabled && !selectedKits[1].Disabled);
+        }
+
+
+        public OneToOneCmpFrm(IList<KitDTO> selectedKits) : this(selectedKits[0].KitNo, selectedKits[1].KitNo)
+        {
+        }
 
         public OneToOneCmpFrm(string kit1, string kit2)
         {
@@ -35,7 +45,6 @@ namespace GenetixKit.Forms
             Program.KitInstance.SetStatus($"Comparing kits {kit1} and {kit2} ...");
 
             Task.Factory.StartNew(() => {
-                phased = GKSqlFuncs.IsPhased(kit1) || GKSqlFuncs.IsPhased(kit2);
                 segmentsRes = GKGenFuncs.CompareOneToOne(kit1, kit2, null, false, false);
 
                 this.Invoke(new MethodInvoker(delegate {
@@ -61,6 +70,7 @@ namespace GenetixKit.Forms
         private void dgvSegmentIdx_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             var selRow = dgvSegmentIdx.GetSelectedObj<CmpSegment>();
+            var phased = GKSqlFuncs.IsPhased(kit1) || GKSqlFuncs.IsPhased(kit2);
             if (phased && selRow != null) {
                 Program.KitInstance.ShowPhasedSegmentVisualizer(kit1, kit2, selRow.Chromosome, selRow.StartPosition, selRow.EndPosition);
             }

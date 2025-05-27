@@ -7,17 +7,26 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using GenetixKit.Core;
 using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
-    public partial class AdmixtureFrm : Form
+    public partial class AdmixtureFrm : GKWidget
     {
         private readonly string kit = null;
-        private List<string> plotted = new List<string>();
+
+
+        public static bool CanBeUsed(IList<KitDTO> selectedKits)
+        {
+            return (selectedKits != null && selectedKits.Count == 1 && !selectedKits[0].Disabled);
+        }
+
+
+        public AdmixtureFrm(IList<KitDTO> selectedKits) : this(selectedKits[0].KitNo)
+        {
+        }
 
         public AdmixtureFrm(string kit)
         {
@@ -48,9 +57,9 @@ namespace GenetixKit.Forms
                 p.IsVisibleInLegend = false;
             }
 
+            var plotted = new List<string>();
             Image img = (Image)Properties.Resources.world_map.Clone();
             using (Graphics g = Graphics.FromImage(img)) {
-                plotted.Clear();
                 foreach (var row in dt) {
                     string item = row.X + ":" + row.Y;
                     if (!plotted.Contains(item)) {

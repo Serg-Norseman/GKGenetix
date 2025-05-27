@@ -1094,5 +1094,78 @@ namespace GenetixKit.Core
                 }
             }
         }
+
+        public static IList<string> FilterSNPsOnYTree(string kitSNPs)
+        {
+            var snpOnTree = new List<string>();
+            snpOnTree.AddRange(Properties.Resources.snps_on_tree.Split(new char[] { ',' }));
+
+            string[] entered_snps = kitSNPs.Replace(" ", "").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var valid_snps = new List<string>();
+            foreach (string s in entered_snps) {
+                // extract string without ending sign (-)
+                string es = s.Substring(0, s.Length - 1);
+                if (snpOnTree.Contains(es)) {
+                    valid_snps.Add(s);
+                }
+            }
+            return valid_snps;
+        }
+
+        public static void ClearPhylogenyTree<T>(T pnNode, IList<T> nodesMap) where T : PhylogenyNode<T>
+        {
+            pnNode.Status = 0;
+            foreach (var subnode in pnNode.Children) {
+                ClearPhylogenyTree(subnode, nodesMap);
+            }
+            nodesMap.Add(pnNode);
+        }
+
+        public const int YHGS_DG = 1;
+        public const int YHGS_LG = 2;
+        public const int YHGS_R = 3;
+
+        public static ISOGGYTreeNode FindYHaplogroup(ISOGGYTreeNode isoggYTree, IList<string> snpArray)
+        {
+            var nodesMap = new List<ISOGGYTreeNode>();
+            ClearPhylogenyTree(isoggYTree, nodesMap);
+
+            ISOGGYTreeNode hg_maxpath = null;
+            foreach (var key in nodesMap) {
+                string hg_snps = key.Markers;
+                if (hg_snps.Equals("-")) continue;
+
+                foreach (string hg_snp in hg_snps.Split(new char[] { ',', '/' })) {
+                    var hg_snp_t = hg_snp.Trim();
+
+                    foreach (string snp in snpArray) {
+                        string snp_ss = snp.Substring(0, snp.Length - 1).Trim();
+                        if (hg_snp_t != snp_ss) continue;
+
+                        if (snp.EndsWith("-")) {
+                            if (key.Status == YHGS_DG) {
+                                key.Status = YHGS_LG;
+                            } else if (key.Status != YHGS_LG) {
+                                key.Status = YHGS_R;
+                            }
+                        } else if (snp.EndsWith("+")) {
+                            if (key.Status == YHGS_R) {
+                                key.Status = YHGS_LG;
+                            } else if (key.Status != YHGS_LG) {
+                                key.Status = YHGS_DG;
+                            }
+
+                            if (hg_maxpath == null) {
+                                hg_maxpath = key;
+                            } else if (key.Depth > hg_maxpath.Depth && key.Parent.Status != YHGS_R) {
+                                hg_maxpath = key;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return hg_maxpath;
+        }
     }
 }

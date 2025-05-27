@@ -11,9 +11,9 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtSNPs;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label lblyhg;
+        private System.Windows.Forms.Label lblFirstHG;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label lblSb;
+        private System.Windows.Forms.Label lblSecondHGs;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.RichTextBox snpTextBox;
         private System.Windows.Forms.Panel panel2;
@@ -42,9 +42,9 @@
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.txtSNPs = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.lblSb = new System.Windows.Forms.Label();
+            this.lblSecondHGs = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.lblyhg = new System.Windows.Forms.Label();
+            this.lblFirstHG = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
@@ -178,9 +178,9 @@
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.lblSb);
+            this.panel1.Controls.Add(this.lblSecondHGs);
             this.panel1.Controls.Add(this.label6);
-            this.panel1.Controls.Add(this.lblyhg);
+            this.panel1.Controls.Add(this.lblFirstHG);
             this.panel1.Controls.Add(this.label5);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(2, 414);
@@ -189,15 +189,15 @@
             this.panel1.Size = new System.Drawing.Size(392, 146);
             this.panel1.TabIndex = 3;
             // 
-            // lblSb
+            // lblSecondHGs
             // 
-            this.lblSb.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblSb.Location = new System.Drawing.Point(159, 75);
-            this.lblSb.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lblSb.Name = "lblSb";
-            this.lblSb.Size = new System.Drawing.Size(224, 60);
-            this.lblSb.TabIndex = 8;
-            this.lblSb.Text = "...";
+            this.lblSecondHGs.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSecondHGs.Location = new System.Drawing.Point(159, 75);
+            this.lblSecondHGs.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblSecondHGs.Name = "lblSecondHGs";
+            this.lblSecondHGs.Size = new System.Drawing.Size(224, 60);
+            this.lblSecondHGs.TabIndex = 8;
+            this.lblSecondHGs.Text = "...";
             // 
             // label6
             // 
@@ -209,15 +209,15 @@
             this.label6.TabIndex = 6;
             this.label6.Text = "Second Best Haplogroup(s) :";
             // 
-            // lblyhg
+            // lblFirstHG
             // 
-            this.lblyhg.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblyhg.Location = new System.Drawing.Point(159, 15);
-            this.lblyhg.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lblyhg.Name = "lblyhg";
-            this.lblyhg.Size = new System.Drawing.Size(224, 60);
-            this.lblyhg.TabIndex = 2;
-            this.lblyhg.Text = "...";
+            this.lblFirstHG.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblFirstHG.Location = new System.Drawing.Point(159, 15);
+            this.lblFirstHG.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblFirstHG.Name = "lblFirstHG";
+            this.lblFirstHG.Size = new System.Drawing.Size(224, 60);
+            this.lblFirstHG.TabIndex = 2;
+            this.lblFirstHG.Text = "...";
             // 
             // label5
             // 
@@ -256,11 +256,8 @@
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.splitContainer1);
             this.Margin = new System.Windows.Forms.Padding(2);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(603, 494);
             this.Name = "MtPhylogenyFrm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Mitocondrial Phylogeny";
             this.Load += new System.EventHandler(this.MainFrm_Load);
             this.splitContainer1.Panel1.ResumeLayout(false);

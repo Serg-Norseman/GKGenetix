@@ -29,9 +29,6 @@ namespace GenetixKit.Core
         // This parameter defines how many no-calls must be allowed in a matching segment. If the no-calls exceeds this limit in a segment, then the segment will not be matched.
         public static int Compare_NoCalls_Limit = 5;
 
-        // The URL from which the latest mtDNA Phylogeny will be fetched.
-        public static string Phylogeny_mtDNA_URL = "http://www.mtdnacommunity.org/downloads/mtDNAPhylogeny.xml";
-
         public const double MB_THRESHOLD = 0.5;
     }
 }

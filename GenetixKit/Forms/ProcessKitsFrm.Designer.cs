@@ -137,12 +137,9 @@
             this.Controls.Add(this.progressBar);
             this.Controls.Add(this.lblComparing);
             this.Controls.Add(this.btnStart);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "ProcessKitsFrm";
-            this.ShowInTaskbar = false;
             this.Text = "Process Kits";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ProcessKitsFrm_FormClosing);
+            this.Closing += new System.EventHandler(this.ProcessKitsFrm_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
         }

@@ -574,6 +574,12 @@ namespace GenetixKit.Core
 
         #region MtDna
 
+        public static bool ExistsMtDna(string kit)
+        {
+            string val = QueryValue($"select kit_no from kit_mtdna where kit_no = '{kit}'");
+            return (val == kit);
+        }
+
         public static void SaveKitMtDNA(string kit_no, string mutations, string fasta)
         {
             using (var conn = GetDBConnection()) {
@@ -603,6 +609,12 @@ namespace GenetixKit.Core
         #endregion
 
         #region YDna
+
+        public static bool ExistsYDna(string kit)
+        {
+            string val = QueryValue($"select kit_no from kit_ysnps where kit_no = '{kit}'");
+            return (val == kit);
+        }
 
         public static IList<YSTR> GetYSTR(string kit)
         {

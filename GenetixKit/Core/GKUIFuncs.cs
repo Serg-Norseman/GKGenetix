@@ -29,6 +29,7 @@ namespace GenetixKit.Core
         public static void AddCheckedColumn(this DataGridView dataGridView, string propertyName, string headerText)
         {
             var column = new DataGridViewCheckBoxColumn() { DataPropertyName = propertyName, HeaderText = headerText };
+            column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             dataGridView.Columns.Add(column);
         }
 
@@ -36,12 +37,14 @@ namespace GenetixKit.Core
         {
             var column = new DataGridViewComboBoxColumn() { DataPropertyName = propertyName, HeaderText = headerText };
             column.Items.AddRange(items);
+            column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             dataGridView.Columns.Add(column);
         }
 
         public static void AddButtonColumn(this DataGridView dataGridView, string propertyName, string headerText)
         {
             var column = new DataGridViewButtonColumn() { DataPropertyName = propertyName, HeaderText = headerText };
+            column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             dataGridView.Columns.Add(column);
         }
 
@@ -78,6 +81,16 @@ namespace GenetixKit.Core
         public static T GetSelectedObj<T>(this DataGridView dataGridView) where T : class
         {
             return (dataGridView.SelectedRows.Count > 0) ? dataGridView.SelectedRows[0].DataBoundItem as T : null;
+        }
+
+        public static TreeNode FindByTag(this TreeView treeView, TreeNode rootNode, object tag)
+        {
+            foreach (TreeNode node in rootNode.Nodes) {
+                if (node.Tag.Equals(tag)) return node;
+                TreeNode next = FindByTag(treeView, node, tag);
+                if (next != null) return next;
+            }
+            return null;
         }
     }
 }

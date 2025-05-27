@@ -174,10 +174,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "OneToOneCmpFrm";
-            this.ShowInTaskbar = false;
             this.Text = "One-To-One Comparison";
             ((System.ComponentModel.ISupportInitialize)(this.dgvSegmentIdx)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);

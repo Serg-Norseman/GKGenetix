@@ -1,6 +1,6 @@
 ﻿namespace GenetixKit.Forms
 {
-    partial class QuickEditKit
+    partial class KitsExplorer
     {
         private System.Windows.Forms.DataGridView dgvEditKit;
 
@@ -24,6 +24,7 @@
             this.dgvEditKit.Size = new System.Drawing.Size(784, 562);
             this.dgvEditKit.TabIndex = 1;
             this.dgvEditKit.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvEditKit_CellContentClick);
+            this.dgvEditKit.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(dgvEditKit_CellFormatting);
             // 
             // QuickEditKit
             // 
@@ -31,12 +32,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.dgvEditKit);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "QuickEditKit";
-            this.ShowInTaskbar = false;
             this.Text = "Quick Edit Kit";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.QuickEditKit_FormClosing);
+            this.Closing += new System.EventHandler(this.QuickEditKit_FormClosing);
             this.Load += new System.EventHandler(this.QuickEditKit_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvEditKit)).EndInit();
             this.ResumeLayout(false);

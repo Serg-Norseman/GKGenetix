@@ -259,8 +259,6 @@
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.splitContainer1);
             this.Margin = new System.Windows.Forms.Padding(2);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(604, 495);
             this.Name = "IsoggYTreeFrm";
             this.Text = "ISOGG Y-Tree";
