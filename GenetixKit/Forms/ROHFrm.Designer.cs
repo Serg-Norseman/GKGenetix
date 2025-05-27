@@ -209,10 +209,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "ROHFrm";
-            this.ShowInTaskbar = false;
             this.Text = "Runs of Homozygosity";
             this.Load += new System.EventHandler(this.ROHFrm_Load);
             this.panel1.ResumeLayout(false);

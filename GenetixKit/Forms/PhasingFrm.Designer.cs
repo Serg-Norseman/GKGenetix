@@ -208,10 +208,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.tableLayoutPanel2);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "PhasingFrm";
-            this.ShowInTaskbar = false;
             this.Text = "Phasing Utility";
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();

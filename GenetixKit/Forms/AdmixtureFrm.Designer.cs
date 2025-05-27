@@ -175,10 +175,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "AdmixtureFrm";
-            this.ShowInTaskbar = false;
             this.Text = "Admixture";
             this.Load += new System.EventHandler(this.AdmixtureFrm_Load);
             this.tableLayoutPanel1.ResumeLayout(false);

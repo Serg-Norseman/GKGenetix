@@ -15,7 +15,7 @@ using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
-    public partial class MitoMapFrm : Form
+    public partial class MitoMapFrm : GKWidget
     {
         private char[] RSRS = null;
         private readonly string kit = null;
@@ -24,6 +24,17 @@ namespace GenetixKit.Forms
         private readonly SortedDictionary<int, List<string>> kitInsertions = new SortedDictionary<int, List<string>>();
         private string mutations = null;
         private int initialValue = -1;
+
+
+        public static bool CanBeUsed(IList<KitDTO> selectedKits)
+        {
+            return (selectedKits != null && selectedKits.Count == 1 && !selectedKits[0].Disabled && GKSqlFuncs.ExistsMtDna(selectedKits[0].KitNo));
+        }
+
+
+        public MitoMapFrm(IList<KitDTO> selectedKits) : this(selectedKits[0].KitNo)
+        {
+        }
 
         public MitoMapFrm(string kit)
         {

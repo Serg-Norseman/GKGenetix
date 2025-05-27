@@ -203,8 +203,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.tableLayoutPanel1);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "MitoMapFrm";
             this.Text = "Mito Map";
             this.Load += new System.EventHandler(this.MitoMapFrm_Load);

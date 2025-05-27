@@ -13,11 +13,24 @@ using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
-    public partial class IsoggYTreeFrm : Form
+    public partial class IsoggYTreeFrm : GKWidget
     {
         private readonly string kit = null;
         private readonly List<TreeNode> snpMap = new List<TreeNode>();
         private IList<string> snpArray = null;
+        private ISOGGYTreeNode isoggYTree = null;
+        private TreeNode root;
+
+
+        public static bool CanBeUsed(IList<KitDTO> selectedKits)
+        {
+            return (selectedKits != null && selectedKits.Count == 1 && !selectedKits[0].Disabled && GKSqlFuncs.ExistsYDna(selectedKits[0].KitNo));
+        }
+
+
+        public IsoggYTreeFrm(IList<KitDTO> selectedKits) : this(selectedKits[0].KitNo)
+        {
+        }
 
         public IsoggYTreeFrm(string kit)
         {
@@ -32,8 +45,8 @@ namespace GenetixKit.Forms
 
             snpMap.Clear();
             treeView1.BeginUpdate();
-            var isoggYTree = GKData.ISOGGYTree;
-            TreeNode root = new TreeNode("Adam");
+            isoggYTree = GKData.ISOGGYTree;
+            root = new TreeNode("Adam");
             treeView1.Nodes.Add(root);
             BuildTree(treeView1, root, isoggYTree);
             treeView1.CollapseAll();
@@ -41,7 +54,7 @@ namespace GenetixKit.Forms
 
             string kitSNPs = GKSqlFuncs.GetYSNPs(kit);
             txtSNPs.Text = kitSNPs;
-            snpArray = FilterSNPsOnTree(kitSNPs);
+            snpArray = GKGenFuncs.FilterSNPsOnYTree(kitSNPs);
 
             timer2.Enabled = true;
         }
@@ -61,91 +74,36 @@ namespace GenetixKit.Forms
         {
             treeView1.BeginUpdate();
 
-            foreach (TreeNode node in snpMap) {
-                node.ForeColor = Color.Gray;
-                node.BackColor = Color.White;
-            }
-
-            TreeNode hg_maxpath = null;
-            foreach (TreeNode key in snpMap) {
-                string hg_snps = ((ISOGGYTreeNode)key.Tag).Markers.Trim();
-                if (hg_snps.Equals("-"))
-                    continue;
-
-                foreach (string hg_snp in hg_snps.Replace(" ", "").Split(new char[] { ',', '/' })) {
-                    foreach (string snp in snpArray) {
-                        string snp_ss = snp.Substring(0, snp.Length - 1).Trim();
-                        if (hg_snp.Trim() != snp_ss) continue;
-
-                        if (snp.EndsWith("-")) {
-                            SetNodeVisual(key, '-');
-                        } else if (snp.EndsWith("+")) {
-                            SetNodeVisual(key, '+');
-
-                            if (hg_maxpath == null) {
-                                hg_maxpath = key;
-                            } else {
-                                if (key.FullPath.LastIndexOf('\\') > hg_maxpath.FullPath.LastIndexOf('\\') && key.Parent.BackColor != Color.Red)
-                                    hg_maxpath = key;
-                            }
-                        }
-                    }
-                }
-            }
+            var hg_maxpath = GKGenFuncs.FindYHaplogroup(isoggYTree, snpArray);
 
             foreach (TreeNode node in snpMap) {
-                if (node.BackColor != Color.DarkGreen && node.BackColor != Color.Red && node.BackColor != Color.LightGreen) {
-                    node.ForeColor = Color.Gray;
-                    node.BackColor = Color.White;
+                var pnNode = ((ISOGGYTreeNode)node.Tag);
+                switch (pnNode.Status) {
+                    case GKGenFuncs.YHGS_DG:
+                        node.ForeColor = Color.White;
+                        node.BackColor = Color.DarkGreen;
+                        break;
+
+                    case GKGenFuncs.YHGS_LG:
+                        node.ForeColor = Color.Orange;
+                        node.BackColor = Color.LightGreen;
+                        break;
+
+                    case GKGenFuncs.YHGS_R:
+                        node.ForeColor = Color.Yellow;
+                        node.BackColor = Color.Red;
+                        break;
                 }
             }
 
             if (hg_maxpath != null) {
-                hg_maxpath.NodeFont = new Font("Microsoft Sans Serif", 7.8f, FontStyle.Underline);
-                hg_maxpath.EnsureVisible();
-                treeView1.SelectedNode = hg_maxpath;
-                lblyhg.Text = hg_maxpath.Text;
+                var tn = treeView1.FindByTag(root, hg_maxpath);
+                tn.EnsureVisible();
+                treeView1.SelectedNode = tn;
+                lblyhg.Text = tn.Text;
             }
 
             treeView1.EndUpdate();
-        }
-
-        private void SetNodeVisual(TreeNode key, char sign)
-        {
-            if (sign == '-') {
-                if (key.ForeColor == Color.White && key.BackColor == Color.DarkGreen) {
-                    key.ForeColor = Color.Orange;
-                    key.BackColor = Color.LightGreen;
-                } else if (key.ForeColor != Color.Orange && key.BackColor != Color.LightGreen) {
-                    key.ForeColor = Color.Yellow;
-                    key.BackColor = Color.Red;
-                }
-            } else if (sign == '+') {
-                if (key.ForeColor == Color.Yellow && key.BackColor == Color.Red) {
-                    key.ForeColor = Color.Orange;
-                    key.BackColor = Color.LightGreen;
-                } else if (key.ForeColor != Color.Orange && key.BackColor != Color.LightGreen) {
-                    key.ForeColor = Color.White;
-                    key.BackColor = Color.DarkGreen;
-                }
-            }
-        }
-
-        private IList<string> FilterSNPsOnTree(string kitSNPs)
-        {
-            var snpOnTree = new List<string>();
-            snpOnTree.AddRange(Properties.Resources.snps_on_tree.Split(new char[] { ',' }));
-
-            string[] entered_snps = kitSNPs.Replace(" ", "").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-            var valid_snps = new List<string>();
-            foreach (string s in entered_snps) {
-                // extract string without ending sign (-)
-                string es = s.Substring(0, s.Length - 1);
-                if (snpOnTree.Contains(es)) {
-                    valid_snps.Add(s);
-                }
-            }
-            return valid_snps;
         }
 
         private void timer2_Tick(object sender, EventArgs e)
@@ -160,7 +118,7 @@ namespace GenetixKit.Forms
             TreeNode node = treeView1.SelectedNode;
             label1.Text = "Defining SNPs for " + node.Text;
 
-            snpTextBox.Text = " " + ((ISOGGYTreeNode)node.Tag).Markers + " ";
+            snpTextBox.Text = " " + ((ISOGGYTreeNode)node.Tag).Markers.Replace(",", ", ") + " ";
             snpTextBox.SelectAll();
             snpTextBox.SelectionColor = Color.Gray;
 

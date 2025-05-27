@@ -14,14 +14,25 @@ using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
-    public partial class MatchingKitsFrm : Form
+    public partial class MatchingKitsFrm : GKWidget
     {
-        private readonly string kit = null;
+        private string kit = null;
         private string phasedKit = null;
         private string unphasedKit = null;
         private bool phased = false;
         private IList<CmpSegment> tblSegments = null;
         private IList<CmpSegmentRow> tblAlleles = null;
+
+
+        public static bool CanBeUsed(IList<KitDTO> selectedKits)
+        {
+            return (selectedKits != null && selectedKits.Count == 1 && !selectedKits[0].Disabled);
+        }
+
+
+        public MatchingKitsFrm(IList<KitDTO> selectedKits) : this(selectedKits[0].KitNo)
+        {
+        }
 
         public MatchingKitsFrm(string kit)
         {
@@ -54,6 +65,11 @@ namespace GenetixKit.Forms
         }
 
         private void MatchingKitsFrm_Load(object sender, EventArgs e)
+        {
+            UpdateView();
+        }
+
+        private void UpdateView()
         {
             btnKit.Text = kit;
             lblName.Text = GKSqlFuncs.GetKitName(kit);
@@ -125,7 +141,8 @@ namespace GenetixKit.Forms
 
         private void btnKit_Click(object sender, EventArgs e)
         {
-            Program.KitInstance.SelectOper(UIOperation.SELECT_ONE_TO_MANY);
+            this.kit = Program.KitInstance.SelectKit();
+            UpdateView();
         }
 
         private void dgvSegments_CellDoubleClick(object sender, DataGridViewCellEventArgs e)

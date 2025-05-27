@@ -5,9 +5,11 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
+using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
@@ -18,11 +20,13 @@ namespace GenetixKit.Forms
         public GKMainFrm()
         {
             InitializeComponent();
+
+            kitsExplorer.SelectionChanged += kitsExplorer_SelectionChanged;
         }
 
         #region Handlers
 
-        private void GGKitFrmMain_Load(object sender, EventArgs e)
+        private void GKMainFrm_Load(object sender, EventArgs e)
         {
             SetStatus("Checking Integrity of DB ...");
             this.Enabled = false;
@@ -39,6 +43,20 @@ namespace GenetixKit.Forms
             });
         }
 
+        private void kitsExplorer_SelectionChanged(object sender, EventArgs e)
+        {
+            var selKits = kitsExplorer.SelectedKits;
+
+            miOpen.Enabled = selKits != null && selKits.Count == 1;
+            miAdmixture.Enabled = AdmixtureFrm.CanBeUsed(selKits);
+            miISOGGYTree.Enabled = IsoggYTreeFrm.CanBeUsed(selKits);
+            miOneToMany.Enabled = MatchingKitsFrm.CanBeUsed(selKits);
+            miMitoMap.Enabled = MitoMapFrm.CanBeUsed(selKits);
+            miMtDnaPhylogeny.Enabled = MtPhylogenyFrm.CanBeUsed(selKits);
+            miOneToOne.Enabled = OneToOneCmpFrm.CanBeUsed(selKits);
+            miRunsOfHomozygosity.Enabled = ROHFrm.CanBeUsed(selKits);
+        }
+
         private void miExit_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -46,21 +64,23 @@ namespace GenetixKit.Forms
 
         private void miNew_Click(object sender, EventArgs e)
         {
-            NewKit(null, false);
+            NewKit();
         }
 
         private void miSave_Click(object sender, EventArgs e)
         {
-            Form mdifrm = this.ActiveMdiChild;
-            if (mdifrm.Name == "NewEditKitFrm")
-                ((NewEditKitFrm)mdifrm).Save();
-            else if (mdifrm.Name == "QuickEditKit")
-                ((QuickEditKit)mdifrm).Save();
+            var widget = (panWidget.Controls.Count > 0) ? panWidget.Controls[0] : null;
+
+            if (widget.Name == "NewEditKitFrm")
+                ((NewEditKitFrm)widget).Save();
+            else
+                kitsExplorer.Save();
         }
 
         private void miOpen_Click(object sender, EventArgs e)
         {
-            SelectOper(UIOperation.OPEN_KIT);
+            var selKit = kitsExplorer.SelectedKits[0];
+            Program.KitInstance.OpenKit(selKit.KitNo, selKit.Disabled);
         }
 
         private void miDelete_Click(object sender, EventArgs e)
@@ -70,14 +90,12 @@ namespace GenetixKit.Forms
 
         private void miOneToOne_Click(object sender, EventArgs e)
         {
-            using (var frm = new SelectTwoKitsFrm(UIOperation.SELECT_ADMIXTURE)) {
-                frm.ShowDialog(this);
-            }
+            Program.KitInstance.ShowOneToOneCmp(kitsExplorer.SelectedKits);
         }
 
         private void miOneToMany_Click(object sender, EventArgs e)
         {
-            SelectOper(UIOperation.SELECT_ONE_TO_MANY);
+            Program.KitInstance.ShowMatchingKits(kitsExplorer.SelectedKits);
         }
 
         private void miProcessKits_Click(object sender, EventArgs e)
@@ -87,56 +105,60 @@ namespace GenetixKit.Forms
 
         private void miAdmixture_Click(object sender, EventArgs e)
         {
-            SelectKitFrm open = new SelectKitFrm(UIOperation.SELECT_ADMIXTURE);
-            open.ShowDialog(this);
-        }
-
-        private void miQuickEdit_Click(object sender, EventArgs e)
-        {
-            ShowQuickEdit();
+            Program.KitInstance.ShowAdmixture(kitsExplorer.SelectedKits);
         }
 
         private void miRunsOfHomozygosity_Click(object sender, EventArgs e)
         {
-            SelectOper(UIOperation.SELECT_ROH);
+            Program.KitInstance.ShowROH(kitsExplorer.SelectedKits);
         }
 
         private void miMtDnaPhylogeny_Click(object sender, EventArgs e)
         {
-            SelectOper(UIOperation.SELECT_MTPHYLOGENY);
+            Program.KitInstance.ShowMtPhylogeny(kitsExplorer.SelectedKits);
         }
 
         private void miMitoMap_Click(object sender, EventArgs e)
         {
-            SelectOper(UIOperation.SELECT_MITOMAP);
+            Program.KitInstance.ShowMitoMap(kitsExplorer.SelectedKits);
         }
 
         private void miISOGGYTree_Click(object sender, EventArgs e)
         {
-            SelectOper(UIOperation.SELECT_ISOGGYTREE);
+            Program.KitInstance.ShowIsoggYTree(kitsExplorer.SelectedKits);
         }
 
         private void miPhasing_Click(object sender, EventArgs e)
         {
-            ShowMdiChild(new PhasingFrm());
+            ShowWidget(new PhasingFrm());
+        }
+
+        private void btnWidgetClose_Click(object sender, EventArgs e)
+        {
+            CloseWidgets();
         }
 
         #endregion
 
-        private void ShowMdiChild(Form frm)
+        private void CloseWidgets()
         {
-            foreach (Form fm in MdiChildren) fm.Dispose();
+            lblWidgetTitle.Text = "...";
+            foreach (Control fm in panWidget.Controls) fm.Dispose();
+        }
 
-            frm.MdiParent = this;
-            frm.Visible = true;
-            frm.WindowState = FormWindowState.Maximized;
+        private void ShowWidget(GKWidget frm)
+        {
+            CloseWidgets();
+
+            frm.Dock = DockStyle.Fill;
+            panWidget.Controls.Add(frm);
+
+            lblWidgetTitle.Text = frm.Text;
         }
 
         public void DeleteKit()
         {
-            Form mdifrm = this.ActiveMdiChild;
-            if (mdifrm.Name == "QuickEditKit")
-                ((QuickEditKit)mdifrm).Delete();
+            kitsExplorer.Delete();
         }
 
         public void SetStatus(string message)
@@ -154,11 +176,18 @@ namespace GenetixKit.Forms
             }
         }
 
-        public void NewKit(string kit, bool disabled)
+        public void NewKit()
+        {
+            if (newKitFrm == null || newKitFrm.IsDisposed)
+                newKitFrm = new NewEditKitFrm(null, false);
+            ShowWidget(newKitFrm);
+        }
+
+        public void OpenKit(string kit, bool disabled)
         {
             if (newKitFrm == null || newKitFrm.IsDisposed)
                 newKitFrm = new NewEditKitFrm(kit, disabled);
-            ShowMdiChild(newKitFrm);
+            ShowWidget(newKitFrm);
         }
 
         public void EnableSave()
@@ -191,19 +220,14 @@ namespace GenetixKit.Forms
             miDelete.Enabled = false;
         }
 
-        public void ShowAdmixture(string kit)
+        public void ShowAdmixture(IList<KitDTO> selectedKits)
         {
-            ShowMdiChild(new AdmixtureFrm(kit));
+            ShowWidget(new AdmixtureFrm(selectedKits));
         }
 
         public void ShowProcessKits()
         {
-            ShowMdiChild(new ProcessKitsFrm());
-        }
-
-        public void ShowQuickEdit()
-        {
-            ShowMdiChild(new QuickEditKit());
+            ShowWidget(new ProcessKitsFrm());
         }
 
         public void ShowPhasedSegmentVisualizer(string kit1, string kit2, string chr, int startPos, int endPos)
@@ -212,48 +236,42 @@ namespace GenetixKit.Forms
                 frm.ShowDialog(this);
         }
 
-        public void SelectOper(UIOperation operation)
-        {
-            using (SelectKitFrm open = new SelectKitFrm(operation))
-                open.ShowDialog(this);
-        }
-
         public string SelectKit()
         {
-            using (var open = new SelectKitFrm(UIOperation.SELECT_KIT)) {
+            using (var open = new SelectKitFrm()) {
                 open.ShowDialog(this);
                 return open.GetSelectedKit();
             }
         }
 
-        public void ShowMatchingKits(string kit)
+        public void ShowMatchingKits(IList<KitDTO> selectedKits)
         {
-            ShowMdiChild(new MatchingKitsFrm(kit));
+            ShowWidget(new MatchingKitsFrm(selectedKits));
         }
 
-        public void ShowROH(string kit)
+        public void ShowROH(IList<KitDTO> selectedKits)
         {
-            ShowMdiChild(new ROHFrm(kit));
+            ShowWidget(new ROHFrm(selectedKits));
         }
 
-        public void ShowMtPhylogeny(string kit)
+        public void ShowMtPhylogeny(IList<KitDTO> selectedKits)
         {
-            ShowMdiChild(new MtPhylogenyFrm(kit));
+            ShowWidget(new MtPhylogenyFrm(selectedKits));
         }
 
-        public void ShowMitoMap(string kit)
+        public void ShowMitoMap(IList<KitDTO> selectedKits)
         {
-            ShowMdiChild(new MitoMapFrm(kit));
+            ShowWidget(new MitoMapFrm(selectedKits));
         }
 
-        public void ShowIsoggYTree(string kit)
+        public void ShowIsoggYTree(IList<KitDTO> selectedKits)
         {
-            ShowMdiChild(new IsoggYTreeFrm(kit));
+            ShowWidget(new IsoggYTreeFrm(selectedKits));
         }
 
-        public void ShowOneToOneCmp(string kit1, string kit2)
+        public void ShowOneToOneCmp(IList<KitDTO> selectedKits)
         {
-            ShowMdiChild(new OneToOneCmpFrm(kit1, kit2));
+            ShowWidget(new OneToOneCmpFrm(selectedKits));
         }
 
         public void SelectLocation(ref int x, ref int y)
@@ -263,6 +281,20 @@ namespace GenetixKit.Forms
                 x = frm.X;
                 y = frm.Y;
             }
+        }
+    }
+
+
+    public class GKWidget : UserControl
+    {
+        public event EventHandler Closing;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) {
+                Closing?.Invoke(this, EventArgs.Empty);
+            }
+            base.Dispose(disposing);
         }
     }
 }

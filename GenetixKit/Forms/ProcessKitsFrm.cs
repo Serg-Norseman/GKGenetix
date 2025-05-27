@@ -13,7 +13,7 @@ using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
-    public partial class ProcessKitsFrm : Form
+    public partial class ProcessKitsFrm : GKWidget
     {
         private string kit1 = null;
         private string kit2 = null;
@@ -22,12 +22,13 @@ namespace GenetixKit.Forms
         private bool redoVisual = false;
         private IList<KitDTO> dt;
 
+
         public ProcessKitsFrm()
         {
             InitializeComponent();
         }
 
-        private void ProcessKitsFrm_FormClosing(object sender, FormClosingEventArgs e)
+        private void ProcessKitsFrm_FormClosing(object sender, EventArgs e)
         {
             if (bwCompare.IsBusy || bwROH.IsBusy || bwPhaseVisualizer.IsBusy) {
                 Program.KitInstance.SetStatus("Cancelling...");
@@ -40,8 +41,8 @@ namespace GenetixKit.Forms
                     bwROH.CancelAsync();
                 if (bwPhaseVisualizer.IsBusy)
                     bwPhaseVisualizer.CancelAsync();
-                e.Cancel = true;
-                this.Close();
+                //e.Cancel = true;
+                //this.Close();
             } else {
                 Program.KitInstance.SetStatus("Done.");
                 Program.KitInstance.SetProgress(-1);

@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,35 +15,61 @@ using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
-    public partial class QuickEditKit : Form
+    public partial class KitsExplorer : GKWidget
     {
         private IList<KitDTO> tblKits;
 
-        public QuickEditKit()
+
+        public IList<KitDTO> SelectedKits
+        {
+            get {
+                var selectedRows = dgvEditKit.SelectedRows.Cast<DataGridViewRow>().Select(x => { return ((KitDTO)x.DataBoundItem); }).ToList();
+                return selectedRows;
+            }
+        }
+
+        public event EventHandler SelectionChanged;
+
+
+        public KitsExplorer()
         {
             InitializeComponent();
 
+            dgvEditKit.SelectionChanged += new EventHandler(dgvEditKit_SelectionChanged);
             dgvEditKit.AutoGenerateColumns = false;
             dgvEditKit.AddColumn("KitNo", "Kit#");
             dgvEditKit.AddColumn("Name", "Name", "", true, false);
             dgvEditKit.AddComboColumn("Sex", "Sex", new object[] { "Unknown", "Male", "Female" });
             dgvEditKit.AddCheckedColumn("Disabled", "Disabled");
             dgvEditKit.AddButtonColumn("Location", "Location");
+            dgvEditKit.AddColumn("LastModified", "Last Modified");
         }
 
         private void QuickEditKit_Load(object sender, EventArgs e)
         {
+            if (this.DesignMode) return;
+
             Program.KitInstance.EnableSave();
             Program.KitInstance.EnableDelete();
 
-            tblKits = GKSqlFuncs.QueryKits();
-            dgvEditKit.DataSource = tblKits;
+            UpdateView();
         }
 
-        private void QuickEditKit_FormClosing(object sender, FormClosingEventArgs e)
+        private void QuickEditKit_FormClosing(object sender, EventArgs e)
         {
             Program.KitInstance.DisableSave();
             Program.KitInstance.DisableDelete();
+        }
+
+        private void dgvEditKit_SelectionChanged(object sender, EventArgs e)
+        {
+            SelectionChanged?.Invoke(this, e);
+        }
+
+        public void UpdateView()
+        {
+            tblKits = GKSqlFuncs.QueryKits();
+            dgvEditKit.DataSource = tblKits;
         }
 
         public void Save()
@@ -68,7 +95,7 @@ namespace GenetixKit.Forms
 
         public void Delete()
         {
-            var rowsToDelete = dgvEditKit.SelectedRows.Cast<DataGridViewRow>().Select(x => { return ((KitDTO)x.DataBoundItem); }).ToList();
+            var rowsToDelete = this.SelectedKits;
 
             int selRowsCount = rowsToDelete.Count;
             if (MessageBox.Show($"You had selected {selRowsCount} kits to be deleted. Are you sure?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
@@ -92,6 +119,12 @@ namespace GenetixKit.Forms
                     }));
                 }, rowsToDelete);
             }
+        }
+
+        private void dgvEditKit_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            var row = ((IList<KitDTO>)dgvEditKit.DataSource)[e.RowIndex];
+            e.CellStyle.ForeColor = (!row.Disabled) ? Color.Black : Color.LightGray;
         }
 
         private void dgvEditKit_CellContentClick(object sender, DataGridViewCellEventArgs e)

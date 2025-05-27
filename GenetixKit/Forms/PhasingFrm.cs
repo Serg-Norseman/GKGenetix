@@ -14,13 +14,14 @@ using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
-    public partial class PhasingFrm : Form
+    public partial class PhasingFrm : GKWidget
     {
         private string fatherKit = "Unknown";
         private string motherKit = "Unknown";
         private string childKit = "Unknown";
         private IList<PhaseRow> dt = null;
         private bool male = true;
+
 
         public PhasingFrm()
         {

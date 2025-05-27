@@ -124,7 +124,7 @@ namespace GenetixKit.Core
                 if (isoggYTree == null) {
                     XDocument doc = XDocument.Parse(Properties.Resources.ytree);
 
-                    isoggYTree = new ISOGGYTreeNode("Adam");
+                    isoggYTree = new ISOGGYTreeNode(null, "Adam");
                     foreach (XElement el in doc.Root.Elements()) {
                         BuildYTree(isoggYTree, el);
                     }
@@ -147,10 +147,9 @@ namespace GenetixKit.Core
                     pnName = Utilities.RemoveDuplicates(pnName);
 
                 string pnMarkers = attrMarkers.Value.Trim();
-                pnMarkers = pnMarkers.Replace(",", ", ");
 
                 if (pnName != "") {
-                    tn = new ISOGGYTreeNode(pnName, pnMarkers);
+                    tn = new ISOGGYTreeNode(parent, pnName, pnMarkers);
                     parent.Children.Add(tn);
                 }
 
@@ -172,7 +171,7 @@ namespace GenetixKit.Core
                 if (mtTree == null) {
                     XDocument doc = XDocument.Parse(Properties.Resources.mtDNAPhylogeny);
 
-                    mtTree = new MtDNAPhylogenyNode("Eve");
+                    mtTree = new MtDNAPhylogenyNode(null, "Eve");
                     foreach (XElement el in doc.Root.Elements()) {
                         BuildMtTree(mtTree, el);
                     }
@@ -193,7 +192,7 @@ namespace GenetixKit.Core
             string pnMarkers = attrMarkers.Value.Trim();
 
             if (pnName != "") {
-                tn = new MtDNAPhylogenyNode(pnName, pnMarkers);
+                tn = new MtDNAPhylogenyNode(parent, pnName, pnMarkers);
                 parent.Children.Add(tn);
             }
 

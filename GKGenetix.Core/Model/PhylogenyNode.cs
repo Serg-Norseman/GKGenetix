@@ -23,7 +23,7 @@ using System.Collections.Generic;
 namespace GKGenetix.Core.Model
 {
     // Phylogeny, phylogenetic tree (https://en.wikipedia.org/wiki/Phylogenesis)
-    public class PhylogenyNode<T>
+    public class PhylogenyNode<T> where T : PhylogenyNode<T>
     {
         private List<T> fChildren = null;
 
@@ -38,27 +38,38 @@ namespace GKGenetix.Core.Model
             }
         }
 
+        public T Parent;
         public string Name;
         public string Markers;
+        public int Depth;
+
+        public int Status;
+
+        protected PhylogenyNode(T parent, string name, string markers)
+        {
+            Parent = parent;
+            Name = name;
+            Markers = markers.Replace(" ", "");
+
+            if (parent == null)
+                Depth = 1;
+            else Depth = parent.Depth + 1;
+        }
     }
 
 
     public class MtDNAPhylogenyNode : PhylogenyNode<MtDNAPhylogenyNode>
     {
-        public MtDNAPhylogenyNode(string name, string markers = "")
+        public MtDNAPhylogenyNode(MtDNAPhylogenyNode parent, string name, string markers = "") : base(parent, name, markers)
         {
-            Name = name;
-            Markers = markers;
         }
     }
 
 
     public class ISOGGYTreeNode : PhylogenyNode<ISOGGYTreeNode>
     {
-        public ISOGGYTreeNode(string name, string markers = "")
+        public ISOGGYTreeNode(ISOGGYTreeNode parent, string name, string markers = "") : base(parent, name, markers)
         {
-            Name = name;
-            Markers = markers;
         }
     }
 }

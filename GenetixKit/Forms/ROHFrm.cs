@@ -14,10 +14,21 @@ using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
-    public partial class ROHFrm : Form
+    public partial class ROHFrm : GKWidget
     {
         private readonly string kit = null;
         private IList<ROHSegment> roh_results;
+
+
+        public static bool CanBeUsed(IList<KitDTO> selectedKits)
+        {
+            return (selectedKits != null && selectedKits.Count == 1 && !selectedKits[0].Disabled);
+        }
+
+
+        public ROHFrm(IList<KitDTO> selectedKits) : this(selectedKits[0].KitNo)
+        {
+        }
 
         public ROHFrm(string kit)
         {

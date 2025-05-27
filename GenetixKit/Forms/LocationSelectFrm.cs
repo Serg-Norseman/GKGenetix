@@ -20,6 +20,7 @@ namespace GenetixKit.Forms
         private Pen pen2;
         private int mX, mY;
 
+
         public LocationSelectFrm(int x, int y)
         {
             InitializeComponent();

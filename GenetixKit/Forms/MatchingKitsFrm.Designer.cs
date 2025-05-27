@@ -218,8 +218,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.splitContainer1);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "MatchingKitsFrm";
             this.Text = "Matching Kits";
             this.Load += new System.EventHandler(this.MatchingKitsFrm_Load);

@@ -16,7 +16,7 @@ using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
 {
-    public partial class NewEditKitFrm : Form
+    public partial class NewEditKitFrm : GKWidget
     {
         private bool saveSuccess = false;
         private string ysnps = null;
@@ -24,6 +24,7 @@ namespace GenetixKit.Forms
         private readonly string kit;
         private readonly bool kitDisabled = false;
         private readonly Control[] editableCtrls = null;
+
 
         public NewEditKitFrm(string kit, bool disabled)
         {
@@ -63,7 +64,7 @@ namespace GenetixKit.Forms
             }
         }
 
-        private void NewKitFrm_FormClosing(object sender, FormClosingEventArgs e)
+        private void NewKitFrm_FormClosing(object sender, EventArgs e)
         {
             if (bwSave.IsBusy)
                 bwSave.CancelAsync();
@@ -533,8 +534,8 @@ namespace GenetixKit.Forms
             Program.KitInstance.SetProgress(-1);
             this.Enabled = true;
             Program.KitInstance.EnableToolbar();
-            if (saveSuccess)
-                this.Close();
+            //if (saveSuccess)
+                //this.Close();
         }
 
         #endregion
