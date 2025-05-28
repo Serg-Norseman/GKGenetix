@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using GenetixKit.Core;
@@ -17,12 +18,10 @@ namespace GenetixKit.Forms
 {
     public partial class MitoMapFrm : GKWidget
     {
-        private char[] RSRS = null;
         private readonly string kit = null;
         private readonly Dictionary<int, string[]> nucleotides = new Dictionary<int, string[]>();
         private readonly SortedDictionary<int, List<string>> kitMutations = new SortedDictionary<int, List<string>>();
         private readonly SortedDictionary<int, List<string>> kitInsertions = new SortedDictionary<int, List<string>>();
-        private string mutations = null;
         private int initialValue = -1;
 
 
@@ -72,14 +71,17 @@ namespace GenetixKit.Forms
             }
             dgvmtdna.DataSource = mtdna_map;
 
-            RSRS = GKData.RSRS;
-            for (int i = 0; i < RSRS.Length; i++)
-                nucleotides.Add(i + 1, new string[] { (i + 1).ToString(), RSRS[i].ToString(), RSRS[i].ToString() });
+            Task.Factory.StartNew(() => {
+                var RSRS = GKData.RSRS;
+                for (int i = 0; i < RSRS.Length; i++)
+                    nucleotides.Add(i + 1, new string[] { (i + 1).ToString(), RSRS[i].ToString(), RSRS[i].ToString() });
 
-            GKSqlFuncs.GetMtDNA(kit, out mutations, out _);
-            dgvNucleotides.Columns[2].HeaderText = GKSqlFuncs.GetKitName(kit) + " (" + kit + ")";
+                GKGenFuncs.GetMtDNA(kit, out string mutations, out _, kitMutations, kitInsertions);
 
-            LoadKitMutations();
+                this.Invoke(new MethodInvoker(delegate {
+                    dgvNucleotides.Columns[2].HeaderText = $"{kit} ({GKSqlFuncs.GetKitName(kit)})";
+                }));
+            });
         }
 
         private void dgvmtdna_SelectionChanged(object sender, EventArgs e)
@@ -144,42 +146,6 @@ namespace GenetixKit.Forms
             PopulateFASTA(title, start, end);
         }
 
-        private void LoadKitMutations()
-        {
-            foreach (string mutation in mutations.Split(new char[] { ',' })) {
-                string mut = mutation.Trim();
-                string allele;
-                List<string> alleles;
-
-                if (mut.IndexOf(".") != -1) {
-                    // insert
-                    allele = mut[mut.Length - 1].ToString();
-                    int pos = int.Parse(mut.Substring(0, mut.IndexOf(".")));
-
-                    if (!kitInsertions.ContainsKey(pos))
-                        alleles = new List<string>();
-                    else
-                        alleles = kitInsertions[pos];
-
-                    alleles.Add(allele);
-                    kitInsertions.Remove(pos);
-                    kitInsertions.Add(pos, alleles);
-                } else {
-                    allele = mut[mut.Length - 1].ToString();
-                    int pos = int.Parse(mut.Substring(1, mut.Length - 2));
-
-                    if (!kitMutations.ContainsKey(pos))
-                        alleles = new List<string>();
-                    else
-                        alleles = kitMutations[pos];
-
-                    alleles.Add(allele);
-                    kitMutations.Remove(pos);
-                    kitMutations.Add(pos, alleles);
-                }
-            }
-        }
-
         private void mtdna_chart_MouseDown(object sender, MouseEventArgs e)
         {
             initialValue = e.Y;
@@ -190,9 +156,7 @@ namespace GenetixKit.Forms
             if (initialValue != -1) {
                 if (e.Button == MouseButtons.Left) {
                     int new_y = e.Y - initialValue;
-
                     int new_degree = new_y * (90) / 1200;
-
                     new_degree += mtdna_chart.ChartAreas[0].Area3DStyle.Inclination;
 
                     if (new_degree < -90)
@@ -206,7 +170,6 @@ namespace GenetixKit.Forms
 
                 if (e.Button == MouseButtons.Right) {
                     int new_y = e.Y - initialValue;
-
                     int new_degree = new_y * 180 / 1200;
 
                     string tmp = mtdna_chart.Series[0].CustomProperties;
@@ -215,8 +178,8 @@ namespace GenetixKit.Forms
                     start_pos = tmp.IndexOf(",");
                     if (start_pos != -1)
                         tmp = tmp.Substring(0, start_pos);
-                    int angle = int.Parse(tmp.Trim());
 
+                    int angle = int.Parse(tmp.Trim());
                     new_degree += angle;
 
                     if (new_degree < -180)
@@ -225,7 +188,6 @@ namespace GenetixKit.Forms
                     if (new_degree > 180)
                         new_degree = -180 + (new_degree - 180);
 
-                    //PieLineColor=Black, CollectedSliceExploded=True, DoughnutRadius=5, PieDrawingStyle=SoftEdge, PieLabelStyle=Outside, PieStartAngle=300
                     mtdna_chart.Series[0].CustomProperties = "PieLineColor=Black, CollectedSliceExploded=True, DoughnutRadius=5, PieDrawingStyle=SoftEdge, PieLabelStyle=Outside, PieStartAngle=" + new_degree;
                 }
             }

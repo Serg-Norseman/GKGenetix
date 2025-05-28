@@ -36,11 +36,9 @@ namespace GenetixKit.Forms
 
         private void OpenKitFrm_Load(object sender, EventArgs e)
         {
-            string whereSql = " where reference = 0";
-
             btnOpen.Text = "Select";
 
-            tbl = GKSqlFuncs.QueryKits(false, whereSql, "");
+            tbl = GKSqlFuncs.QueryKits(false, true);
             dgvKits.DataSource = tbl;
 
             if (tbl.Count == 0) {

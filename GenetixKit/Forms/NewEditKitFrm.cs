@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GKGenetix.Core;
@@ -70,8 +71,6 @@ namespace GenetixKit.Forms
                 bwSave.CancelAsync();
             if (bwNewKitAutosomalJob.IsBusy)
                 bwNewKitAutosomalJob.CancelAsync();
-            if (bwNewKitYDNAJob.IsBusy)
-                bwNewKitYDNAJob.CancelAsync();
             if (bwPopulate.IsBusy)
                 bwPopulate.CancelAsync();
 
@@ -186,7 +185,7 @@ namespace GenetixKit.Forms
                 string[] filePaths = (string[])e.Argument;
 
                 foreach (string file_path in filePaths) {
-                    DNARec dnaout = GKGenFuncs.GetAutosomalDNAList(file_path, bwNewKitAutosomalJob);
+                    DNARec dnaout = GKGenFuncs.LoadDNAFile(file_path, bwNewKitAutosomalJob);
 
                     var ysnps_arr = dnaout.ydna;
                     var mtdna_arr = dnaout.mtdna;
@@ -261,60 +260,27 @@ namespace GenetixKit.Forms
 
         #region Y-DNA
 
-        private void textBoxYDNA_DragDrop(object sender, DragEventArgs e)
+        private void txtYDNA_DragDrop(object sender, DragEventArgs e)
         {
             if (TryGetFilesDrop(e, out string[] filePaths)) {
                 Program.KitInstance.SetStatus("Parsing Y-DNA file(s) ...");
-                bwNewKitYDNAJob.RunWorkerAsync(filePaths[0]);
-            }
-        }
 
-        private void bwNewKitYDNAJob_DoWork(object sender, DoWorkEventArgs e)
-        {
-            try {
-                var ymap = GKData.YMap;
+                var fileName = filePaths[0];
 
-                string[] lines = File.ReadAllLines(e.Argument.ToString());
-                var snpList = new List<string>();
-                string[] data = null;
-                string[] snp = null;
-                foreach (string line in lines) {
-                    data = line.Replace("\"", "").Split(new char[] { ',' });
-
-                    // "Type" 0, "Position" 1, "SNPName" 2, "Derived" 3, "OnTree" 4, "Reference" 5, "Genotype" 6, "Confidence" 7
-                    string valType = data[0];
-                    string valPos = data[1];
-                    string valSNP = data[2];
-                    string valDerived = data[3];
-                    string valGt = data[6];
-
-                    if (valType == "Known SNP") {
-                        if (valDerived == "Yes(+)") {
-                            snpList.Add(valSNP + "+");
-                        } else if (valDerived == "No(-)") {
-                            snpList.Add(valSNP + "-");
-                        }
-                    } else if (valType == "Novel Variant") {
-                        if (ymap.ContainsKey(valPos)) {
-                            snp = GKGenFuncs.GetYSNP(valPos, valGt);
-                            if (snp[0].IndexOf(";") == -1)
-                                snpList.Add(snp[0] + snp[1]);
-                            else
-                                snpList.Add(snp[0].Substring(0, snp[0].IndexOf(";")) + snp[1]);
-                        }
+                Task.Factory.StartNew(() => {
+                    try {
+                        var snpList = GKGenFuncs.LoadYDNAFile(fileName);
+                        ysnps = string.Join(", ", snpList);
+                    } catch (Exception) {
+                        MessageBox.Show($"Unable to get Y-SNPs from {fileName}");
                     }
-                }
 
-                ysnps = string.Join(", ", snpList);
-            } catch (Exception) {
-                MessageBox.Show("Unable to get Y-SNPs from " + e.Argument.ToString());
+                    this.Invoke(new MethodInvoker(delegate {
+                        txtYDNA.Text = ysnps;
+                        Program.KitInstance.SetStatus("Done.");
+                    }));
+                });
             }
-        }
-
-        private void bwNewKitYDNAJob_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            txtYDNA.Text = ysnps;
-            Program.KitInstance.SetStatus("Done.");
         }
 
         private void miDeleteRowYDNAMisc_Click(object sender, EventArgs e)
@@ -414,7 +380,7 @@ namespace GenetixKit.Forms
 
         #region Mt-DNA
 
-        private void textBoxMtDNA_DragDrop(object sender, DragEventArgs e)
+        private void txtMtDNA_DragDrop(object sender, DragEventArgs e)
         {
             if (TryGetFilesDrop(e, out string[] filePaths)) {
                 string fasta_file = filePaths[0];
@@ -427,7 +393,7 @@ namespace GenetixKit.Forms
             }
         }
 
-        private void tbFASTA_DragDrop(object sender, DragEventArgs e)
+        private void txtFASTA_DragDrop(object sender, DragEventArgs e)
         {
             if (TryGetFilesDrop(e, out string[] filePaths)) {
                 string fasta_file = filePaths[0];

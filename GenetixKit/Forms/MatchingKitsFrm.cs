@@ -147,12 +147,10 @@ namespace GenetixKit.Forms
 
         private void dgvSegments_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (!phased) return;
-
             var segment = dgvSegments.GetSelectedObj<CmpSegment>();
-            if (segment == null) return;
-
-            Program.KitInstance.ShowPhasedSegmentVisualizer(phasedKit, unphasedKit, segment.Chromosome, segment.StartPosition, segment.EndPosition);
+            if (segment != null && phased) {
+                Program.KitInstance.ShowPhasedSegmentVisualizer(phasedKit, unphasedKit, segment.Chromosome, segment.StartPosition, segment.EndPosition);
+            }
         }
     }
 }

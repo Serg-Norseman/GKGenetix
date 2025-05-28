@@ -45,12 +45,12 @@ namespace GenetixKit.Forms
         private void AdmixtureFrm_Load(object sender, EventArgs e)
         {
             kitLbl.Text = $"{kit} ({GKSqlFuncs.GetKitName(kit)})";
-            var dt = GKSqlFuncs.GetAdmixture(kit, "50");
+            var dt = GKSqlFuncs.GetAdmixture(kit, "> 3");
             AdmixtureRec.RecalcPercents(dt);
             dgvAdmixture.DataSource = dt;
 
             foreach (var row in dt) {
-                chart1.Series[0].Points.AddXY($"{row.Population}, {row.Location} ({row.Percentage:#0.00} %)", new object[] { row.Percentage });
+                chart1.Series[0].Points.AddXY($"{row.Population}, {row.Location} ({row.Percentage:#0.00} %)", row.Percentage);
             }
 
             foreach (DataPoint p in chart1.Series[0].Points) {

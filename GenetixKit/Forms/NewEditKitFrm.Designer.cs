@@ -30,7 +30,6 @@
         private System.Windows.Forms.DataGridView dgvY25;
         private System.Windows.Forms.DataGridView dgvY12;
         private System.Windows.Forms.TextBox txtMtDNA;
-        private System.ComponentModel.BackgroundWorker bwNewKitYDNAJob;
         private System.Windows.Forms.Label tipLbl;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
         private System.Windows.Forms.Label lblY12;
@@ -105,7 +104,6 @@
             this.txtName = new System.Windows.Forms.TextBox();
             this.txtKit = new System.Windows.Forms.TextBox();
             this.bwNewKitAutosomalJob = new System.ComponentModel.BackgroundWorker();
-            this.bwNewKitYDNAJob = new System.ComponentModel.BackgroundWorker();
             this.tipLbl = new System.Windows.Forms.Label();
             this.bwSave = new System.ComponentModel.BackgroundWorker();
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
@@ -264,7 +262,7 @@
             this.txtYDNA.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txtYDNA.Size = new System.Drawing.Size(709, 423);
             this.txtYDNA.TabIndex = 0;
-            this.txtYDNA.DragDrop += new System.Windows.Forms.DragEventHandler(this.textBoxYDNA_DragDrop);
+            this.txtYDNA.DragDrop += new System.Windows.Forms.DragEventHandler(this.txtYDNA_DragDrop);
             this.txtYDNA.DragEnter += new System.Windows.Forms.DragEventHandler(this.nekf_DragEnter);
             // 
             // tabYSTR
@@ -541,7 +539,7 @@
             this.txtMtDNA.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txtMtDNA.Size = new System.Drawing.Size(715, 429);
             this.txtMtDNA.TabIndex = 1;
-            this.txtMtDNA.DragDrop += new System.Windows.Forms.DragEventHandler(this.textBoxMtDNA_DragDrop);
+            this.txtMtDNA.DragDrop += new System.Windows.Forms.DragEventHandler(this.txtMtDNA_DragDrop);
             this.txtMtDNA.DragEnter += new System.Windows.Forms.DragEventHandler(this.nekf_DragEnter);
             // 
             // tabFasta
@@ -566,7 +564,7 @@
             this.txtFASTA.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.txtFASTA.Size = new System.Drawing.Size(715, 429);
             this.txtFASTA.TabIndex = 2;
-            this.txtFASTA.DragDrop += new System.Windows.Forms.DragEventHandler(this.tbFASTA_DragDrop);
+            this.txtFASTA.DragDrop += new System.Windows.Forms.DragEventHandler(this.txtFASTA_DragDrop);
             this.txtFASTA.DragEnter += new System.Windows.Forms.DragEventHandler(this.nekf_DragEnter);
             // 
             // txtName
@@ -590,12 +588,6 @@
             this.bwNewKitAutosomalJob.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwNewKitAutosomalJob_DoWork);
             this.bwNewKitAutosomalJob.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bwNewKitAutosomalJob_ProgressChanged);
             this.bwNewKitAutosomalJob.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwNewKitAutosomalJob_RunWorkerCompleted);
-            // 
-            // bwNewKitYDNAJob
-            // 
-            this.bwNewKitYDNAJob.WorkerSupportsCancellation = true;
-            this.bwNewKitYDNAJob.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwNewKitYDNAJob_DoWork);
-            this.bwNewKitYDNAJob.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwNewKitYDNAJob_RunWorkerCompleted);
             // 
             // tipLbl
             // 

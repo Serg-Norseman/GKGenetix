@@ -193,18 +193,21 @@ namespace GenetixKit.Core
             }
         }
 
-        public static IList<KitDTO> QueryKits(bool excludeDisabled = false, string whereSql = "", string orderBy = "")
+        public static IList<KitDTO> QueryKits(bool excludeDisabled = false, bool excludeRefs = true)
         {
             var result = new List<KitDTO>();
 
-            string where = whereSql;
+            string where = "";
             if (excludeDisabled)
                 where = "where disabled = 0";
 
-            if (string.IsNullOrEmpty(orderBy))
-                orderBy = "order by last_modified desc";
+            if (excludeRefs) {
+                if (string.IsNullOrEmpty(where))
+                    where = " where reference = 0";
+                else where += " and reference = 0";
+            }
 
-            string sql = $"select kit_no, name, sex, disabled, coalesce(x, 0), coalesce(y, 0), last_modified, reference, roh_status from kit_master {where} {orderBy}";
+            string sql = $"select kit_no, name, sex, disabled, coalesce(x, 0), coalesce(y, 0), last_modified, reference, roh_status from kit_master {where} order by last_modified desc";
 
             using (SQLiteConnection cnn = GetDBConnection())
             using (SQLiteCommand query = new SQLiteCommand(sql, cnn))
@@ -284,14 +287,14 @@ namespace GenetixKit.Core
                 $"select rsid, chromosome, position, kit1_genotype, kit2_genotype, match from cmp_mrca where segment_id = '{segmentId}'");
         }
 
-        public static IList<AdmixtureRec> GetAdmixture(string kit, string limit = "3")
+        public static IList<AdmixtureRec> GetAdmixture(string kit, string limit = "< 3")
         {
             //  "select name, at_total, at_longest, x, y FROM (select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit1='" + kit + "' and a.kit2=b.kit_no and a.kit2 like 'HGDP%' and a.status_autosomal=1 and a.at_longest<3 and a.at_total!=0 UNION select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit2='" + kit + "' and a.kit1=b.kit_no and a.kit1 like 'HGDP%' and a.status_autosomal=1 and a.at_longest<3 and a.at_total!=0) ORDER BY at_total DESC";
 
             return GetRows<AdmixtureRec>(
                 "select name, at_total, at_longest, x, y from (" +
-                $"select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit1='{kit}' and a.kit2=b.kit_no and a.status_autosomal=1 and a.at_longest < {limit} and a.at_total != 0 " +
-                $"union select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit2='{kit}' and a.kit1=b.kit_no and a.status_autosomal=1 and a.at_longest < {limit} and a.at_total != 0" +
+                $"select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit1='{kit}' and a.kit2=b.kit_no and a.status_autosomal=1 and a.at_longest {limit} and a.at_total != 0 " +
+                $"union select b.name,a.at_total,a.at_longest,b.x,b.y from cmp_status a,kit_master b where a.kit2='{kit}' and a.kit1=b.kit_no and a.status_autosomal=1 and a.at_longest {limit} and a.at_total != 0" +
                 ") order by at_total desc");
         }
 

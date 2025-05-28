@@ -278,8 +278,8 @@ namespace GenetixKit.Forms
         {
             using (var frm = new LocationSelectFrm(x, y)) {
                 frm.ShowDialog(this);
-                x = frm.X;
-                y = frm.Y;
+                x = frm.Longitude;
+                y = frm.Latitude;
             }
         }
     }

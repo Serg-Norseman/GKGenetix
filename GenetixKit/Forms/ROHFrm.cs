@@ -69,10 +69,10 @@ namespace GenetixKit.Forms
             dgvSegmentIdx.DataSource = roh_results;
 
             var segmentStats = SegmentStats.CalculateSegmentStats(roh_results);
-            lblTotalSegments.Text = segmentStats.Total.ToString() + " cM";
-            lblTotalXSegments.Text = segmentStats.XTotal.ToString() + " cM";
-            lblLongestSegment.Text = segmentStats.Longest.ToString() + " cM";
-            lblLongestXSegment.Text = segmentStats.XLongest.ToString() + " cM";
+            lblTotalSegments.Text = $"{segmentStats.Total:#0.00} cM";
+            lblTotalXSegments.Text = $"{segmentStats.XTotal:#0.00} cM";
+            lblLongestSegment.Text = $"{segmentStats.Longest:#0.00} cM";
+            lblLongestXSegment.Text = $"{segmentStats.XLongest:#0.00} cM";
             lblMRCA.Text = segmentStats.GetMRCAText(true);
 
             Program.KitInstance.SetStatus("Done.");
@@ -80,11 +80,9 @@ namespace GenetixKit.Forms
 
         private void dgvSegmentIdx_SelectionChanged(object sender, EventArgs e)
         {
-            if (dgvSegmentIdx.CurrentRow == null)
-                return;
-
-            int index = dgvSegmentIdx.CurrentRow.Index;
-            dgvMatching.DataSource = roh_results[index].Rows;
+            var selRow = dgvSegmentIdx.GetSelectedObj<ROHSegment>();
+            if (selRow == null) return;
+            dgvMatching.DataSource = selRow.Rows;
         }
 
         private void dgvMatching_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)

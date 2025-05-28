@@ -12,8 +12,8 @@ namespace GenetixKit.Forms
 {
     public partial class LocationSelectFrm : Form
     {
-        public int X = 0;
-        public int Y = 0;
+        public int Longitude { get; set; }
+        public int Latitude { get; set; }
 
         private bool preInit = false;
         private Pen pen1;
@@ -21,7 +21,7 @@ namespace GenetixKit.Forms
         private int mX, mY;
 
 
-        public LocationSelectFrm(int x, int y)
+        public LocationSelectFrm(int lng, int lat)
         {
             InitializeComponent();
 
@@ -29,11 +29,11 @@ namespace GenetixKit.Forms
             pen1 = new Pen(Color.Red, 3);
             pen2 = new Pen(Color.Red, 1);
 
-            X = x;
-            Y = y;
-            if (X != 0 && Y != 0) {
-                mX = X / 2;
-                mY = Y / 2;
+            Longitude = lng;
+            Latitude = lat;
+            if (Longitude != 0 && Latitude != 0) {
+                mX = Longitude / 2;
+                mY = Latitude / 2;
                 preInit = true;
             }
         }
@@ -72,8 +72,8 @@ namespace GenetixKit.Forms
         private void pbWorldMap_MouseClick(object sender, MouseEventArgs e)
         {
             if (MessageBox.Show("Is the selected region displayed in the World Map is where the kit/kit's ancestors are from?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-                X = e.X * 2;
-                Y = e.Y * 2;
+                Longitude = e.X * 2;
+                Latitude = e.Y * 2;
                 this.Hide();
             }
         }

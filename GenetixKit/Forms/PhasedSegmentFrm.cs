@@ -79,9 +79,10 @@ namespace GenetixKit.Forms
             if (original != null && dgvSegment.SelectedRows.Count > 0) {
                 int idx = (dgvSegment.SelectedRows[0].Index * 600) / dgvSegment.Rows.Count;
                 Image img = (Image)original.Clone();
-                Graphics g = Graphics.FromImage(img);
-                Pen p1 = new Pen(Color.Black, 1);
-                g.DrawLine(p1, idx, 0, idx, 150);
+                using (var g = Graphics.FromImage(img)) {
+                    Pen p1 = new Pen(Color.Black, 1);
+                    g.DrawLine(p1, idx, 0, idx, 150);
+                }
                 pbSegment.Image = img;
             }
         }

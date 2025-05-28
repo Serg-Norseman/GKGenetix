@@ -67,7 +67,7 @@ namespace GenetixKit.Core
             return cm;
         }
 
-        public static DNARec GetAutosomalDNAList(string file, BackgroundWorker bgw)
+        public static DNARec LoadDNAFile(string file, BackgroundWorker bgw)
         {
             var rows = new List<SingleSNP>();
 
@@ -431,6 +431,44 @@ namespace GenetixKit.Core
             string markers_str = ConvertInsDelToMod(markers, fasta_file);
             Directory.Delete(diff_work_dir, true);
             return markers_str;
+        }
+
+        public static List<string> LoadYDNAFile(string file)
+        {
+            var ymap = GKData.YMap;
+
+            string[] lines = File.ReadAllLines(file);
+            var snpList = new List<string>();
+            string[] data = null;
+            string[] snp = null;
+            foreach (string line in lines) {
+                data = line.Replace("\"", "").Split(new char[] { ',' });
+
+                // "Type" 0, "Position" 1, "SNPName" 2, "Derived" 3, "OnTree" 4, "Reference" 5, "Genotype" 6, "Confidence" 7
+                string valType = data[0];
+                string valPos = data[1];
+                string valSNP = data[2];
+                string valDerived = data[3];
+                string valGt = data[6];
+
+                if (valType == "Known SNP") {
+                    if (valDerived == "Yes(+)") {
+                        snpList.Add(valSNP + "+");
+                    } else if (valDerived == "No(-)") {
+                        snpList.Add(valSNP + "-");
+                    }
+                } else if (valType == "Novel Variant") {
+                    if (ymap.ContainsKey(valPos)) {
+                        snp = GKGenFuncs.GetYSNP(valPos, valGt);
+                        if (snp[0].IndexOf(";") == -1)
+                            snpList.Add(snp[0] + snp[1]);
+                        else
+                            snpList.Add(snp[0].Substring(0, snp[0].IndexOf(";")) + snp[1]);
+                    }
+                }
+            }
+
+            return snpList;
         }
 
         public static void DontMatchProc(int start_pos, int end_pos, string prev_chr, string chromosome, IList<CmpSegment> segments_idx, ref List<CmpSegmentRow> tmp, bool reference)
@@ -1121,9 +1159,11 @@ namespace GenetixKit.Core
             nodesMap.Add(pnNode);
         }
 
-        public const int YHGS_DG = 1;
-        public const int YHGS_LG = 2;
-        public const int YHGS_R = 3;
+        public const int HGS_DG = 1;
+        public const int HGS_LG = 2;
+        public const int HGS_R = 3;
+
+        #region Determine Y-DNA Haplogroup
 
         public static ISOGGYTreeNode FindYHaplogroup(ISOGGYTreeNode isoggYTree, IList<string> snpArray)
         {
@@ -1143,21 +1183,21 @@ namespace GenetixKit.Core
                         if (hg_snp_t != snp_ss) continue;
 
                         if (snp.EndsWith("-")) {
-                            if (key.Status == YHGS_DG) {
-                                key.Status = YHGS_LG;
-                            } else if (key.Status != YHGS_LG) {
-                                key.Status = YHGS_R;
+                            if (key.Status == HGS_DG) {
+                                key.Status = HGS_LG;
+                            } else if (key.Status != HGS_LG) {
+                                key.Status = HGS_R;
                             }
                         } else if (snp.EndsWith("+")) {
-                            if (key.Status == YHGS_R) {
-                                key.Status = YHGS_LG;
-                            } else if (key.Status != YHGS_LG) {
-                                key.Status = YHGS_DG;
+                            if (key.Status == HGS_R) {
+                                key.Status = HGS_LG;
+                            } else if (key.Status != HGS_LG) {
+                                key.Status = HGS_DG;
                             }
 
                             if (hg_maxpath == null) {
                                 hg_maxpath = key;
-                            } else if (key.Depth > hg_maxpath.Depth && key.Parent.Status != YHGS_R) {
+                            } else if (key.Depth > hg_maxpath.Depth && key.Parent.Status != HGS_R) {
                                 hg_maxpath = key;
                             }
                         }
@@ -1166,6 +1206,235 @@ namespace GenetixKit.Core
             }
 
             return hg_maxpath;
+        }
+
+        #endregion
+
+        #region Determine Mt-DNA Haplogroup
+
+        public static MtDNAPhylogenyNode FindMtHaplogroup(MtDNAPhylogenyNode mtTree, string kitMarkers, out string firstBest, out string secondBest)
+        {
+            var nodesMap = new List<MtDNAPhylogenyNode>();
+            GKGenFuncs.ClearPhylogenyTree(mtTree, nodesMap);
+
+            firstBest = string.Empty;
+            secondBest = string.Empty;
+            MtDNAPhylogenyNode name_maxpath = null;
+
+            // dirty but ok for now
+            kitMarkers = kitMarkers.Replace(",", " ").Replace("\t", " ").Replace("\r", " ").Replace("\n", " ");
+
+            Regex regex = new Regex(@"[ ]{2,}", RegexOptions.None);
+            kitMarkers = regex.Replace(kitMarkers, @" ");
+            kitMarkers = kitMarkers.Replace(" ", ",");
+
+            string[] marker_array = kitMarkers.Split(",".ToCharArray());
+
+            var list = new List<MtDNAPhylogenyNode>();
+            foreach (var key in nodesMap) {
+                string marker_names = key.Markers;
+                string[] marker_names_on_hg = marker_names.Split(",".ToCharArray());
+                foreach (string marker_name in marker_names_on_hg) {
+                    string m_name = marker_name.Replace("(", "").Replace(")", "").Replace("!", "").Trim();
+
+                    foreach (string marker in marker_array) {
+                        if (marker.Trim().IndexOf(m_name) != -1 || m_name == marker.Trim()) {
+                            if (!list.Contains(key))
+                                list.Add(key);
+
+                            key.Status = HGS_DG;
+                        }
+                    }
+                }
+            }
+
+            // go through all terminals with matches and count the number of matching parents. now, that's the score.
+            var best_score = new SortedList<int, List<MtDNAPhylogenyNode>>();
+            foreach (var key in list) {
+                int pm = GetParentMatches(key);
+                var alist = best_score.ContainsKey(pm) ? best_score[pm] : new List<MtDNAPhylogenyNode>();
+                alist.Add(key);
+                best_score.Remove(pm);
+                best_score.Add(pm, alist);
+            }
+            var desc = best_score.Reverse();
+
+            bool found_first = false;
+            bool found_second = false;
+
+            var sorted_hg_readjustment = new SortedDictionary<int, List<MtDNAPhylogenyNode>>();
+            foreach (KeyValuePair<int, List<MtDNAPhylogenyNode>> kvp in desc) {
+                var mlist = kvp.Value;
+                string str = "";
+                if (!found_first) {
+                    foreach (var tn in mlist) {
+                        if (IsMatchingAll(tn, marker_array, sorted_hg_readjustment)) {
+                            name_maxpath = tn;
+                            str = str + " " + tn.Name;
+                            found_first = true;
+                        }
+                    }
+                    firstBest = str.Trim().Replace(" ", ", ");
+                    if (found_first)
+                        continue;
+                } else if (!found_second) {
+                    foreach (var tn in mlist) {
+                        if (IsMatchingAll(tn, marker_array, sorted_hg_readjustment)) {
+                            //name_maxpath = tn;
+                            str = str + " " + tn.Name;
+                            found_second = true;
+                        }
+                    }
+                    secondBest = str.Trim().Replace(" ", ", ");
+                    if (found_second)
+                        break;
+                }
+            }
+
+            // --  final readjustment .. it's dirty
+            found_first = false;
+            found_second = false;
+            string mstr = "";
+            foreach (KeyValuePair<int, List<MtDNAPhylogenyNode>> hg in sorted_hg_readjustment) {
+                var m_list = hg.Value;
+                foreach (var mhg in m_list)
+                    mstr = mstr + " " + mhg.Name;
+
+                var mstr_tr = mstr.Trim().Replace(" ", ", ");
+
+                if (!found_first) {
+                    name_maxpath = m_list[0];
+                    firstBest = mstr_tr;
+                    found_first = true;
+                    mstr = "";
+                } else if (!found_second) {
+                    secondBest = mstr_tr;
+                    break;
+                }
+            }
+
+            return name_maxpath;
+        }
+
+        private static bool IsMatchingAll(MtDNAPhylogenyNode key, string[] kitMarkers, SortedDictionary<int, List<MtDNAPhylogenyNode>> sorted_hg_readjustment)
+        {
+            var hgs = GetAllMatchingInParent(key);
+
+            var hgs_found = new List<string>();
+            var mismatches = new List<string>();
+            var matches = new List<string>();
+
+            foreach (string u_marker in kitMarkers) {
+                bool ignore_found = false;
+                foreach (string i_marker in GKData.MtIgnoreList) {
+                    if (u_marker == i_marker || u_marker.StartsWith(i_marker) || u_marker.Substring(1).StartsWith(i_marker)) {
+                        ignore_found = true;
+                        break;
+                    }
+                }
+                if (ignore_found) continue;
+
+                //check u_marker in haplogroups
+                bool found = false;
+                string hg_found = "";
+                foreach (string markers in hgs) {
+                    string parent_markers = markers.Substring(markers.IndexOf(":") + 1);
+                    string parent_hg = markers.Substring(0, markers.IndexOf(":"));
+                    if (parent_markers.IndexOf(u_marker) != -1) {
+                        found = true;
+                        hg_found = markers;
+                        break;
+                    }
+                }
+
+                if (found) {
+                    if (!hgs_found.Contains(hg_found))
+                        hgs_found.Add(hg_found);
+
+                    matches.Add(u_marker);
+                } else
+                    mismatches.Add(u_marker);
+            }
+
+            if (hgs.Count == hgs_found.Count) {
+                var tnList = new List<MtDNAPhylogenyNode>();
+                if (sorted_hg_readjustment.ContainsKey(mismatches.Count))
+                    tnList = sorted_hg_readjustment[mismatches.Count];
+                tnList.Add(key);
+                sorted_hg_readjustment.Remove(mismatches.Count);
+                sorted_hg_readjustment.Add(mismatches.Count, tnList);
+
+                return true;
+            } else
+                return false;
+        }
+
+        private static List<string> GetAllMatchingInParent(MtDNAPhylogenyNode key)
+        {
+            var list = new List<string>();
+            list.Add(key.Name + ":" + key.Markers);
+
+            MtDNAPhylogenyNode parent = key.Parent;
+            while (true) {
+                if (parent.Name == "Eve")
+                    break;
+                if (parent.Status == HGS_DG) {
+                    list.Add(parent.Name + ":" + parent.Markers);
+                }
+                parent = parent.Parent;
+            }
+            return list;
+        }
+
+        private static int GetParentMatches(MtDNAPhylogenyNode key)
+        {
+            int match = key.Status == HGS_DG ? 1 : 0;
+            if (key.Parent != null)
+                return match + GetParentMatches(key.Parent);
+            else
+                return match;
+        }
+
+        #endregion
+
+        public static void GetMtDNA(string kit, out string mutations, out string fasta,
+            SortedDictionary<int, List<string>> kitMutations,
+            SortedDictionary<int, List<string>> kitInsertions)
+        {
+            GKSqlFuncs.GetMtDNA(kit, out mutations, out fasta);
+
+            foreach (string mutation in mutations.Split(new char[] { ',' })) {
+                string mut = mutation.Trim();
+                string allele;
+                List<string> alleles;
+
+                if (mut.IndexOf(".") != -1) {
+                    // insert
+                    allele = mut[mut.Length - 1].ToString();
+                    int pos = int.Parse(mut.Substring(0, mut.IndexOf(".")));
+
+                    if (!kitInsertions.ContainsKey(pos))
+                        alleles = new List<string>();
+                    else
+                        alleles = kitInsertions[pos];
+
+                    alleles.Add(allele);
+                    kitInsertions.Remove(pos);
+                    kitInsertions.Add(pos, alleles);
+                } else {
+                    allele = mut[mut.Length - 1].ToString();
+                    int pos = int.Parse(mut.Substring(1, mut.Length - 2));
+
+                    if (!kitMutations.ContainsKey(pos))
+                        alleles = new List<string>();
+                    else
+                        alleles = kitMutations[pos];
+
+                    alleles.Add(allele);
+                    kitMutations.Remove(pos);
+                    kitMutations.Add(pos, alleles);
+                }
+            }
         }
     }
 }

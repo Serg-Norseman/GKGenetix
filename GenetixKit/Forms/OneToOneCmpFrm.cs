@@ -58,10 +58,10 @@ namespace GenetixKit.Forms
             dgvSegmentIdx.DataSource = segmentsRes;
 
             var segmentStats = SegmentStats.CalculateSegmentStats(segmentsRes);
-            lblTotalSegments.Text = segmentStats.Total.ToString("#0.00") + " cM";
-            lblTotalXSegments.Text = segmentStats.XTotal.ToString("#0.00") + " cM";
-            lblLongestSegment.Text = segmentStats.Longest.ToString("#0.00") + " cM";
-            lblLongestXSegment.Text = segmentStats.XLongest.ToString("#0.00") + " cM";
+            lblTotalSegments.Text = $"{segmentStats.Total:#0.00} cM";
+            lblTotalXSegments.Text = $"{segmentStats.XTotal:#0.00} cM";
+            lblLongestSegment.Text = $"{segmentStats.Longest:#0.00} cM";
+            lblLongestXSegment.Text = $"{segmentStats.XLongest:#0.00} cM";
             lblMRCA.Text = segmentStats.GetMRCAText(false);
 
             Program.KitInstance.SetStatus("Done.");

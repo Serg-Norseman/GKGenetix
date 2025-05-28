@@ -123,14 +123,13 @@ namespace GenetixKit.Forms
 
         private void dgvEditKit_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-            var row = ((IList<KitDTO>)dgvEditKit.DataSource)[e.RowIndex];
+            var row = tblKits[e.RowIndex];
             e.CellStyle.ForeColor = (!row.Disabled) ? Color.Black : Color.LightGray;
         }
 
         private void dgvEditKit_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            var senderGrid = (DataGridView)sender;
-            if (senderGrid.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0) {
+            if (dgvEditKit.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0) {
                 var kitRow = tblKits[e.RowIndex];
                 string location = kitRow.Location;
                 int x = 0;
@@ -143,7 +142,7 @@ namespace GenetixKit.Forms
                 Program.KitInstance.SelectLocation(ref x, ref y);
                 kitRow.Location = x.ToString() + ":" + y.ToString();
 
-                senderGrid.Invalidate();
+                dgvEditKit.Invalidate();
             }
         }
     }
