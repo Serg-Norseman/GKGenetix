@@ -2,7 +2,6 @@
 {
     partial class IsoggYTreeFrm
     {
-        private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
@@ -17,19 +16,9 @@
         private System.Windows.Forms.Label lblyhg;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.RichTextBox snpTextBox;
-        private System.Windows.Forms.Timer timer2;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null)) {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
 
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
@@ -44,7 +33,6 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.lblyhg = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.timer2 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -247,10 +235,6 @@
             this.label5.Size = new System.Drawing.Size(121, 13);
             this.label5.TabIndex = 1;
             this.label5.Text = "Identified Y Haplogroup:";
-            // 
-            // timer2
-            // 
-            this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
             // 
             // IsoggYTreeFrm
             // 

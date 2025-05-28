@@ -18,8 +18,6 @@ namespace GenetixKit.Forms
         private string kit1 = null;
         private string kit2 = null;
         private IList<CmpSegment> cmpResults;
-        private bool redoAgain = false;
-        private bool redoVisual = false;
         private IList<KitDTO> dt;
 
 
@@ -52,8 +50,6 @@ namespace GenetixKit.Forms
         private void btnStart_Click(object sender, EventArgs e)
         {
             if (btnStart.Text == "Start") {
-                redoAgain = cbDontSkip.Checked;
-                redoVisual = cbRedoVisual.Checked;
                 Program.KitInstance.SetStatus("Processing Kits ...");
                 if (bwCompare.IsBusy) {
                     MessageBox.Show("Process is busy!", "Please Wait!", MessageBoxButtons.OK, MessageBoxIcon.Stop);
@@ -76,6 +72,8 @@ namespace GenetixKit.Forms
 
         private void bwCompare_DoWork(object sender, DoWorkEventArgs e)
         {
+            var redoAgain = cbDontSkip.Checked;
+
             if (redoAgain)
                 GKSqlFuncs.ClearAllComparisons(false);
 
@@ -112,13 +110,11 @@ namespace GenetixKit.Forms
                     string name2 = dt[j].Name;
                     idx++;
 
-                    this.Invoke(new MethodInvoker(delegate {
-                        if (reference) {
-                            WriteStatusMsg($"Comparing Reference {kit1} ({name1}) and {kit2} ({name2})", true);
-                        } else {
-                            WriteStatusMsg($"Comparing Kits {kit1} ({name1}) and {kit2} ({name2})", true);
-                        }
-                    }));
+                    if (reference) {
+                        WriteStatus($"Comparing Reference {kit1} ({name1}) and {kit2} ({name2})", true);
+                    } else {
+                        WriteStatus($"Comparing Kits {kit1} ({name1}) and {kit2} ({name2})", true);
+                    }
 
                     progress = idx * 100 / total;
 
@@ -131,16 +127,12 @@ namespace GenetixKit.Forms
                         if (!this.IsHandleCreated)
                             break;
 
-                        this.Invoke(new MethodInvoker(delegate {
-                            if (reference)
-                                WriteStatusMsg($"{cmpResults.Count} compound segments found.", true);
-                            else
-                                WriteStatusMsg($"{cmpResults.Count} matching segments found.", true);
-                        }));
+                        if (reference)
+                            WriteStatus($"{cmpResults.Count} compound segments found.", true);
+                        else
+                            WriteStatus($"{cmpResults.Count} matching segments found.", true);
                     } else {
-                        this.Invoke(new MethodInvoker(delegate {
-                            WriteStatusMsg("Earlier comparison exists. Skipping.", true);
-                        }));
+                        WriteStatus("Earlier comparison exists. Skipping.", true);
                     }
                     bwCompare.ReportProgress(progress, progress.ToString() + "%");
                 }
@@ -153,13 +145,20 @@ namespace GenetixKit.Forms
                 bwCompare.ReportProgress(100, "Done.");
         }
 
+        private void WriteStatus(string msg, bool onlyLocal = false)
+        {
+            this.Invoke(new MethodInvoker(delegate {
+                WriteStatusMsg(msg, onlyLocal);
+            }));
+        }
+
         private void WriteStatusMsg(string msg, bool onlyLocal = false)
         {
             if (!onlyLocal) Program.KitInstance.SetStatus(msg);
 
             lblComparing.Text = msg;
 
-            tbStatus.Text += "{msg}\r\n";
+            tbStatus.Text += $"{msg}\r\n";
             tbStatus.Select(tbStatus.Text.Length - 1, 0);
             tbStatus.ScrollToCaret();
         }
@@ -227,6 +226,7 @@ namespace GenetixKit.Forms
 
         private void bwPhaseVisualizer_DoWork(object sender, DoWorkEventArgs e)
         {
+            var redoVisual = cbRedoVisual.Checked;
             GKGenFuncs.DoPhaseVisualizer(redoVisual, bwPhaseVisualizer);
         }
 

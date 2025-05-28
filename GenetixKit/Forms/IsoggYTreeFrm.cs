@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GKGenetix.Core.Model;
@@ -16,10 +17,7 @@ namespace GenetixKit.Forms
     public partial class IsoggYTreeFrm : GKWidget
     {
         private readonly string kit = null;
-        private readonly List<TreeNode> snpMap = new List<TreeNode>();
         private IList<string> snpArray = null;
-        private ISOGGYTreeNode isoggYTree = null;
-        private TreeNode root;
 
 
         public static bool CanBeUsed(IList<KitDTO> selectedKits)
@@ -43,12 +41,12 @@ namespace GenetixKit.Forms
             lblKitName.Text = GKSqlFuncs.GetKitName(kit);
             Program.KitInstance.SetStatus("Plotting on ISOGG Y-Tree ...");
 
-            snpMap.Clear();
+            var snpMap = new List<TreeNode>();
             treeView1.BeginUpdate();
-            isoggYTree = GKData.ISOGGYTree;
-            root = new TreeNode("Adam");
+            var isoggYTree = GKData.ISOGGYTree;
+            var root = new TreeNode("Adam");
             treeView1.Nodes.Add(root);
-            BuildTree(treeView1, root, isoggYTree);
+            BuildTree(treeView1, root, isoggYTree, snpMap);
             treeView1.CollapseAll();
             treeView1.EndUpdate();
 
@@ -56,61 +54,52 @@ namespace GenetixKit.Forms
             txtSNPs.Text = kitSNPs;
             snpArray = GKGenFuncs.FilterSNPsOnYTree(kitSNPs);
 
-            timer2.Enabled = true;
+            Task.Factory.StartNew(() => {
+                var hg_maxpath = GKGenFuncs.FindYHaplogroup(isoggYTree, snpArray);
+
+                this.Invoke(new MethodInvoker(delegate {
+                    treeView1.BeginUpdate();
+                    foreach (TreeNode node in snpMap) {
+                        var pnNode = ((ISOGGYTreeNode)node.Tag);
+                        switch (pnNode.Status) {
+                            case GKGenFuncs.HGS_DG:
+                                node.ForeColor = Color.White;
+                                node.BackColor = Color.DarkGreen;
+                                break;
+
+                            case GKGenFuncs.HGS_LG:
+                                node.ForeColor = Color.Orange;
+                                node.BackColor = Color.LightGreen;
+                                break;
+
+                            case GKGenFuncs.HGS_R:
+                                node.ForeColor = Color.Yellow;
+                                node.BackColor = Color.Red;
+                                break;
+                        }
+                    }
+                    if (hg_maxpath != null) {
+                        var tn = treeView1.FindByTag(root, hg_maxpath);
+                        tn.EnsureVisible();
+                        treeView1.SelectedNode = tn;
+                        lblyhg.Text = tn.Text;
+                    }
+                    treeView1.EndUpdate();
+
+                    Program.KitInstance.SetStatus("Done.");
+                }));
+            });
         }
 
-        private void BuildTree(TreeView treeView, TreeNode treeNode, ISOGGYTreeNode pnNode)
+        private void BuildTree(TreeView treeView, TreeNode treeNode, ISOGGYTreeNode pnNode, List<TreeNode> snpMap)
         {
             treeNode.Tag = pnNode;
             foreach (var subnode in pnNode.Children) {
                 var tn = new TreeNode(subnode.Name);
                 treeNode.Nodes.Add(tn);
-                BuildTree(treeView, tn, subnode);
+                BuildTree(treeView, tn, subnode, snpMap);
             }
             snpMap.Add(treeNode);
-        }
-
-        private void MarkOnTree()
-        {
-            treeView1.BeginUpdate();
-
-            var hg_maxpath = GKGenFuncs.FindYHaplogroup(isoggYTree, snpArray);
-
-            foreach (TreeNode node in snpMap) {
-                var pnNode = ((ISOGGYTreeNode)node.Tag);
-                switch (pnNode.Status) {
-                    case GKGenFuncs.YHGS_DG:
-                        node.ForeColor = Color.White;
-                        node.BackColor = Color.DarkGreen;
-                        break;
-
-                    case GKGenFuncs.YHGS_LG:
-                        node.ForeColor = Color.Orange;
-                        node.BackColor = Color.LightGreen;
-                        break;
-
-                    case GKGenFuncs.YHGS_R:
-                        node.ForeColor = Color.Yellow;
-                        node.BackColor = Color.Red;
-                        break;
-                }
-            }
-
-            if (hg_maxpath != null) {
-                var tn = treeView1.FindByTag(root, hg_maxpath);
-                tn.EnsureVisible();
-                treeView1.SelectedNode = tn;
-                lblyhg.Text = tn.Text;
-            }
-
-            treeView1.EndUpdate();
-        }
-
-        private void timer2_Tick(object sender, EventArgs e)
-        {
-            timer2.Enabled = false;
-            MarkOnTree();
-            Program.KitInstance.SetStatus("Done.");
         }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
