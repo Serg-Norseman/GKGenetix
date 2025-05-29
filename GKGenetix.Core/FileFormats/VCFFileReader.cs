@@ -1,8 +1,8 @@
 ﻿/*
- *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2024 by Sergey V. Zhdanovskih.
+ *  "GKGenetix", the simple DNA analysis kit.
+ *  Copyright (C) 2022-2025 by Sergey V. Zhdanovskih.
  *
- *  This file is part of "GEDKeeper".
+ *  This file is part of "GKGenetix".
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
  */
 
 using System.IO;
+using GKGenetix.Core.Model;
 
 namespace GKGenetix.Core.FileFormats
 {
@@ -61,14 +62,14 @@ namespace GKGenetix.Core.FileFormats
 
             var snp = new SNP();
             snp.rsID = fields[2];
-            snp.Chr = (byte)fields[0].ParseChromosome();
-            snp.Pos = position;
+            snp.Chromosome = (byte)fields[0].ParseChromosome();
+            snp.Position = position;
 
             // FIXME: bad, modify later
             string refGenotype = fields[3];
             //string altGenotype = fields[4];
 
-            snp.Genotype = new SNPGenotype(refGenotype, Orientation.Unknown);
+            snp.Genotype = new Genotype(refGenotype, Orientation.Unknown);
 
             double quality = 0;
             if (fields[5] == ".") {

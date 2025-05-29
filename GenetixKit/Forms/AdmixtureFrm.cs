@@ -61,9 +61,9 @@ namespace GenetixKit.Forms
             Image img = (Image)Properties.Resources.world_map.Clone();
             using (Graphics g = Graphics.FromImage(img)) {
                 foreach (var row in dt) {
-                    string item = row.X + ":" + row.Y;
+                    string item = row.Longitude + ":" + row.Latitude;
                     if (!plotted.Contains(item)) {
-                        SetHeatMap(g, (int)row.Percentage, row.X, row.Y);
+                        SetHeatMap(g, (int)row.Percentage, row.Longitude, row.Latitude);
                         plotted.Add(item);
                     }
                 }

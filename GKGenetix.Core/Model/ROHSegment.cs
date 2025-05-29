@@ -33,16 +33,16 @@ namespace GKGenetix.Core.Model
         public int SNPCount { get; private set; }
 
 
-        public IList<SingleSNP> Rows { get; set; }
+        public IList<SNP> Rows { get; set; }
 
 
         public ROHSegment()
         {
         }
 
-        public ROHSegment(string chromosome, int startPosition, int endPosition, double segmentLength_cm, IList<SingleSNP> rows)
+        public ROHSegment(byte chromosome, int startPosition, int endPosition, double segmentLength_cm, IList<SNP> rows)
         {
-            Chromosome = chromosome;
+            Chromosome = chromosome.ToString();
             StartPosition = startPosition;
             EndPosition = endPosition;
             SegmentLength_cm = segmentLength_cm;

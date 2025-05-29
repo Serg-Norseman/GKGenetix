@@ -46,7 +46,7 @@ namespace GKGenetix.Core.Model
 
     public class PhaseRow : ISNPHeader, ITableRow
     {
-        public string RSID { get; private set; } // 0
+        public string rsID { get; private set; } // 0
         public string Chromosome { get; private set; } // 1
         public int Position { get; private set; } // 2
 
@@ -67,7 +67,7 @@ namespace GKGenetix.Core.Model
 
         public void Load(IDataRecord values)
         {
-            RSID = values.GetString(0);
+            rsID = values.GetString(0);
             Chromosome = values.GetString(1);
             Position = values.GetInt32(2);
             ChildGenotype = values.GetString(3);

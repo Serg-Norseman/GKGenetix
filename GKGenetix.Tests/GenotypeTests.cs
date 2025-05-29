@@ -18,36 +18,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System.Data;
+using System.Runtime.InteropServices;
+using GKGenetix.Core.Model;
+using NUnit.Framework;
 
-namespace GKGenetix.Core.Model
+namespace GKGenetix.Tests
 {
-    public class SingleSNP : ISNPHeader, ITableRow
+    [TestFixture]
+    public class GenotypeTests
     {
-        public string RSID { get; private set; }
-        public string Chromosome { get; private set; }
-        public int Position { get; private set; }
-        public string Genotype { get; private set; }
-
-
-        public SingleSNP()
+        [Test]
+        public void Test_Size()
         {
+            Assert.AreEqual(4, Marshal.SizeOf(typeof(Genotype)));
         }
 
-        public SingleSNP(string rsid, string chromosome, int position, string genotype)
+        [Test]
+        public void Test_New()
         {
-            RSID = rsid;
-            Chromosome = chromosome;
-            Position = position;
-            Genotype = genotype;
-        }
+            var instance = new Genotype("AT");
+            Assert.AreEqual('A', instance.A1);
+            Assert.AreEqual('T', instance.A2);
 
-        public void Load(IDataRecord values)
-        {
-            RSID = values.GetString(0);
-            Chromosome = values.GetString(1);
-            Position = values.GetInt32(2);
-            Genotype = values.GetString(3);
+            instance = new Genotype('G', 'C');
+            Assert.AreEqual('G', instance.A1);
+            Assert.AreEqual('C', instance.A2);
+
+            instance = new Genotype("G");
+            Assert.AreEqual('G', instance.A1);
+            Assert.AreEqual('0', instance.A2);
         }
     }
 }

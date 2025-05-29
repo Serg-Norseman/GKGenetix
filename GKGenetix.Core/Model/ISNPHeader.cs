@@ -22,7 +22,7 @@ namespace GKGenetix.Core.Model
 {
     public interface ISNPHeader
     {
-        string RSID { get; }
+        string rsID { get; }
         string Chromosome { get; }
         int Position { get; }
     }

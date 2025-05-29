@@ -1,8 +1,8 @@
 ﻿/*
- *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2022 by Sergey V. Zhdanovskih.
+ *  "GKGenetix", the simple DNA analysis kit.
+ *  Copyright (C) 2022-2025 by Sergey V. Zhdanovskih.
  *
- *  This file is part of "GEDKeeper".
+ *  This file is part of "GKGenetix".
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 using System;
 using System.IO;
 using System.Text;
+using GKGenetix.Core.Model;
 
 namespace GKGenetix.Core.FileFormats
 {
@@ -109,7 +110,7 @@ namespace GKGenetix.Core.FileFormats
                         if (curr_chr == null) {
                             curr_chr = new Region(snpIdx, 0, false);
                             result.Chromosomes.Add(curr_chr);
-                        } else if (snp.Chr != prev_snp.Chr) {
+                        } else if (snp.Chromosome != prev_snp.Chromosome) {
                             curr_chr.EndPosition = snpIdx - 1;
                             curr_chr = new Region(snpIdx, 0, false);
                             result.Chromosomes.Add(curr_chr);

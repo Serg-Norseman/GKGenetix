@@ -29,8 +29,8 @@ namespace GKGenetix.Core.Model
         public string Location { get; private set; }
         public double AtTotal { get; private set; }
         public double AtLongest { get; private set; }
-        public int X { get; private set; }
-        public int Y { get; private set; }
+        public int Longitude { get; private set; }
+        public int Latitude { get; private set; }
 
         public double Percentage { get; set; }
 
@@ -48,8 +48,8 @@ namespace GKGenetix.Core.Model
 
             AtTotal = values.GetDouble(1);
             AtLongest = values.GetDouble(2);
-            X = values.GetInt32(3);
-            Y = values.GetInt32(4);
+            Longitude = values.GetInt32(3);
+            Latitude = values.GetInt32(4);
         }
 
         public static void RecalcPercents(IList<AdmixtureRec> items)

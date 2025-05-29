@@ -67,7 +67,6 @@
       <DependentUpon>GKMainFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="Core\GKData.cs" />
-    <Compile Include="Core\GKSettings.cs" />
     <Compile Include="Core\GKSqlFuncs.cs" />
     <Compile Include="Core\GKUIFuncs.cs" />
     <Compile Include="Core\GKGenFuncs.cs" />
