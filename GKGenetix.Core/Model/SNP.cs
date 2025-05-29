@@ -1,8 +1,8 @@
 ﻿/*
- *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2022 by Sergey V. Zhdanovskih.
+ *  "GKGenetix", the simple DNA analysis kit.
+ *  Copyright (C) 2022-2025 by Sergey V. Zhdanovskih.
  *
- *  This file is part of "GEDKeeper".
+ *  This file is part of "GKGenetix".
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,51 +19,73 @@
  */
 
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
-namespace GKGenetix.Core
+namespace GKGenetix.Core.Model
 {
     /// <summary>
     /// Single-nucleotide polymorphism (SNP).
     /// Substitution of a single nucleotide at a specific position in the genome.
     /// </summary>
-    public sealed class SNP
+    public sealed class SNP : ITableRow
     {
         /// <summary>
         /// The rsID number ("rs#"; "refSNP cluster") is a unique label ("rs" followed by a number) used by researchers and databases to identify a specific SNP.
         /// It stands for Reference SNP cluster ID and is the naming convention used for most SNPs.
         /// Alleles in genotype oriented with respect to the plus strand on the human reference sequence.
         /// </summary>
-        public string rsID;
+        public string rsID { get; set; }
 
         /// <summary>
         /// Chromosome.
         /// </summary>
-        public byte Chr;
+        public byte Chromosome { get; set; }
 
         /// <summary>
         /// Basepair position.
         /// </summary>
-        public int Pos;
+        public int Position { get; set; }
 
         /// <summary>
         /// Genotype. Allele1 and Allele2.
         /// </summary>
-        public SNPGenotype Genotype;
+        public Genotype Genotype { get; set; }
 
         /// <summary>
         /// Logical centiMorgan location of SNP in the chromosome.
         /// </summary>
-        public float cM;
+        public float cM { get; set; }
+
+
+        public SNP()
+        {
+        }
+
+        public SNP(string rsid, string chromosome, int position, string genotype)
+        {
+            rsID = rsid;
+            Chromosome = (byte)chromosome.ParseChromosome();
+            Position = position;
+            Genotype = new Genotype(genotype);
+        }
+
+        public void Load(IDataRecord values)
+        {
+            rsID = values.GetString(0);
+            Chromosome = (byte)values.GetString(1).ParseChromosome();
+            Position = values.GetInt32(2);
+            Genotype = new Genotype(values.GetString(3));
+        }
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(rsID);
             sb.Append(" ");
-            sb.Append(Chr);
+            sb.Append(Chromosome);
             sb.Append("@");
-            sb.Append(Pos);
+            sb.Append(Position);
             sb.Append(" ");
             sb.Append(Genotype.ToString());
             return sb.ToString();
@@ -74,10 +96,10 @@ namespace GKGenetix.Core
     {
         public int Compare(SNP x, SNP y)
         {
-            int result = x.Chr.CompareTo(y.Chr);
+            int result = x.Chromosome.CompareTo(y.Chromosome);
 
             if (result == 0) {
-                result = x.Pos.CompareTo(y.Pos);
+                result = x.Position.CompareTo(y.Position);
 
                 if (result == 0) {
                     result = x.rsID.CompareTo(y.rsID);

@@ -17,3 +17,6 @@ rmdir .\GKGenetixPlugin\obj /s /q 2>NUL
 
 rmdir .\GenetixKit\bin /s /q 2>NUL
 rmdir .\GenetixKit\obj /s /q 2>NUL
+
+rmdir .\GKGenetix.Tests\bin /s /q 2>NUL
+rmdir .\GKGenetix.Tests\obj /s /q 2>NUL

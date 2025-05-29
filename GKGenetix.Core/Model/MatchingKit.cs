@@ -22,23 +22,17 @@ using System.Data;
 
 namespace GKGenetix.Core.Model
 {
-    public class MatchingKit : ITableRow
+    public class MatchingKit : SegmentStats, ITableRow
     {
         public int CmpId { get; private set; }
         public string Kit {  get; private set; }
         public string Name { get; private set; }
-        public double Longest { get; private set; }
-        public double Total { get; private set; }
-        public double XLongest { get; private set; }
-        public double XTotal { get; private set; }
-        public int Mrca { get; private set; }
-
-        // cmp_id, kit, name, at_longest, at_total, x_longest, x_total, mrca
 
         public MatchingKit()
         {
         }
 
+        // cmp_id, kit, name, at_longest, at_total, x_longest, x_total, mrca
         public void Load(IDataRecord values)
         {
             CmpId = values.GetInt32(0);

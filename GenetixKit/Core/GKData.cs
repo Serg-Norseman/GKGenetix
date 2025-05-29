@@ -15,6 +15,34 @@ namespace GenetixKit.Core
 {
     internal static class GKData
     {
+        #region Settings
+
+        // This parameter is the cM threshold used when comparing autosomal data for matching purposes. Any matching segment below this threshold will be ignored.
+        public static float Compare_Autosomal_Threshold_cM = 5.0f;
+
+        // This parameter is the SNPs threshold used when comparing autosomal data for matching purposes. Any matching segment below this threshold will be ignored.
+        public static int Compare_Autosomal_Threshold_SNPs = 500;
+
+        // This parameter is the cM threshold used when comparing X-DNA data for matching purposes. Any matching segment below this threshold will be ignored.
+        public static float Compare_X_Threshold_cM = 3.0f;
+
+        // This parameter is the SNPs threshold used when comparing X-DNA data for matching purposes. Any matching segment below this threshold will be ignored.
+        public static int Compare_X_Threshold_SNPs = 300;
+
+        // This parameter is the cM threshold used for admixure calculations using compound segments. Any matching segment below this threshold will be ignored.
+        public static float Admixture_Threshold_cM = 0.5f;
+
+        // This parameter is the SNPs threshold used for admixure calculations using compound segments. Any matching segment below this threshold will be ignored.
+        public static int Admixture_Threshold_SNPs = 100;
+
+        // This parameter defines how many no-calls must be allowed in a matching segment. If the no-calls exceeds this limit in a segment, then the segment will not be matched.
+        public static int Compare_NoCalls_Limit = 5;
+
+        public const double MB_THRESHOLD = 0.5;
+
+        #endregion
+
+
         public static readonly string[] ydna12 = new string[] { "DYS393", "DYS390", "DYS19", "DYS391", "DYS385", "DYS426", "DYS388", "DYS439", "DYS389I", "DYS392", "DYS389II" };
         public static readonly string[] ydna25 = new string[] { "DYS458", "DYS459", "DYS455", "DYS454", "DYS447", "DYS437", "DYS448", "DYS449", "DYS464" };
         public static readonly string[] ydna37 = new string[] { "DYS460", "Y-GATA-H4", "YCAII", "DYS456", "DYS607", "DYS576", "DYS570", "CDY", "DYS442", "DYS438" };

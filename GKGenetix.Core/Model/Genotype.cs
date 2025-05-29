@@ -1,8 +1,8 @@
 ﻿/*
- *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2024 by Sergey V. Zhdanovskih.
+ *  "GKGenetix", the simple DNA analysis kit.
+ *  Copyright (C) 2022-2025 by Sergey V. Zhdanovskih.
  *
- *  This file is part of "GEDKeeper".
+ *  This file is part of "GKGenetix".
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,13 +19,23 @@
  */
 
 using System;
+using System.Runtime.InteropServices;
 
-namespace GKGenetix.Core
+namespace GKGenetix.Core.Model
 {
+    public enum Orientation : ushort
+    {
+        Unknown,
+        Plus,
+        Minus
+    }
+
+
     /// <summary>
     /// 
     /// </summary>
-    public class Genotype : IEquatable<Genotype>
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct Genotype : IEquatable<Genotype>
     {
         public const char UnknownAllele = '0';
 
@@ -53,13 +63,20 @@ namespace GKGenetix.Core
             }
         }
 
-        public Genotype(char a1, char a2)
+        /// <summary>
+        /// Strand orientation.
+        /// </summary>
+        public Orientation Orientation;
+
+
+        public Genotype(char a1, char a2, Orientation orientation = Orientation.Unknown)
         {
             A1 = a1;
             A2 = a2;
+            Orientation = orientation;
         }
 
-        public Genotype(string field)
+        public Genotype(string field, Orientation orientation = Orientation.Unknown)
         {
             A1 = '0';
             A2 = '0';
@@ -69,6 +86,12 @@ namespace GKGenetix.Core
                     A2 = field[1];
                 }
             }
+            Orientation = orientation;
+        }
+
+        public static bool IsEmptyOrUnknown(char a)
+        {
+            return /*a == UnknownAllele ||*/ a == '-' || a == '?';
         }
 
         public bool Equals(Genotype other)
@@ -123,6 +146,25 @@ namespace GKGenetix.Core
                     break;
             }
             return result;
+        }
+
+        public Genotype GetComplement(Orientation orientation)
+        {
+            return new Genotype(GeneLab.GetComplementaryNucleotide(A1), GeneLab.GetComplementaryNucleotide(A2), orientation);
+        }
+
+        /// <summary>
+        /// Get the genotype oriented for a given strand.
+        /// </summary>
+        public Genotype GetOrientedGenotype(Orientation targetOrientation)
+        {
+            if (targetOrientation == Orientation.Unknown || Orientation == Orientation.Unknown) {
+                return new Genotype(UnknownAllele, UnknownAllele, Orientation.Unknown);
+            } else if (Orientation == targetOrientation) {
+                return this;
+            } else {
+                return GetComplement(targetOrientation);
+            }
         }
     }
 }

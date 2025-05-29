@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
+using GKGenetix.Core;
 using GKGenetix.Core.Model;
 
 namespace GenetixKit.Forms
@@ -41,7 +42,7 @@ namespace GenetixKit.Forms
             dgvSegmentIdx.AddColumn("Chromosome", "Chromosome");
             dgvSegmentIdx.AddColumn("StartPosition", "Start Position");
             dgvSegmentIdx.AddColumn("EndPosition", "End Position");
-            dgvSegmentIdx.AddColumn("SegmentLength_cm", "Segment Length (cM)");
+            dgvSegmentIdx.AddColumn("SegmentLength_cm", "Segment Length (cM)", "#0.00");
             dgvSegmentIdx.AddColumn("SNPCount", "SNP Count");
 
             dgvMatching.AddColumn("RSID", "RSID");
@@ -89,11 +90,11 @@ namespace GenetixKit.Forms
         {
             int index = dgvSegmentIdx.CurrentRow.Index;
             var segRow = roh_results[index].Rows;
-            SingleSNP row = segRow[e.RowIndex];
+            SNP row = segRow[e.RowIndex];
 
-            if (row.Genotype == "-")
+            if (row.Genotype.A1 == '-')
                 e.CellStyle.BackColor = Color.LightGray;
-            else if (row.Genotype == "")
+            else if (row.Genotype.A1 == '0')
                 e.CellStyle.BackColor = Color.OrangeRed;
         }
     }

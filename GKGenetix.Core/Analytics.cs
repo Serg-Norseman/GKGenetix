@@ -1,8 +1,8 @@
 ﻿/*
- *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2024 by Sergey V. Zhdanovskih.
+ *  "GKGenetix", the simple DNA analysis kit.
+ *  Copyright (C) 2022-2025 by Sergey V. Zhdanovskih.
  *
- *  This file is part of "GEDKeeper".
+ *  This file is part of "GKGenetix".
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ using System.IO;
 using System.Linq;
 using BSLib;
 using GKGenetix.Core.FileFormats;
+using GKGenetix.Core.Model;
 using GKGenetix.Core.Reference;
 
 namespace GKGenetix.Core
@@ -81,7 +82,7 @@ namespace GKGenetix.Core
                 for (int j = 0; j < dbHaplogroupMutationsY.Count; j++) {
                     var hGroup = dbHaplogroupMutationsY[j];
                     // position matches known haplogroup
-                    if (snp.Pos == hGroup.Position) {
+                    if (snp.Position == hGroup.Position) {
                         // mutation matches haplogroup
                         if (snp.Genotype.A1 == hGroup.NewNucleotide && !hgs.Contains(hGroup.Haplogroup)) {
                             hgs.Add(hGroup.Haplogroup);
@@ -498,7 +499,7 @@ namespace GKGenetix.Core
                     var snp = dna.SNP[i];
                     for (int j = 0; j < dbHaplogroupMutationsY.Count; j++) {
                         var hGroup = dbHaplogroupMutationsY[j];
-                        if (snp.Pos == hGroup.Position) {
+                        if (snp.Position == hGroup.Position) {
                             HGMatch tuple;
                             if (!mutationMatches.TryGetValue(hGroup.Haplogroup, out tuple)) {
                                 tuple = new HGMatch();

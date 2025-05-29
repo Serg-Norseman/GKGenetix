@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Windows.Forms;
+using GKGenetix.Core;
 using GKGenetix.Core.Model;
 
 namespace GenetixKit.Core
@@ -357,7 +358,7 @@ namespace GenetixKit.Core
                         foreach (var row in obj.Rows) {
                             ExecCmd(
                                 "insert or replace into cmp_mrca (rsid, chromosome, position, kit1_genotype, kit2_genotype, match, segment_id) " +
-                                $"values ('{row.RSID}', '{row.Chromosome}', {row.Position}, '{row.Kit1Genotype}', '{row.Kit2Genotype}', '{row.Match}', '{segment_id}')", cnn, transaction);
+                                $"values ('{row.rsID}', '{row.Chromosome}', {row.Position}, '{row.Kit1Genotype}', '{row.Kit2Genotype}', '{row.Match}', '{segment_id}')", cnn, transaction);
                         }
                         transaction.Commit();
                     }
@@ -378,9 +379,9 @@ namespace GenetixKit.Core
                 $"select segment_id, chromosome, start_position, end_position, segment_length_cm, snp_count from cmp_autosomal where cmp_id = '{cmp_id}'");
         }
 
-        public static IList<SingleSNP> GetAutosomal(string kit)
+        public static IList<SNP> GetAutosomal(string kit)
         {
-            return GetRows<SingleSNP>(
+            return GetRows<SNP>(
                 $"select rsid, chromosome, position, genotype from kit_autosomal where kit_no = '{kit}' order by chromosome, position");
         }
 
@@ -471,16 +472,16 @@ namespace GenetixKit.Core
             return GetRows<ROHSegment>($"select chromosome, start_position, end_position, segment_length_cm, snp_count from kit_roh where kit_no = '{kit}'");
         }
 
-        public static IList<SingleSNP> GetROHSeg(string kit, string chromosome, int startPos, int endPos)
+        public static IList<SNP> GetROHSeg(string kit, string chromosome, int startPos, int endPos)
         {
-            return GetRows<SingleSNP>(
+            return GetRows<SNP>(
                 "select rsid, chromosome, position, genotype from kit_autosomal " +
                 $"where kit_no = '{kit}' and chromosome = '{chromosome}' and position >= {startPos} and position <= {endPos} order by position");
         }
 
-        public static IList<SingleSNP> GetROHRows(string kit)
+        public static IList<SNP> GetROHRows(string kit)
         {
-            return GetRows<SingleSNP>($"select rsid, chromosome, position, genotype from kit_autosomal where kit_no = '{kit}' order by cast(chromosome as integer), position");
+            return GetRows<SNP>($"select rsid, chromosome, position, genotype from kit_autosomal where kit_no = '{kit}' order by cast(chromosome as integer), position");
         }
 
         #endregion
@@ -546,7 +547,7 @@ namespace GenetixKit.Core
 
                         ExecCmd(
                             "insert or replace into kit_phased (kit_no, rsid, chromosome, position, paternal_genotype, maternal_genotype, paternal_kit_no, maternal_kit_no) " +
-                            $"values ('{child_kit}', '{row.RSID}', '{row.Chromosome}', {row.Position}, '{phasedPaternal}', '{phasedMaternal}', '{father_kit}', '{mother_kit}')", conn, trans);
+                            $"values ('{child_kit}', '{row.rsID}', '{row.Chromosome}', {row.Position}, '{phasedPaternal}', '{phasedMaternal}', '{father_kit}', '{mother_kit}')", conn, trans);
                     }
                     trans.Commit();
                 }

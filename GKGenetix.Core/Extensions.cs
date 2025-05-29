@@ -1,8 +1,8 @@
 ﻿/*
- *  "GEDKeeper", the personal genealogical database editor.
- *  Copyright (C) 2009-2024 by Sergey V. Zhdanovskih.
+ *  "GKGenetix", the simple DNA analysis kit.
+ *  Copyright (C) 2022-2025 by Sergey V. Zhdanovskih.
  *
- *  This file is part of "GEDKeeper".
+ *  This file is part of "GKGenetix".
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
  */
 
 using System;
+using GKGenetix.Core.Model;
 
 namespace GKGenetix.Core
 {
@@ -153,8 +154,7 @@ namespace GKGenetix.Core
 
         public static int ParsePosition(this string s)
         {
-            int x;
-            return !int.TryParse(s.Trim(), out x) ? -1 : x;
+            return !int.TryParse(s.Trim(), out int x) ? -1 : x;
         }
 
         public static char[] ParseMutation(string mutation)

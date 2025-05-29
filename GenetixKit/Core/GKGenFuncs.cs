@@ -30,6 +30,12 @@ namespace GenetixKit.Core
         private static readonly List<string> markers_new = new List<string>();
 
 
+        public static double GetLength_in_cM(byte chr, int start_pos, int end_pos)
+        {
+            var chr_s = chr.ToString();
+            return GetPosition_in_cM(chr_s, end_pos) - GetPosition_in_cM(chr_s, start_pos);
+        }
+
         public static double GetLength_in_cM(string chr, int start_pos, int end_pos)
         {
             return GetPosition_in_cM(chr, end_pos) - GetPosition_in_cM(chr, start_pos);
@@ -69,7 +75,7 @@ namespace GenetixKit.Core
 
         public static DNARec LoadDNAFile(string file, BackgroundWorker bgw)
         {
-            var rows = new List<SingleSNP>();
+            var rows = new List<SNP>();
 
             char[] rsrs = GKData.RSRS;
             string[] lines;
@@ -88,7 +94,7 @@ namespace GenetixKit.Core
 
             if (type == -1) {
                 GKUIFuncs.ShowMessage("Unable to identify file format for " + file);
-                return new DNARec(new List<SingleSNP>(), new List<string>(), new List<string>());
+                return new DNARec(new List<SNP>(), new List<string>(), new List<string>());
             }
 
             string rsid = null;
@@ -161,7 +167,7 @@ namespace GenetixKit.Core
 
                 if (chr != "Y" && chr != "MT") {
                     if (chr != "0")
-                        rows.Add(new SingleSNP(rsid, chr, int.Parse(pos), genotype));
+                        rows.Add(new SNP(rsid, chr, int.Parse(pos), genotype));
                 } else {
                     if (chr == "Y") {
                         if (GKData.YMap.ContainsKey(pos)) {
@@ -480,18 +486,18 @@ namespace GenetixKit.Core
             int diffPos = (end_pos - start_pos);
 
             if (reference) {
-                snp_th = GKSettings.Admixture_Threshold_SNPs;
-                cm_th = GKSettings.Admixture_Threshold_cM;
+                snp_th = GKData.Admixture_Threshold_SNPs;
+                cm_th = GKData.Admixture_Threshold_cM;
                 overTh = diffPos > 5000;
             } else {
                 if (chromosome == "X") {
-                    cm_th = GKSettings.Compare_X_Threshold_cM;
-                    snp_th = GKSettings.Compare_X_Threshold_SNPs;
+                    cm_th = GKData.Compare_X_Threshold_cM;
+                    snp_th = GKData.Compare_X_Threshold_SNPs;
                 } else {
-                    cm_th = GKSettings.Compare_Autosomal_Threshold_cM;
-                    snp_th = GKSettings.Compare_Autosomal_Threshold_SNPs;
+                    cm_th = GKData.Compare_Autosomal_Threshold_cM;
+                    snp_th = GKData.Compare_Autosomal_Threshold_SNPs;
                 }
-                overTh = diffPos / 1000000.0 > GKSettings.MB_THRESHOLD;
+                overTh = diffPos / 1000000.0 > GKData.MB_THRESHOLD;
             }
 
             if (overTh) {
@@ -508,7 +514,7 @@ namespace GenetixKit.Core
             tmp = new List<CmpSegmentRow>();
         }
 
-        public static void DontMatchProcRoH(int start_pos, int end_pos, string prev_chr, string chromosome, IList<ROHSegment> segments_idx, ref List<SingleSNP> tmp, bool reference)
+        public static void DontMatchProcRoH(int start_pos, int end_pos, byte prev_chr, byte chromosome, IList<ROHSegment> segments_idx, ref List<SNP> tmp, bool reference)
         {
             double cm_len, cm_th;
             int snp_th;
@@ -517,18 +523,18 @@ namespace GenetixKit.Core
             int diffPos = (end_pos - start_pos);
 
             if (reference) {
-                snp_th = GKSettings.Admixture_Threshold_SNPs;
-                cm_th = GKSettings.Admixture_Threshold_cM;
+                snp_th = GKData.Admixture_Threshold_SNPs;
+                cm_th = GKData.Admixture_Threshold_cM;
                 overTh = diffPos > 5000;
             } else {
-                if (chromosome == "X") {
-                    cm_th = GKSettings.Compare_X_Threshold_cM;
-                    snp_th = GKSettings.Compare_X_Threshold_SNPs;
+                if (chromosome == (byte)Chromosome.CHR_X) {
+                    cm_th = GKData.Compare_X_Threshold_cM;
+                    snp_th = GKData.Compare_X_Threshold_SNPs;
                 } else {
-                    cm_th = GKSettings.Compare_Autosomal_Threshold_cM;
-                    snp_th = GKSettings.Compare_Autosomal_Threshold_SNPs;
+                    cm_th = GKData.Compare_Autosomal_Threshold_cM;
+                    snp_th = GKData.Compare_Autosomal_Threshold_SNPs;
                 }
-                overTh = diffPos / 1000000.0 > GKSettings.MB_THRESHOLD;
+                overTh = diffPos / 1000000.0 > GKData.MB_THRESHOLD;
             }
 
             if (overTh) {
@@ -542,7 +548,7 @@ namespace GenetixKit.Core
                 }
             }
 
-            tmp = new List<SingleSNP>();
+            tmp = new List<SNP>();
         }
 
         /*
@@ -569,13 +575,13 @@ namespace GenetixKit.Core
             int snp_th;
             int errorRadius;
             if (chromosome == "X") {
-                snp_th = GKSettings.Compare_X_Threshold_SNPs;
+                snp_th = GKData.Compare_X_Threshold_SNPs;
                 errorRadius = snp_th / 2;
             } else {
-                snp_th = GKSettings.Compare_Autosomal_Threshold_SNPs;
+                snp_th = GKData.Compare_Autosomal_Threshold_SNPs;
                 errorRadius = snp_th / 2;
             }
-            int no_call_limit = GKSettings.Compare_NoCalls_Limit;
+            int no_call_limit = GKData.Compare_NoCalls_Limit;
 
             int paternal_no_call_count = 0;
             int maternal_no_call_count = 0;
@@ -596,8 +602,8 @@ namespace GenetixKit.Core
                 curr_pos = ix;
                 x = curr_pos * width / dt.Count;
 
-                if (!IsPhasedMatch(row.Genotype, row.PaternalGenotype)) // paternal not matched
-                {
+                // paternal not matched
+                if (!IsPhasedMatch(row.Genotype, row.PaternalGenotype)) {
                     if ((row.Genotype.IndexOf('-') != -1 || row.PaternalGenotype.IndexOf('-') != -1 || row.Genotype.IndexOf('?') != -1 || row.PaternalGenotype.IndexOf('?') != -1) && paternal_no_call_count <= no_call_limit) {
                         //allow no call but count it.
                         paternal_no_call_count++;
@@ -624,8 +630,8 @@ namespace GenetixKit.Core
                     }
                 }
 
-                if (!IsPhasedMatch(row.Genotype, row.MaternalGenotype)) // maternal not matched
-                {
+                // maternal not matched
+                if (!IsPhasedMatch(row.Genotype, row.MaternalGenotype)) {
                     if ((row.Genotype.IndexOf('-') != -1 || row.MaternalGenotype.IndexOf('-') != -1 || row.Genotype.IndexOf('?') != -1 || row.MaternalGenotype.IndexOf('?') != -1) && maternal_no_call_count <= no_call_limit) {
                         //allow no call but count it.
                         maternal_no_call_count++;
@@ -755,13 +761,13 @@ namespace GenetixKit.Core
                 int end_pos = 0;
                 int prev_snp_count = 0;
                 int no_call_counter = 0;
-                int no_call_limit = GKSettings.Compare_NoCalls_Limit;
+                int no_call_limit = GKData.Compare_NoCalls_Limit;
 
                 foreach (var rd in otoRows) {
                     if (bwCompare != null && bwCompare.CancellationPending)
                         break;
 
-                    string rsid = rd.RSID;
+                    string rsid = rd.rsID;
                     string chromosome = rd.Chromosome;
                     int position = rd.Position;
                     string gt1 = rd.Genotype1;
@@ -773,7 +779,7 @@ namespace GenetixKit.Core
                     if (gt2.Length == 1) gt2 += gt2;
 
                     if (prev_chr == chromosome) {
-                        float errorRadius = (chromosome == "X") ? GKSettings.Compare_X_Threshold_SNPs / 2 : GKSettings.Compare_Autosomal_Threshold_SNPs / 2;
+                        float errorRadius = (chromosome == "X") ? GKData.Compare_X_Threshold_SNPs / 2 : GKData.Compare_Autosomal_Threshold_SNPs / 2;
 
                         if (cnt == 1) {
                             // match both alleles
@@ -861,9 +867,7 @@ namespace GenetixKit.Core
                 }
 
                 otoRows.Clear();
-                otoRows = null;
 
-                //save
                 GKSqlFuncs.SaveAutosomalCmp(kit1, kit2, segments_idx, reference);
             }
 
@@ -886,41 +890,42 @@ namespace GenetixKit.Core
             } else {
                 var rows = GKSqlFuncs.GetROHRows(kit);
 
-                var tmp = new List<SingleSNP>();
+                var tmp = new List<SNP>();
 
-                string prev_chr = "";
+                byte prev_chr = 0;
                 int start_pos = 0;
                 int end_pos = 0;
                 int prev_snp_count = 0;
                 int no_call_counter = 0;
-                int no_call_limit = GKSettings.Compare_NoCalls_Limit;
+                int no_call_limit = GKData.Compare_NoCalls_Limit;
                 foreach (var snp in rows) {
-                    string chromosome = snp.Chromosome;
+                    byte chromosome = snp.Chromosome;
                     int position = snp.Position;
-                    string genotype = snp.Genotype;
 
-                    if (genotype.Length == 1)
-                        genotype += genotype;
-
-                    if (prev_chr == "")
+                    if (prev_chr == 0)
                         prev_chr = chromosome;
 
                     if (prev_chr == chromosome) {
                         float errorRadius;
-                        if (chromosome == "X")
-                            errorRadius = GKSettings.Compare_X_Threshold_SNPs / 2;
+                        if (chromosome == (byte)Chromosome.CHR_X)
+                            errorRadius = GKData.Compare_X_Threshold_SNPs / 2;
                         else
-                            errorRadius = GKSettings.Compare_Autosomal_Threshold_SNPs / 2;
+                            errorRadius = GKData.Compare_Autosomal_Threshold_SNPs / 2;
 
-                        char gt0 = genotype[0];
-                        char gt1 = genotype[1];
+                        var genotype = snp.Genotype;
+                        char gt0 = genotype.A1;
+                        char gt1 = genotype.A2;
 
-                        if (gt0 == gt1 && gt0 != '-' && gt0 != '?') {
+                        bool gt0_unk = Genotype.IsEmptyOrUnknown(gt0);
+                        bool gt1_unk = Genotype.IsEmptyOrUnknown(gt1);
+                        if (gt1_unk) gt1 = gt0;
+
+                        if (gt0 == gt1 && !gt0_unk) {
                             // match 
                             tmp.Add(snp);
                             if (start_pos == 0)
                                 start_pos = position;
-                        } else if ((gt0 != '-' && gt0 != '?' && (gt1 == '-' || gt1 == '?')) || (gt1 != '-' && gt1 != '?' && (gt0 == '-' || gt0 == '?'))) {
+                        } else if ((!gt0_unk && gt1_unk) || (!gt1_unk && gt0_unk)) {
                             no_call_counter++;
                             if (no_call_counter <= no_call_limit) {
                                 tmp.Add(snp);
@@ -957,7 +962,6 @@ namespace GenetixKit.Core
                 }
 
                 rows.Clear();
-                rows = null;
 
                 GKSqlFuncs.SaveROHCmp(kit, segments_idx);
             }

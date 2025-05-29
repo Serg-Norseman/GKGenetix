@@ -29,8 +29,8 @@ namespace GKGenetix.Core.Model
         public string Name { get; set; }
         public string Sex { get; set; }
         public bool Disabled { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
+        public int Longitude { get; set; }
+        public int Latitude { get; set; }
         public DateTime LastModified { get; set; }
         public int Reference { get; set; }
         public int RoH_Status { get; set; }
@@ -46,8 +46,8 @@ namespace GKGenetix.Core.Model
             Name = values.GetString(1);
             Sex = values.GetString(2);
             Disabled = values.GetBoolean(3);
-            X = values.GetInt32(4);
-            Y = values.GetInt32(5);
+            Longitude = values.GetInt32(4);
+            Latitude = values.GetInt32(5);
             LastModified = values.GetDateTime(6);
             Reference = values.GetInt32(7);
             RoH_Status = values.GetInt32(8);
@@ -62,7 +62,7 @@ namespace GKGenetix.Core.Model
             }
 
             if (displayLocation) {
-                string xy = X + ":" + Y;
+                string xy = Longitude + ":" + Latitude;
                 if (xy == "0:0")
                     xy = "Unknown";
                 Location = xy;
