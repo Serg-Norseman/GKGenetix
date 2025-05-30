@@ -26,16 +26,117 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DNAAnalysis.cs">
+    <Compile Include="DevConsole.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DNAAnalysis.Designer.cs">
-      <DependentUpon>DNAAnalysis.cs</DependentUpon>
+    <Compile Include="DevConsole.Designer.cs">
+      <DependentUpon>DevConsole.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\AdmixtureFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\AdmixtureFrm.Designer.cs">
+      <DependentUpon>AdmixtureFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\GKMainFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\GKMainFrm.Designer.cs">
+      <DependentUpon>GKMainFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\IsoggYTreeFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\IsoggYTreeFrm.designer.cs">
+      <DependentUpon>IsoggYTreeFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\KitsExplorer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\KitsExplorer.Designer.cs">
+      <DependentUpon>KitsExplorer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\LocationSelectFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\LocationSelectFrm.Designer.cs">
+      <DependentUpon>LocationSelectFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\MatchingKitsFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\MatchingKitsFrm.Designer.cs">
+      <DependentUpon>MatchingKitsFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\MitoMapFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\MitoMapFrm.Designer.cs">
+      <DependentUpon>MitoMapFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\MtPhylogenyFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\MtPhylogenyFrm.designer.cs">
+      <DependentUpon>MtPhylogenyFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\NewEditKitFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\NewEditKitFrm.Designer.cs">
+      <DependentUpon>NewEditKitFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\OneToOneCmpFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\OneToOneCmpFrm.Designer.cs">
+      <DependentUpon>OneToOneCmpFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\PhasedSegmentFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\PhasedSegmentFrm.Designer.cs">
+      <DependentUpon>PhasedSegmentFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\PhasingFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\PhasingFrm.Designer.cs">
+      <DependentUpon>PhasingFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\ProcessKitsFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\ProcessKitsFrm.Designer.cs">
+      <DependentUpon>ProcessKitsFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\ROHFrm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\ROHFrm.Designer.cs">
+      <DependentUpon>ROHFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GGKit.Forms\SelectKitFrm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GGKit.Forms\SelectKitFrm.Designer.cs">
+      <DependentUpon>SelectKitFrm.cs</DependentUpon>
     </Compile>
     <Compile Include="UIHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GKGenetix.Core\GKGenetix.Core.csproj">
@@ -43,5 +144,7 @@
       <Name>GKGenetix.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
+  <Import Project="GKGenetix.UI.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

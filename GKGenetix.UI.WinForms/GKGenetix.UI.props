@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <ItemGroup>
+        <Content Include="Resources\Images\eraser.png" />
+        <Content Include="Resources\Images\paste.png" />
+        <Content Include="Resources\Images\world_map.png" />
+    </ItemGroup>
+
+</Project>

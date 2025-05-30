@@ -14,8 +14,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GKGenetix", "GKGenetix\GKGe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GKGenetix.UI.WinForms", "GKGenetix.UI.WinForms\GKGenetix.UI.WinForms.csproj", "{B9225DE4-BE79-43F8-B84B-BECF360E329A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenetixKit", "GenetixKit\GenetixKit.csproj", "{918565A4-0748-4C0E-BC26-F725402DF66B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GKGenetix.Tests", "GKGenetix.Tests\GKGenetix.Tests.csproj", "{11A15E74-9BE4-4EF6-9373-526321EFD584}"
 EndProject
 Global
@@ -36,10 +34,6 @@ Global
 		{B9225DE4-BE79-43F8-B84B-BECF360E329A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9225DE4-BE79-43F8-B84B-BECF360E329A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9225DE4-BE79-43F8-B84B-BECF360E329A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{918565A4-0748-4C0E-BC26-F725402DF66B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{918565A4-0748-4C0E-BC26-F725402DF66B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{918565A4-0748-4C0E-BC26-F725402DF66B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{918565A4-0748-4C0E-BC26-F725402DF66B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{11A15E74-9BE4-4EF6-9373-526321EFD584}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{11A15E74-9BE4-4EF6-9373-526321EFD584}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11A15E74-9BE4-4EF6-9373-526321EFD584}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -2,6 +2,7 @@
 
 Pilot project adding genetic data analysis functions to GEDKeeper.
 
+Management, analysis and matching tool for Autosomal, X, Y and Mitochondrial DNA (thanks to the GGKit project).
 
 Features:
 - Supported file formats: 23AndMe, AncestryDNA, deCODEme, VCF (partial and primitive);
@@ -15,3 +16,9 @@ Features:
 Planned:
 - Downloading up-to-date SNP reference databases;
 - Simple charts;
+
+## GGKit (Genetic Genealogy Kit)
+
+Management, analysis and matching tool for Autosomal, X, Y and Mitochondrial DNA.
+The MIT License (MIT)
+Copyright (c) 2014 Felix Jeyareuben Chandrakumar

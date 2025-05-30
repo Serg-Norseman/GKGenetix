@@ -20,7 +20,7 @@
 
 using System;
 using System.Windows.Forms;
-using GKGenetix.UI;
+using GGKit.Forms;
 
 namespace GKGenetix
 {
@@ -31,7 +31,7 @@ namespace GKGenetix
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new DNAAnalysis());
+            Application.Run(new GKMainFrm());
         }
     }
 }
