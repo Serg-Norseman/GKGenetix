@@ -10,8 +10,8 @@ using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
-using GKGenetix.Core;
 using GKGenetix.Core.Model;
+using GKGenetix.UI;
 
 namespace GenetixKit.Forms
 {
@@ -27,17 +27,17 @@ namespace GenetixKit.Forms
         }
 
 
-        public ROHFrm(IList<KitDTO> selectedKits) : this(selectedKits[0].KitNo)
+        public ROHFrm(IKitHost host, IList<KitDTO> selectedKits) : this(host, selectedKits[0].KitNo)
         {
         }
 
-        public ROHFrm(string kit)
+        public ROHFrm(IKitHost host, string kit) : base(host)
         {
             InitializeComponent();
             this.kit = kit;
 
-            GKUIFuncs.FixGridView(dgvSegmentIdx);
-            GKUIFuncs.FixGridView(dgvMatching);
+            UIHelper.FixGridView(dgvSegmentIdx);
+            UIHelper.FixGridView(dgvMatching);
 
             dgvSegmentIdx.AddColumn("Chromosome", "Chromosome");
             dgvSegmentIdx.AddColumn("StartPosition", "Start Position");
@@ -53,7 +53,7 @@ namespace GenetixKit.Forms
 
         private void ROHFrm_Load(object sender, EventArgs e)
         {
-            Program.KitInstance.SetStatus("Calculating ROH ...");
+            _host.SetStatus("Calculating ROH ...");
             this.Text = $"Runs of Homozygosity - {kit} ({GKSqlFuncs.GetKitName(kit)})";
 
             Task.Factory.StartNew(() => {
@@ -76,7 +76,7 @@ namespace GenetixKit.Forms
             lblLongestXSegment.Text = $"{segmentStats.XLongest:#0.00} cM";
             lblMRCA.Text = segmentStats.GetMRCAText(true);
 
-            Program.KitInstance.SetStatus("Done.");
+            _host.SetStatus("Done.");
         }
 
         private void dgvSegmentIdx_SelectionChanged(object sender, EventArgs e)

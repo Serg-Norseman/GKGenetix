@@ -21,7 +21,7 @@ namespace GenetixKit.Forms
         private IList<KitDTO> dt;
 
 
-        public ProcessKitsFrm()
+        public ProcessKitsFrm(IKitHost host) : base(host)
         {
             InitializeComponent();
         }
@@ -29,8 +29,8 @@ namespace GenetixKit.Forms
         private void ProcessKitsFrm_FormClosing(object sender, EventArgs e)
         {
             if (bwCompare.IsBusy || bwROH.IsBusy || bwPhaseVisualizer.IsBusy) {
-                Program.KitInstance.SetStatus("Cancelling...");
-                Program.KitInstance.SetProgress(-1);
+                _host.SetStatus("Cancelling...");
+                _host.SetProgress(-1);
                 btnStart.Text = "Cancelling";
                 btnStart.Enabled = false;
                 if (bwCompare.IsBusy)
@@ -42,15 +42,15 @@ namespace GenetixKit.Forms
                 //e.Cancel = true;
                 //this.Close();
             } else {
-                Program.KitInstance.SetStatus("Done.");
-                Program.KitInstance.SetProgress(-1);
+                _host.SetStatus("Done.");
+                _host.SetProgress(-1);
             }
         }
 
         private void btnStart_Click(object sender, EventArgs e)
         {
             if (btnStart.Text == "Start") {
-                Program.KitInstance.SetStatus("Processing Kits ...");
+                _host.SetStatus("Processing Kits ...");
                 if (bwCompare.IsBusy) {
                     MessageBox.Show("Process is busy!", "Please Wait!", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 } else {
@@ -59,8 +59,8 @@ namespace GenetixKit.Forms
                 }
             } else if (btnStart.Text == "Stop") {
                 if (MessageBox.Show("Are you sure you want to cancel the process?", "Cancel?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-                    Program.KitInstance.SetStatus("Done.");
-                    Program.KitInstance.SetProgress(-1);
+                    _host.SetStatus("Done.");
+                    _host.SetProgress(-1);
                     bwCompare.CancelAsync();
                     bwROH.CancelAsync();
                     bwPhaseVisualizer.CancelAsync();
@@ -154,7 +154,7 @@ namespace GenetixKit.Forms
 
         private void WriteStatusMsg(string msg, bool onlyLocal = false)
         {
-            if (!onlyLocal) Program.KitInstance.SetStatus(msg);
+            if (!onlyLocal) _host.SetStatus(msg);
 
             lblComparing.Text = msg;
 
@@ -176,8 +176,8 @@ namespace GenetixKit.Forms
 
         private void bwCompare_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            Program.KitInstance.SetProgress(e.ProgressPercentage);
-            Program.KitInstance.SetStatus(e.UserState.ToString());
+            _host.SetProgress(e.ProgressPercentage);
+            _host.SetStatus(e.UserState.ToString());
             progressBar.Value = e.ProgressPercentage;
         }
 
@@ -208,7 +208,7 @@ namespace GenetixKit.Forms
         {
             string rohStatus = e.UserState.ToString();
 
-            Program.KitInstance.SetProgress(e.ProgressPercentage);
+            _host.SetProgress(e.ProgressPercentage);
             progressBar.Value = e.ProgressPercentage;
 
             WriteStatusMsg(rohStatus);
@@ -217,7 +217,7 @@ namespace GenetixKit.Forms
         private void bwROH_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             progressBar.Value = 0;
-            Program.KitInstance.SetProgress(-1);
+            _host.SetProgress(-1);
 
             WriteStatusMsg("Runs of Homozygosity Processing Completed.");
 
@@ -235,7 +235,7 @@ namespace GenetixKit.Forms
             progressBar.Value = 0;
             btnStart.Text = "Start";
             btnStart.Enabled = true;
-            Program.KitInstance.SetProgress(-1);
+            _host.SetProgress(-1);
 
             WriteStatusMsg("Phased Segment Processing Completed.");
         }
@@ -244,7 +244,7 @@ namespace GenetixKit.Forms
         {
             string phStatus = e.UserState.ToString();
 
-            Program.KitInstance.SetProgress(e.ProgressPercentage);
+            _host.SetProgress(e.ProgressPercentage);
             progressBar.Value = e.ProgressPercentage;
 
             WriteStatusMsg(phStatus);

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GKGenetix.Core.Model;
+using GKGenetix.UI;
 
 namespace GenetixKit.Forms
 {
@@ -31,7 +32,7 @@ namespace GenetixKit.Forms
         public event EventHandler SelectionChanged;
 
 
-        public KitsExplorer()
+        public KitsExplorer() : base(null)
         {
             InitializeComponent();
 
@@ -45,20 +46,25 @@ namespace GenetixKit.Forms
             dgvEditKit.AddColumn("LastModified", "Last Modified");
         }
 
+        public void SetHost(IKitHost host)
+        {
+            _host = host;
+        }
+
         private void QuickEditKit_Load(object sender, EventArgs e)
         {
             if (this.DesignMode) return;
 
-            Program.KitInstance.EnableSave();
-            Program.KitInstance.EnableDelete();
+            _host.EnableSave();
+            _host.EnableDelete();
 
             UpdateView();
         }
 
         private void QuickEditKit_FormClosing(object sender, EventArgs e)
         {
-            Program.KitInstance.DisableSave();
-            Program.KitInstance.DisableDelete();
+            _host.DisableSave();
+            _host.DisableDelete();
         }
 
         private void dgvEditKit_SelectionChanged(object sender, EventArgs e)
@@ -74,23 +80,22 @@ namespace GenetixKit.Forms
 
         public void Save()
         {
-            Program.KitInstance.SetStatus("Saving ...");
+            _host.SetStatus("Saving ...");
 
             foreach (var row in tblKits) {
                 string location = row.Location;
-                string x, y;
+                string lng, lat;
                 if (location == "Unknown") {
-                    x = "0";
-                    y = "0";
+                    lng = "0";
+                    lat = "0";
                 } else {
-                    x = location.Split(new char[] { ':' })[0];
-                    y = location.Split(new char[] { ':' })[1];
+                    lng = location.Split(new char[] { ':' })[0];
+                    lat = location.Split(new char[] { ':' })[1];
                 }
-
-                GKSqlFuncs.SaveKit(row.KitNo, row.Name, row.Sex, row.Disabled, x, y);
+                GKSqlFuncs.SaveKit(row.KitNo, row.Name, row.Sex, row.Disabled, lng, lat);
             }
 
-            Program.KitInstance.SetStatus("Saved.");
+            _host.SetStatus("Saved.");
         }
 
         public void Delete()
@@ -99,9 +104,9 @@ namespace GenetixKit.Forms
 
             int selRowsCount = rowsToDelete.Count;
             if (MessageBox.Show($"You had selected {selRowsCount} kits to be deleted. Are you sure?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
-                Program.KitInstance.SetStatus($"Deleting {selRowsCount} kit(s) and all it's associated data ...");
+                _host.SetStatus($"Deleting {selRowsCount} kit(s) and all it's associated data ...");
                 this.Enabled = false;
-                Program.KitInstance.DisableToolbar();
+                _host.DisableToolbar();
 
                 Task.Factory.StartNew((object obj) => {
                     var rows2Del = (List<KitDTO>)obj;
@@ -113,9 +118,9 @@ namespace GenetixKit.Forms
                     this.Invoke(new MethodInvoker(delegate {
                         dgvEditKit.DataSource = tblKits;
 
-                        Program.KitInstance.SetStatus("Deleted.");
+                        _host.SetStatus("Deleted.");
                         this.Enabled = true;
-                        Program.KitInstance.EnableToolbar();
+                        _host.EnableToolbar();
                     }));
                 }, rowsToDelete);
             }
@@ -132,18 +137,22 @@ namespace GenetixKit.Forms
             if (dgvEditKit.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0) {
                 var kitRow = tblKits[e.RowIndex];
                 string location = kitRow.Location;
-                int x = 0;
-                int y = 0;
+                int lng = 0;
+                int lat = 0;
                 if (location != "Unknown") {
                     var parts = location.Split(new char[] { ':' });
-                    x = int.Parse(parts[0]);
-                    y = int.Parse(parts[1]);
+                    lng = int.Parse(parts[0]);
+                    lat = int.Parse(parts[1]);
                 }
-                Program.KitInstance.SelectLocation(ref x, ref y);
-                kitRow.Location = x.ToString() + ":" + y.ToString();
+                _host.SelectLocation(ref lng, ref lat);
+                kitRow.Location = lng.ToString() + ":" + lat.ToString();
 
                 dgvEditKit.Invalidate();
             }
+        }
+
+        private void dgvEditKit_DoubleClick(object sender, EventArgs e)
+        {
         }
     }
 }

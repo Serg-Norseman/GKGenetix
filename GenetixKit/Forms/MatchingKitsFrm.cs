@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GKGenetix.Core.Model;
+using GKGenetix.UI;
 
 namespace GenetixKit.Forms
 {
@@ -30,15 +31,15 @@ namespace GenetixKit.Forms
         }
 
 
-        public MatchingKitsFrm(IList<KitDTO> selectedKits) : this(selectedKits[0].KitNo)
+        public MatchingKitsFrm(IKitHost host, IList<KitDTO> selectedKits) : this(host, selectedKits[0].KitNo)
         {
         }
 
-        public MatchingKitsFrm(string kit)
+        public MatchingKitsFrm(IKitHost host, string kit) : base(host)
         {
             InitializeComponent();
 
-            GKUIFuncs.FixGridView(dgvMatches);
+            UIHelper.FixGridView(dgvMatches);
             dgvMatches.AddColumn("Kit", "Kit No");
             dgvMatches.AddColumn("Name", "Name");
             dgvMatches.AddColumn("Longest", "Autosomal Longest", "N2");
@@ -47,14 +48,14 @@ namespace GenetixKit.Forms
             dgvMatches.AddColumn("XTotal", "X Total", "N2");
             dgvMatches.AddColumn("Mrca", "MRCA");
 
-            GKUIFuncs.FixGridView(dgvSegments);
+            UIHelper.FixGridView(dgvSegments);
             dgvSegments.AddColumn("Chromosome", "Chromosome");
             dgvSegments.AddColumn("StartPosition", "Start Position");
             dgvSegments.AddColumn("EndPosition", "End Position");
             dgvSegments.AddColumn("SegmentLength_cm", "Segment Length (cM)", "N2");
             dgvSegments.AddColumn("SNPCount", "SNP Count");
 
-            GKUIFuncs.FixGridView(dgvAlleles);
+            UIHelper.FixGridView(dgvAlleles);
             dgvAlleles.AddColumn("RSID", "RSID");
             dgvAlleles.AddColumn("Position", "Position");
             dgvAlleles.AddColumn("Kit1Genotype", "");
@@ -141,7 +142,7 @@ namespace GenetixKit.Forms
 
         private void btnKit_Click(object sender, EventArgs e)
         {
-            this.kit = Program.KitInstance.SelectKit();
+            this.kit = _host.SelectKit();
             UpdateView();
         }
 
@@ -149,7 +150,7 @@ namespace GenetixKit.Forms
         {
             var segment = dgvSegments.GetSelectedObj<CmpSegment>();
             if (segment != null && phased) {
-                Program.KitInstance.ShowPhasedSegmentVisualizer(phasedKit, unphasedKit, segment.Chromosome, segment.StartPosition, segment.EndPosition);
+                _host.ShowPhasedSegmentVisualizer(phasedKit, unphasedKit, segment.Chromosome, segment.StartPosition, segment.EndPosition);
             }
         }
     }

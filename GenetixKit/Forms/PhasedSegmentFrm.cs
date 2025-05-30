@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GKGenetix.Core.Model;
+using GKGenetix.UI;
 
 namespace GenetixKit.Forms
 {
@@ -29,7 +30,7 @@ namespace GenetixKit.Forms
         {
             InitializeComponent();
 
-            GKUIFuncs.FixGridView(dgvSegment);
+            UIHelper.FixGridView(dgvSegment);
 
             dgvSegment.AddColumn("Position", "Position");
             dgvSegment.AddColumn("Genotype", GKSqlFuncs.GetKitName(unphased_kit));

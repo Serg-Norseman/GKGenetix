@@ -21,6 +21,7 @@ namespace GenetixKit.Forms
         {
             InitializeComponent();
 
+            kitsExplorer.SetHost(this);
             kitsExplorer.SelectionChanged += kitsExplorer_SelectionChanged;
         }
 
@@ -80,7 +81,12 @@ namespace GenetixKit.Forms
         private void miOpen_Click(object sender, EventArgs e)
         {
             var selKit = kitsExplorer.SelectedKits[0];
-            Program.KitInstance.OpenKit(selKit.KitNo, selKit.Disabled);
+            OpenKit(selKit.KitNo, selKit.Disabled);
+        }
+
+        private void miImport_Click(object sender, EventArgs e)
+        {
+            ImportKit();
         }
 
         private void miDelete_Click(object sender, EventArgs e)
@@ -90,12 +96,12 @@ namespace GenetixKit.Forms
 
         private void miOneToOne_Click(object sender, EventArgs e)
         {
-            Program.KitInstance.ShowOneToOneCmp(kitsExplorer.SelectedKits);
+            ShowOneToOneCmp(kitsExplorer.SelectedKits);
         }
 
         private void miOneToMany_Click(object sender, EventArgs e)
         {
-            Program.KitInstance.ShowMatchingKits(kitsExplorer.SelectedKits);
+            ShowMatchingKits(kitsExplorer.SelectedKits);
         }
 
         private void miProcessKits_Click(object sender, EventArgs e)
@@ -105,32 +111,32 @@ namespace GenetixKit.Forms
 
         private void miAdmixture_Click(object sender, EventArgs e)
         {
-            Program.KitInstance.ShowAdmixture(kitsExplorer.SelectedKits);
+            ShowAdmixture(kitsExplorer.SelectedKits);
         }
 
         private void miRunsOfHomozygosity_Click(object sender, EventArgs e)
         {
-            Program.KitInstance.ShowROH(kitsExplorer.SelectedKits);
+            ShowROH(kitsExplorer.SelectedKits);
         }
 
         private void miMtDnaPhylogeny_Click(object sender, EventArgs e)
         {
-            Program.KitInstance.ShowMtPhylogeny(kitsExplorer.SelectedKits);
+            ShowMtPhylogeny(kitsExplorer.SelectedKits);
         }
 
         private void miMitoMap_Click(object sender, EventArgs e)
         {
-            Program.KitInstance.ShowMitoMap(kitsExplorer.SelectedKits);
+            ShowMitoMap(kitsExplorer.SelectedKits);
         }
 
         private void miISOGGYTree_Click(object sender, EventArgs e)
         {
-            Program.KitInstance.ShowIsoggYTree(kitsExplorer.SelectedKits);
+            ShowIsoggYTree(kitsExplorer.SelectedKits);
         }
 
         private void miPhasing_Click(object sender, EventArgs e)
         {
-            ShowWidget(new PhasingFrm());
+            ShowWidget(new PhasingFrm(this));
         }
 
         private void btnWidgetClose_Click(object sender, EventArgs e)
@@ -179,15 +185,19 @@ namespace GenetixKit.Forms
         public void NewKit()
         {
             if (newKitFrm == null || newKitFrm.IsDisposed)
-                newKitFrm = new NewEditKitFrm(null, false);
+                newKitFrm = new NewEditKitFrm(this, null, false);
             ShowWidget(newKitFrm);
         }
 
         public void OpenKit(string kit, bool disabled)
         {
             if (newKitFrm == null || newKitFrm.IsDisposed)
-                newKitFrm = new NewEditKitFrm(kit, disabled);
+                newKitFrm = new NewEditKitFrm(this, kit, disabled);
             ShowWidget(newKitFrm);
+        }
+
+        public void ImportKit()
+        {
         }
 
         public void EnableSave()
@@ -222,12 +232,12 @@ namespace GenetixKit.Forms
 
         public void ShowAdmixture(IList<KitDTO> selectedKits)
         {
-            ShowWidget(new AdmixtureFrm(selectedKits));
+            ShowWidget(new AdmixtureFrm(this, selectedKits));
         }
 
         public void ShowProcessKits()
         {
-            ShowWidget(new ProcessKitsFrm());
+            ShowWidget(new ProcessKitsFrm(this));
         }
 
         public void ShowPhasedSegmentVisualizer(string kit1, string kit2, string chr, int startPos, int endPos)
@@ -246,48 +256,60 @@ namespace GenetixKit.Forms
 
         public void ShowMatchingKits(IList<KitDTO> selectedKits)
         {
-            ShowWidget(new MatchingKitsFrm(selectedKits));
+            ShowWidget(new MatchingKitsFrm(this, selectedKits));
         }
 
         public void ShowROH(IList<KitDTO> selectedKits)
         {
-            ShowWidget(new ROHFrm(selectedKits));
+            ShowWidget(new ROHFrm(this, selectedKits));
         }
 
         public void ShowMtPhylogeny(IList<KitDTO> selectedKits)
         {
-            ShowWidget(new MtPhylogenyFrm(selectedKits));
+            ShowWidget(new MtPhylogenyFrm(this, selectedKits));
         }
 
         public void ShowMitoMap(IList<KitDTO> selectedKits)
         {
-            ShowWidget(new MitoMapFrm(selectedKits));
+            ShowWidget(new MitoMapFrm(this, selectedKits));
         }
 
         public void ShowIsoggYTree(IList<KitDTO> selectedKits)
         {
-            ShowWidget(new IsoggYTreeFrm(selectedKits));
+            ShowWidget(new IsoggYTreeFrm(this, selectedKits));
         }
 
         public void ShowOneToOneCmp(IList<KitDTO> selectedKits)
         {
-            ShowWidget(new OneToOneCmpFrm(selectedKits));
+            ShowWidget(new OneToOneCmpFrm(this, selectedKits));
         }
 
-        public void SelectLocation(ref int x, ref int y)
+        public void SelectLocation(ref int lng, ref int lat)
         {
-            using (var frm = new LocationSelectFrm(x, y)) {
+            using (var frm = new LocationSelectFrm(lng, lat)) {
                 frm.ShowDialog(this);
-                x = frm.Longitude;
-                y = frm.Latitude;
+                lng = frm.Longitude;
+                lat = frm.Latitude;
             }
+        }
+
+        public void ShowMessage(string msg)
+        {
+            MessageBox.Show(msg);
         }
     }
 
 
     public class GKWidget : UserControl
     {
+        protected IKitHost _host;
+
         public event EventHandler Closing;
+
+        protected GKWidget(IKitHost host)
+        {
+            _host = host;
+        }
 
         protected override void Dispose(bool disposing)
         {

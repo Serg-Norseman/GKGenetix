@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GKGenetix.Core.Model;
+using GKGenetix.UI;
 
 namespace GenetixKit.Forms
 {
@@ -23,11 +24,11 @@ namespace GenetixKit.Forms
         private bool male = true;
 
 
-        public PhasingFrm()
+        public PhasingFrm(IKitHost host) : base(host)
         {
             InitializeComponent();
 
-            GKUIFuncs.FixGridView(dgvPhasing);
+            UIHelper.FixGridView(dgvPhasing);
 
             dgvPhasing.AddColumn("RSID", "RSID");
             dgvPhasing.AddColumn("Chromosome", "Chromosome");
@@ -55,19 +56,19 @@ namespace GenetixKit.Forms
 
         private void btnFather_Click(object sender, EventArgs e)
         {
-            fatherKit = Program.KitInstance.SelectKit();
+            fatherKit = _host.SelectKit();
             UpdateControls();
         }
 
         private void btnMother_Click(object sender, EventArgs e)
         {
-            motherKit = Program.KitInstance.SelectKit();
+            motherKit = _host.SelectKit();
             UpdateControls();
         }
 
         private void btnChild_Click(object sender, EventArgs e)
         {
-            childKit = Program.KitInstance.SelectKit();
+            childKit = _host.SelectKit();
             UpdateControls();
         }
 
@@ -82,7 +83,7 @@ namespace GenetixKit.Forms
 
         private void btnPhasing_Click(object sender, EventArgs e)
         {
-            Program.KitInstance.SetStatus("Phasing...");
+            _host.SetStatus("Phasing...");
 
             btnPhasing.Enabled = false;
             btnChild.Enabled = false;
@@ -97,6 +98,7 @@ namespace GenetixKit.Forms
                 GKGenFuncs.DoPhasing(fatherKit, motherKit, childKit, ref dt, male);
 
                 this.Invoke(new MethodInvoker(delegate {
+                    _host.SetStatus("Saving Phased Kit " + childKit + " ...");
                     UpdateView();
                 }));
             });
@@ -113,7 +115,7 @@ namespace GenetixKit.Forms
             rbMale.Enabled = true;
             rbFemale.Enabled = true;
 
-            Program.KitInstance.SetStatus("Done.");
+            _host.SetStatus("Done.");
         }
     }
 }

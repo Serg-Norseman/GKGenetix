@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GKGenetix.Core.Model;
+using GKGenetix.UI;
 
 namespace GenetixKit.Forms
 {
@@ -25,11 +26,11 @@ namespace GenetixKit.Forms
         }
 
 
-        public MtPhylogenyFrm(IList<KitDTO> selectedKits) : this(selectedKits[0].KitNo)
+        public MtPhylogenyFrm(IKitHost host, IList<KitDTO> selectedKits) : this(host, selectedKits[0].KitNo)
         {
         }
 
-        public MtPhylogenyFrm(string kit)
+        public MtPhylogenyFrm(IKitHost host, string kit) : base(host)
         {
             InitializeComponent();
             this.kit = kit;
@@ -40,15 +41,7 @@ namespace GenetixKit.Forms
             lblKit.Text = $"{kit} ({GKSqlFuncs.GetKitName(kit)})";
             this.Text = $"Mitocondrial Phylogeny - {lblKit.Text}";
 
-            treeView1.BeginUpdate();
             var mtTree = GKData.MtTree;
-            var root = new TreeNode("Eve");
-            treeView1.Nodes.Add(root);
-            var mutationsMap = new Dictionary<TreeNode, string>();
-            BuildTree(treeView1, root, mtTree, mutationsMap);
-            treeView1.CollapseAll();
-            treeView1.EndUpdate();
-
             GKSqlFuncs.GetMtDNA(kit, out string mutations, out _);
             txtSNPs.Text = mutations;
 
@@ -56,18 +49,14 @@ namespace GenetixKit.Forms
                 var name_maxpath = GKGenFuncs.FindMtHaplogroup(mtTree, mutations, out string firstBest, out string secondBest);
 
                 this.Invoke(new MethodInvoker(delegate {
-                    treeView1.BeginUpdate();
                     lblFirstHG.Text = firstBest;
                     lblSecondHGs.Text = secondBest;
-                    foreach (TreeNode node in mutationsMap.Keys) {
-                        var pnNode = (MtDNAPhylogenyNode)node.Tag;
-                        if (pnNode.Status != GKGenFuncs.HGS_DG) {
-                            node.ForeColor = Color.LightGray;
-                        } else {
-                            node.ForeColor = Color.White;
-                            node.BackColor = Color.DarkGreen;
-                        }
-                    }
+
+                    treeView1.BeginUpdate();
+                    var root = new TreeNode("Eve");
+                    treeView1.Nodes.Add(root);
+                    BuildTree(treeView1, root, mtTree);
+                    treeView1.CollapseAll();
                     var tnode = treeView1.FindByTag(root, name_maxpath);
                     if (tnode != null) {
                         tnode.EnsureVisible();
@@ -78,16 +67,22 @@ namespace GenetixKit.Forms
             });
         }
 
-        private void BuildTree(TreeView treeView, TreeNode treeNode, MtDNAPhylogenyNode pnNode, Dictionary<TreeNode, string> mutationsMap)
+        private void BuildTree(TreeView treeView, TreeNode treeNode, MtDNAPhylogenyNode pnNode)
         {
             treeNode.Tag = pnNode;
-            treeNode.ForeColor = Color.Black;
+
+            if (pnNode.Status != GKGenFuncs.HGS_DG) {
+                treeNode.ForeColor = Color.LightGray;
+            } else {
+                treeNode.ForeColor = Color.White;
+                treeNode.BackColor = Color.DarkGreen;
+            }
+
             foreach (var subnode in pnNode.Children) {
                 var tn = new TreeNode(subnode.Name);
                 treeNode.Nodes.Add(tn);
-                BuildTree(treeView, tn, subnode, mutationsMap);
+                BuildTree(treeView, tn, subnode);
             }
-            mutationsMap.Add(treeNode, pnNode.Markers);
         }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)

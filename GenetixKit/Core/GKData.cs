@@ -231,5 +231,18 @@ namespace GenetixKit.Core
                     BuildMtTree(parent, el);
             }
         }
+
+        private static List<string> snpOnTree = null;
+
+        public static List<string> SnpOnTree
+        {
+            get {
+                if (snpOnTree == null) {
+                    snpOnTree = new List<string>();
+                    snpOnTree.AddRange(Properties.Resources.snps_on_tree.Split(new char[] { ',' }));
+                }
+                return snpOnTree;
+            }
+        }
     }
 }
