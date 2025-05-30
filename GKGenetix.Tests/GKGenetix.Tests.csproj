@@ -44,10 +44,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GenetixKit\GenetixKit.csproj">
-      <Project>{918565a4-0748-4c0e-bc26-f725402df66b}</Project>
-      <Name>GenetixKit</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GKGenetix.Core\GKGenetix.Core.csproj">
       <Project>{78659756-b505-403b-9173-0965df601030}</Project>
       <Name>GKGenetix.Core</Name>
