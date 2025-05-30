@@ -9,7 +9,7 @@ using GKGenetix.Core.Model;
 
 namespace GenetixKit.Core
 {
-    internal interface IKitHost
+    public interface IKitHost
     {
         void SetStatus(string message);
         void SetProgress(int percent);
@@ -29,11 +29,13 @@ namespace GenetixKit.Core
         void ShowMitoMap(IList<KitDTO> selectedKits);
         void ShowIsoggYTree(IList<KitDTO> selectedKits);
         void ShowOneToOneCmp(IList<KitDTO> selectedKits);
-        void SelectLocation(ref int x, ref int y);
+        void SelectLocation(ref int lng, ref int lat);
+        void ShowMessage(string msg);
 
         void NewKit();
         void OpenKit(string kit, bool disabled);
         string SelectKit();
         void DeleteKit();
+        void ImportKit();
     }
 }

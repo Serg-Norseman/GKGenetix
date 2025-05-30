@@ -25,6 +25,7 @@
             this.dgvEditKit.TabIndex = 1;
             this.dgvEditKit.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvEditKit_CellContentClick);
             this.dgvEditKit.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(dgvEditKit_CellFormatting);
+            this.dgvEditKit.DoubleClick += new System.EventHandler(this.dgvEditKit_DoubleClick);
             // 
             // QuickEditKit
             // 

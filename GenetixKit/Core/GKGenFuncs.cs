@@ -73,7 +73,7 @@ namespace GenetixKit.Core
             return cm;
         }
 
-        public static DNARec LoadDNAFile(string file, BackgroundWorker bgw)
+        public static DNARec LoadDNAFile(IKitHost host, string file, BackgroundWorker bgw)
         {
             var rows = new List<SNP>();
 
@@ -93,7 +93,7 @@ namespace GenetixKit.Core
             int type = DetectDNAFileType(lines);
 
             if (type == -1) {
-                GKUIFuncs.ShowMessage("Unable to identify file format for " + file);
+                host.ShowMessage("Unable to identify file format for " + file);
                 return new DNARec(new List<SNP>(), new List<string>(), new List<string>());
             }
 
@@ -236,17 +236,36 @@ namespace GenetixKit.Core
             return "0";
         }
 
-        public static string GetMarkers(string file, string diff_work_dir)
+        private static Process ExecuteDiff(string file1, string file2, string diff_work_dir)
+        {
+            File.WriteAllBytes(diff_work_dir + "diff.exe", Properties.Resources.diff);
+
+            Process p = new Process();
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.CreateNoWindow = true;
+            p.StartInfo.WorkingDirectory = diff_work_dir;
+            p.StartInfo.FileName = diff_work_dir + "diff.exe";
+            p.StartInfo.Arguments = file1 + " " + file2;
+            p.Start();
+            return p;
+        }
+
+        public static string GetMarkers(string file)
         {
             string rsrs = new String(GKData.RSRS).ToUpper();
             string user = FastaSeq(file).ToUpper();
             rsrs = Regex.Replace(rsrs, "(.)", "$1\r\n");
             user = Regex.Replace(user, "(.)", "$1\r\n");
+
+            string diff_work_dir = Path.GetTempPath() + "Fasta2Rsrs\\";
+            Directory.CreateDirectory(diff_work_dir);
+
             File.WriteAllText(diff_work_dir + "rsrs.txt", rsrs);
             File.WriteAllText(diff_work_dir + "user.txt", user);
 
-            File.WriteAllBytes(diff_work_dir + "diff.exe", Properties.Resources.diff);
-            Process p = Utilities.Execute(diff_work_dir + "rsrs.txt", diff_work_dir + "user.txt", diff_work_dir);
+            Process p = ExecuteDiff(diff_work_dir + "rsrs.txt", diff_work_dir + "user.txt", diff_work_dir);
+
             StringBuilder sb = new StringBuilder();
             while (!p.StandardOutput.EndOfStream) {
                 string line = p.StandardOutput.ReadLine();
@@ -309,6 +328,7 @@ namespace GenetixKit.Core
                     }
                 }
             }
+
             try {
                 if (p != null) {
                     if (!p.HasExited)
@@ -318,6 +338,9 @@ namespace GenetixKit.Core
                     }
                 }
             } catch (Exception) { }
+
+            Directory.Delete(diff_work_dir, true);
+
             return sb.ToString().Trim().Replace(" ", ", ");
         }
 
@@ -411,10 +434,7 @@ namespace GenetixKit.Core
 
         public static string GetMtDNAMarkers(string fasta_file)
         {
-            string diff_work_dir = Path.GetTempPath() + "Fasta2Rsrs\\";
-            Directory.CreateDirectory(diff_work_dir);
-
-            string txt = GetMarkers(fasta_file, diff_work_dir);
+            string txt = GetMarkers(fasta_file);
 
             string[] txt2 = txt.Replace(" ", "").Split(new char[] { ',' });
             List<string> markers = new List<string>();
@@ -435,7 +455,6 @@ namespace GenetixKit.Core
             }
 
             string markers_str = ConvertInsDelToMod(markers, fasta_file);
-            Directory.Delete(diff_work_dir, true);
             return markers_str;
         }
 
@@ -1059,7 +1078,6 @@ namespace GenetixKit.Core
                 }
             }
 
-            Program.KitInstance.SetStatus("Saving Phased Kit " + childKit + " ...");
             GKSqlFuncs.SavePhasedKit(fatherKit, motherKit, childKit, dt);
         }
 
@@ -1109,10 +1127,8 @@ namespace GenetixKit.Core
                     string start_position = unphSeg.StartPosition.ToString();
                     string end_position = unphSeg.EndPosition.ToString();
 
-                    var exists = GKSqlFuncs.QueryValue(
-                        $"select phased_kit from cmp_phased where phased_kit='{phased_kit}' and match_kit='{unphased_kit}' and chromosome='{chromosome}' and start_position={start_position} and end_position={end_position}");
-
-                    if (!string.IsNullOrEmpty(exists)) {
+                    var exists = GKSqlFuncs.HasUnphasedSegment(phased_kit, unphased_kit, chromosome, start_position, end_position);
+                    if (exists) {
                         //already exists...
                         if (!redoVisual) {
                             if (bw != null)
@@ -1139,8 +1155,7 @@ namespace GenetixKit.Core
 
         public static IList<string> FilterSNPsOnYTree(string kitSNPs)
         {
-            var snpOnTree = new List<string>();
-            snpOnTree.AddRange(Properties.Resources.snps_on_tree.Split(new char[] { ',' }));
+            var snpOnTree = GKData.SnpOnTree;
 
             string[] entered_snps = kitSNPs.Replace(" ", "").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             var valid_snps = new List<string>();

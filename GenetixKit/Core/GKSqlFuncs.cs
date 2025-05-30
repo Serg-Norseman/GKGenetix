@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Windows.Forms;
-using GKGenetix.Core;
 using GKGenetix.Core.Model;
 
 namespace GenetixKit.Core
@@ -501,6 +500,13 @@ namespace GenetixKit.Core
                 $"select kit1'unphased_kit', chromosome, start_position, end_position from cmp_autosomal where kit2='{phased_kit}' " +
                 $"union select kit2'unphased_kit', chromosome, start_position, end_position from cmp_autosomal where kit1='{phased_kit}'" +
                 ") order by cast(chromosome as integer), start_position");
+        }
+
+        public static bool HasUnphasedSegment(string phased_kit, string unphased_kit, string chromosome, string start_position, string end_position)
+        {
+            var val = QueryValue(
+                $"select phased_kit from cmp_phased where phased_kit='{phased_kit}' and match_kit='{unphased_kit}' and chromosome='{chromosome}' and start_position={start_position} and end_position={end_position}");
+            return !string.IsNullOrEmpty(val);
         }
 
         public static IList<PhaseSegment> GetPhaseSegments(string unphased_kit, int start_position, int end_position, string chromosome, string phased_kit)

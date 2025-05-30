@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GKGenetix.Core.Model;
+using GKGenetix.UI;
 
 namespace GenetixKit.Forms
 {
@@ -25,15 +26,15 @@ namespace GenetixKit.Forms
         }
 
 
-        public OneToOneCmpFrm(IList<KitDTO> selectedKits) : this(selectedKits[0].KitNo, selectedKits[1].KitNo)
+        public OneToOneCmpFrm(IKitHost host, IList<KitDTO> selectedKits) : this(host, selectedKits[0].KitNo, selectedKits[1].KitNo)
         {
         }
 
-        public OneToOneCmpFrm(string kit1, string kit2)
+        public OneToOneCmpFrm(IKitHost host, string kit1, string kit2) : base(host)
         {
             InitializeComponent();
 
-            GKUIFuncs.FixGridView(dgvSegmentIdx);
+            UIHelper.FixGridView(dgvSegmentIdx);
             dgvSegmentIdx.AddColumn("Chromosome", "Chromosome");
             dgvSegmentIdx.AddColumn("StartPosition", "Start Position");
             dgvSegmentIdx.AddColumn("EndPosition", "End Position");
@@ -42,7 +43,7 @@ namespace GenetixKit.Forms
 
             this.kit1 = kit1;
             this.kit2 = kit2;
-            Program.KitInstance.SetStatus($"Comparing kits {kit1} and {kit2} ...");
+            _host.SetStatus($"Comparing kits {kit1} and {kit2} ...");
 
             Task.Factory.StartNew(() => {
                 segmentsRes = GKGenFuncs.CompareOneToOne(kit1, kit2, null, false, false);
@@ -64,7 +65,7 @@ namespace GenetixKit.Forms
             lblLongestXSegment.Text = $"{segmentStats.XLongest:#0.00} cM";
             lblMRCA.Text = segmentStats.GetMRCAText(false);
 
-            Program.KitInstance.SetStatus("Done.");
+            _host.SetStatus("Done.");
         }
 
         private void dgvSegmentIdx_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -72,7 +73,7 @@ namespace GenetixKit.Forms
             var selRow = dgvSegmentIdx.GetSelectedObj<CmpSegment>();
             var phased = GKSqlFuncs.IsPhased(kit1) || GKSqlFuncs.IsPhased(kit2);
             if (phased && selRow != null) {
-                Program.KitInstance.ShowPhasedSegmentVisualizer(kit1, kit2, selRow.Chromosome, selRow.StartPosition, selRow.EndPosition);
+                _host.ShowPhasedSegmentVisualizer(kit1, kit2, selRow.Chromosome, selRow.StartPosition, selRow.EndPosition);
             }
         }
     }

@@ -44,7 +44,7 @@ namespace GKGenetix.UI
 
     public partial class DNAAnalysis : Form, IDisplay
     {
-        private List<DNAFileInfo> fFiles;
+        private readonly List<DNAFileInfo> fFiles;
         private string fFileName;
         private DNAData fDNA;
 
@@ -138,41 +138,6 @@ namespace GKGenetix.UI
             image.Save(outputFilePath, ImageFormat.Png);
         }
 
-        private void UpdateFilesIT()
-        {
-            lvFiles.BeginUpdate();
-            lvFiles.Clear();
-            lvFiles.Columns.Add("File name", 160);
-
-            foreach (DNAFileInfo dfi in fFiles) {
-                var item = lvFiles.Items.Add(Path.GetFileName(dfi.FileName));
-
-                if (dfi.Stage >= ProcessStage.DNALoading) {
-                    if (lvFiles.Columns.Count < 2) {
-                        lvFiles.Columns.Add("Loaded", 40);
-                    }
-                    item.SubItems.Add("ok");
-                }
-
-                if (dfi.Stage >= ProcessStage.SexDefine) {
-                    if (lvFiles.Columns.Count < 3) {
-                        lvFiles.Columns.Add("Sex", 40);
-                    }
-                    item.SubItems.Add(dfi.DNA.Sex.ToString());
-                }
-
-                if (dfi.Stage >= ProcessStage.Analysis) {
-                    if (lvFiles.Columns.Count < 4) {
-                        lvFiles.Columns.Add("Analysis", 40);
-                    }
-                    item.SubItems.Add("Done");
-                }
-            }
-            lvFiles.EndUpdate();
-
-            Application.DoEvents();
-        }
-
         private void btnInheritanceTest_Click(object sender, EventArgs e)
         {
             using (var dlg = new OpenFileDialog()) {
@@ -185,19 +150,16 @@ namespace GKGenetix.UI
                         var dfi = new DNAFileInfo();
                         dfi.FileName = file;
                         fFiles.Add(dfi);
-                        UpdateFilesIT();
                     }
 
                     foreach (var dfi in fFiles) {
                         dfi.DNA = FileFormatsHelper.ReadFile(dfi.FileName);
                         dfi.Stage = ProcessStage.DNALoading;
-                        UpdateFilesIT();
                     }
 
                     foreach (var dfi in fFiles) {
                         dfi.DNA.DetermineSex();
                         dfi.Stage = ProcessStage.SexDefine;
-                        UpdateFilesIT();
                     }
 
                     for (int i = 0; i < fFiles.Count; i++) {
@@ -209,7 +171,6 @@ namespace GKGenetix.UI
                         }
 
                         dfi1.Stage = ProcessStage.Analysis;
-                        UpdateFilesIT();
                     }
                 }
             }

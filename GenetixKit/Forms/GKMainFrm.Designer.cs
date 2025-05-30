@@ -34,6 +34,8 @@
         private System.Windows.Forms.Button btnWidgetClose;
         private System.Windows.Forms.Label lblWidgetTitle;
         private System.Windows.Forms.Panel panWidget;
+        private System.Windows.Forms.ToolStripMenuItem miImport;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 
         private void InitializeComponent()
         {
@@ -69,6 +71,8 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.btnWidgetClose = new System.Windows.Forms.Button();
             this.lblWidgetTitle = new System.Windows.Forms.Label();
+            this.miImport = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStripGGK.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -116,6 +120,13 @@
             this.miOpen.Text = "&Open";
             this.miOpen.Click += new System.EventHandler(this.miOpen_Click);
             // 
+            // miImport
+            // 
+            this.miImport.Name = "miImport";
+            this.miImport.Size = new System.Drawing.Size(103, 22);
+            this.miImport.Text = "&Import";
+            this.miImport.Click += new System.EventHandler(this.miImport_Click);
+            // 
             // miSave
             // 
             this.miSave.Enabled = false;
@@ -128,6 +139,11 @@
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(100, 6);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(100, 6);
             // 
             // miExit
             // 
@@ -142,6 +158,8 @@
             this.miNew,
             this.miOpen,
             this.miSave,
+            this.toolStripSeparator2,
+            this.miImport,
             this.toolStripSeparator5,
             this.miDelete});
             this.miTest.Name = "miTest";

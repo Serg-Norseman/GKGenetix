@@ -68,7 +68,6 @@
     </Compile>
     <Compile Include="Core\GKData.cs" />
     <Compile Include="Core\GKSqlFuncs.cs" />
-    <Compile Include="Core\GKUIFuncs.cs" />
     <Compile Include="Core\GKGenFuncs.cs" />
     <Compile Include="Forms\IsoggYTreeFrm.cs">
       <SubType>UserControl</SubType>
@@ -169,6 +168,10 @@
     <ProjectReference Include="..\GKGenetix.Core\GKGenetix.Core.csproj">
       <Project>{78659756-b505-403b-9173-0965df601030}</Project>
       <Name>GKGenetix.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GKGenetix.UI.WinForms\GKGenetix.UI.WinForms.csproj">
+      <Project>{b9225de4-be79-43f8-b84b-becf360e329a}</Project>
+      <Name>GKGenetix.UI.WinForms</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="GenetixKit.props" />

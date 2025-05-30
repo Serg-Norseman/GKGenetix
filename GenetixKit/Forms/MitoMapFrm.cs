@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using GenetixKit.Core;
 using GKGenetix.Core.Model;
+using GKGenetix.UI;
 
 namespace GenetixKit.Forms
 {
@@ -31,15 +32,15 @@ namespace GenetixKit.Forms
         }
 
 
-        public MitoMapFrm(IList<KitDTO> selectedKits) : this(selectedKits[0].KitNo)
+        public MitoMapFrm(IKitHost host, IList<KitDTO> selectedKits) : this(host, selectedKits[0].KitNo)
         {
         }
 
-        public MitoMapFrm(string kit)
+        public MitoMapFrm(IKitHost host, string kit) : base(host)
         {
             InitializeComponent();
 
-            GKUIFuncs.FixGridView(dgvmtdna);
+            UIHelper.FixGridView(dgvmtdna);
             dgvmtdna.AddColumn("MapLocus", "Map Locus");
             dgvmtdna.AddColumn("Starting", "Start Position");
             dgvmtdna.AddColumn("Ending", "End Position");
@@ -47,7 +48,7 @@ namespace GenetixKit.Forms
             dgvmtdna.AddColumn("Shorthand", "Shorthand");
             dgvmtdna.AddColumn("Description", "Description");
 
-            GKUIFuncs.FixGridView(dgvNucleotides);
+            UIHelper.FixGridView(dgvNucleotides);
             dgvNucleotides.AddColumn("pos", "Position");
             dgvNucleotides.AddColumn("rsrsname", "RSRS");
             dgvNucleotides.AddColumn("ckit", "Kit");
@@ -211,7 +212,7 @@ namespace GenetixKit.Forms
 
                 DataPoint dp = (DataPoint)result.Object;
                 dp.LabelBackColor = Color.LightBlue;
-                Program.KitInstance.SetStatus("Selected " + dp.Label);
+                _host.SetStatus("Selected " + dp.Label);
 
                 foreach (DataGridViewRow dgvRow in dgvmtdna.Rows) {
                     var row = (MDMapRow)dgvRow.DataBoundItem;

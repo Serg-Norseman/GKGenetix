@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using GenetixKit.Core;
 using GKGenetix.Core;
 using GKGenetix.Core.Model;
+using GKGenetix.UI;
 
 namespace GenetixKit.Forms
 {
@@ -27,11 +28,11 @@ namespace GenetixKit.Forms
         private readonly Control[] editableCtrls = null;
 
 
-        public NewEditKitFrm(string kit, bool disabled)
+        public NewEditKitFrm(IKitHost host, string kit, bool disabled) : base(host)
         {
             InitializeComponent();
 
-            GKUIFuncs.FixGridView(dgvAutosomal);
+            UIHelper.FixGridView(dgvAutosomal);
             dgvAutosomal.AddColumn("RSID", "RSID");
             dgvAutosomal.AddColumn("Chromosome", "Chromosome");
             dgvAutosomal.AddColumn("Position", "Position");
@@ -56,7 +57,7 @@ namespace GenetixKit.Forms
             if (kit == null) {
                 this.Text = "New Kit";
                 txtKit.Enabled = true;
-                Program.KitInstance.EnableSave();
+                _host.EnableSave();
             } else {
                 this.Text = "Edit Kit";
                 txtKit.Text = kit;
@@ -74,9 +75,9 @@ namespace GenetixKit.Forms
             if (bwPopulate.IsBusy)
                 bwPopulate.CancelAsync();
 
-            Program.KitInstance.DisableSave();
-            Program.KitInstance.DisableDelete();
-            Program.KitInstance.SetStatus("Done.");
+            _host.DisableSave();
+            _host.DisableDelete();
+            _host.SetStatus("Done.");
         }
 
         private void tabsNewKit_SelectedIndexChanged(object sender, EventArgs e)
@@ -115,11 +116,11 @@ namespace GenetixKit.Forms
         private void SetControlActivities(bool disabled)
         {
             if (disabled) {
-                Program.KitInstance.EnableDelete();
-                Program.KitInstance.DisableSave();
+                _host.EnableDelete();
+                _host.DisableSave();
             } else {
-                Program.KitInstance.EnableDelete();
-                Program.KitInstance.EnableSave();
+                _host.EnableDelete();
+                _host.EnableSave();
             }
 
             txtName.ReadOnly = disabled;
@@ -154,7 +155,7 @@ namespace GenetixKit.Forms
         private void dgvAutosomal_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
             MessageBox.Show("Data Error. Technical Details: " + e.Exception.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Program.KitInstance.SetStatus("Data Error. Technical Details: " + e.Exception.Message);
+            _host.SetStatus("Data Error. Technical Details: " + e.Exception.Message);
         }
 
         private void dgvAutosomal_MouseDown(object sender, MouseEventArgs e)
@@ -172,7 +173,7 @@ namespace GenetixKit.Forms
         {
             // autosomal file dropped.
             if (TryGetFilesDrop(e, out string[] filePaths)) {
-                Program.KitInstance.SetStatus("Parsing autosomal file(s) ...");
+                _host.SetStatus("Parsing autosomal file(s) ...");
                 if (bwNewKitAutosomalJob.IsBusy)
                     bwNewKitAutosomalJob.CancelAsync();
                 bwNewKitAutosomalJob.RunWorkerAsync(filePaths);
@@ -185,7 +186,7 @@ namespace GenetixKit.Forms
                 string[] filePaths = (string[])e.Argument;
 
                 foreach (string file_path in filePaths) {
-                    DNARec dnaout = GKGenFuncs.LoadDNAFile(file_path, bwNewKitAutosomalJob);
+                    DNARec dnaout = GKGenFuncs.LoadDNAFile(_host, file_path, bwNewKitAutosomalJob);
 
                     var ysnps_arr = dnaout.ydna;
                     var mtdna_arr = dnaout.mtdna;
@@ -228,14 +229,14 @@ namespace GenetixKit.Forms
 
         private void bwNewKitAutosomalJob_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            Program.KitInstance.SetProgress(-1);
-            Program.KitInstance.SetStatus("Done.");
+            _host.SetProgress(-1);
+            _host.SetStatus("Done.");
         }
 
         private void bwNewKitAutosomalJob_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            Program.KitInstance.SetProgress(e.ProgressPercentage);
-            Program.KitInstance.SetStatus(e.UserState.ToString());
+            _host.SetProgress(e.ProgressPercentage);
+            _host.SetStatus(e.UserState.ToString());
         }
 
         private void miClearAllAutosomal_Click(object sender, EventArgs e)
@@ -263,7 +264,7 @@ namespace GenetixKit.Forms
         private void txtYDNA_DragDrop(object sender, DragEventArgs e)
         {
             if (TryGetFilesDrop(e, out string[] filePaths)) {
-                Program.KitInstance.SetStatus("Parsing Y-DNA file(s) ...");
+                _host.SetStatus("Parsing Y-DNA file(s) ...");
 
                 var fileName = filePaths[0];
 
@@ -277,7 +278,7 @@ namespace GenetixKit.Forms
 
                     this.Invoke(new MethodInvoker(delegate {
                         txtYDNA.Text = ysnps;
-                        Program.KitInstance.SetStatus("Done.");
+                        _host.SetStatus("Done.");
                     }));
                 });
             }
@@ -295,7 +296,7 @@ namespace GenetixKit.Forms
         private void dgvY_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
             MessageBox.Show("Data Error. Technical Details: " + e.Exception.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Program.KitInstance.SetStatus("Data Error. Technical Details: " + e.Exception.Message);
+            _host.SetStatus("Data Error. Technical Details: " + e.Exception.Message);
         }
 
         private void dgvYMisc_MouseDown(object sender, MouseEventArgs e)
@@ -435,10 +436,10 @@ namespace GenetixKit.Forms
                 txtKit.Text, txtName.Text, dgvAutosomal.Rows, txtYDNA.Text, txtMtDNA.Text, yRows, cbSex.Text, txtFASTA.Text
             };
 
-            Program.KitInstance.DisableSave();
-            Program.KitInstance.SetStatus("Saving ...");
+            _host.DisableSave();
+            _host.SetStatus("Saving ...");
             this.Enabled = false;
-            Program.KitInstance.DisableToolbar();
+            _host.DisableToolbar();
             bwSave.RunWorkerAsync(args);
         }
 
@@ -490,16 +491,16 @@ namespace GenetixKit.Forms
 
         private void bwSave_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            Program.KitInstance.SetProgress(e.ProgressPercentage);
+            _host.SetProgress(e.ProgressPercentage);
             if (e.UserState != null)
-                Program.KitInstance.SetStatus(e.UserState.ToString());
+                _host.SetStatus(e.UserState.ToString());
         }
 
         private void bwSave_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            Program.KitInstance.SetProgress(-1);
+            _host.SetProgress(-1);
             this.Enabled = true;
-            Program.KitInstance.EnableToolbar();
+            _host.EnableToolbar();
             //if (saveSuccess)
                 //this.Close();
         }
@@ -513,7 +514,7 @@ namespace GenetixKit.Forms
             foreach (Control ctrl in editableCtrls)
                 ctrl.Enabled = false;
 
-            Program.KitInstance.SetStatus("Please wait ...");
+            _host.SetStatus("Please wait ...");
             bwPopulate.RunWorkerAsync(kit);
         }
 
@@ -574,7 +575,7 @@ namespace GenetixKit.Forms
                 ctrl.Enabled = true;
 
             SetControlActivities(kitDisabled);
-            Program.KitInstance.SetStatus("Done.");
+            _host.SetStatus("Done.");
         }
 
         private static void PopulateYGrid(string[] ydna, Dictionary<string, string> ystr_dict, DataGridView dgv)

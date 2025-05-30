@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GKGenetix.Core.Model;
+using GKGenetix.UI;
 
 namespace GenetixKit.Forms
 {
@@ -27,7 +28,7 @@ namespace GenetixKit.Forms
         {
             InitializeComponent();
 
-            GKUIFuncs.FixGridView(dgvKits);
+            UIHelper.FixGridView(dgvKits);
             dgvKits.AddColumn("KitNo", "Kit #");
             dgvKits.AddColumn("Name", "Name");
             dgvKits.AddCheckedColumn("Disabled", "Disabled");

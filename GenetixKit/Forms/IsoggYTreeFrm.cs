@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using GenetixKit.Core;
 using GKGenetix.Core.Model;
+using GKGenetix.UI;
 
 namespace GenetixKit.Forms
 {
@@ -26,11 +27,11 @@ namespace GenetixKit.Forms
         }
 
 
-        public IsoggYTreeFrm(IList<KitDTO> selectedKits) : this(selectedKits[0].KitNo)
+        public IsoggYTreeFrm(IKitHost host, IList<KitDTO> selectedKits) : this(host, selectedKits[0].KitNo)
         {
         }
 
-        public IsoggYTreeFrm(string kit)
+        public IsoggYTreeFrm(IKitHost host, string kit) : base(host)
         {
             InitializeComponent();
             this.kit = kit;
@@ -39,16 +40,9 @@ namespace GenetixKit.Forms
         private void MainFrm_Load(object sender, EventArgs e)
         {
             lblKitName.Text = GKSqlFuncs.GetKitName(kit);
-            Program.KitInstance.SetStatus("Plotting on ISOGG Y-Tree ...");
+            _host.SetStatus("Plotting on ISOGG Y-Tree ...");
 
-            var snpMap = new List<TreeNode>();
-            treeView1.BeginUpdate();
             var isoggYTree = GKData.ISOGGYTree;
-            var root = new TreeNode("Adam");
-            treeView1.Nodes.Add(root);
-            BuildTree(treeView1, root, isoggYTree, snpMap);
-            treeView1.CollapseAll();
-            treeView1.EndUpdate();
 
             string kitSNPs = GKSqlFuncs.GetYSNPs(kit);
             txtSNPs.Text = kitSNPs;
@@ -58,26 +52,13 @@ namespace GenetixKit.Forms
                 var hg_maxpath = GKGenFuncs.FindYHaplogroup(isoggYTree, snpArray);
 
                 this.Invoke(new MethodInvoker(delegate {
+                    var snpMap = new List<TreeNode>();
                     treeView1.BeginUpdate();
-                    foreach (TreeNode node in snpMap) {
-                        var pnNode = ((ISOGGYTreeNode)node.Tag);
-                        switch (pnNode.Status) {
-                            case GKGenFuncs.HGS_DG:
-                                node.ForeColor = Color.White;
-                                node.BackColor = Color.DarkGreen;
-                                break;
+                    var root = new TreeNode("Adam");
+                    treeView1.Nodes.Add(root);
+                    BuildTree(treeView1, root, isoggYTree);
+                    treeView1.CollapseAll();
 
-                            case GKGenFuncs.HGS_LG:
-                                node.ForeColor = Color.Orange;
-                                node.BackColor = Color.LightGreen;
-                                break;
-
-                            case GKGenFuncs.HGS_R:
-                                node.ForeColor = Color.Yellow;
-                                node.BackColor = Color.Red;
-                                break;
-                        }
-                    }
                     if (hg_maxpath != null) {
                         var tn = treeView1.FindByTag(root, hg_maxpath);
                         tn.EnsureVisible();
@@ -86,20 +67,37 @@ namespace GenetixKit.Forms
                     }
                     treeView1.EndUpdate();
 
-                    Program.KitInstance.SetStatus("Done.");
+                    _host.SetStatus("Done.");
                 }));
             });
         }
 
-        private void BuildTree(TreeView treeView, TreeNode treeNode, ISOGGYTreeNode pnNode, List<TreeNode> snpMap)
+        private void BuildTree(TreeView treeView, TreeNode treeNode, ISOGGYTreeNode pnNode)
         {
             treeNode.Tag = pnNode;
+
+            switch (pnNode.Status) {
+                case GKGenFuncs.HGS_DG:
+                    treeNode.ForeColor = Color.White;
+                    treeNode.BackColor = Color.DarkGreen;
+                    break;
+
+                case GKGenFuncs.HGS_LG:
+                    treeNode.ForeColor = Color.Orange;
+                    treeNode.BackColor = Color.LightGreen;
+                    break;
+
+                case GKGenFuncs.HGS_R:
+                    treeNode.ForeColor = Color.Yellow;
+                    treeNode.BackColor = Color.Red;
+                    break;
+            }
+
             foreach (var subnode in pnNode.Children) {
                 var tn = new TreeNode(subnode.Name);
                 treeNode.Nodes.Add(tn);
-                BuildTree(treeView, tn, subnode, snpMap);
+                BuildTree(treeView, tn, subnode);
             }
-            snpMap.Add(treeNode);
         }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)

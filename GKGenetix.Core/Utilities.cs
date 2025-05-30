@@ -123,19 +123,6 @@ namespace GKGenetix.Core
             return result;
         }
 
-        public static Process Execute(string file1, string file2, string diff_work_dir)
-        {
-            Process p = new Process();
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.WorkingDirectory = diff_work_dir;
-            p.StartInfo.FileName = diff_work_dir + "diff.exe";
-            p.StartInfo.Arguments = file1 + " " + file2;
-            p.Start();
-            return p;
-        }
-
         public static T[] MergeArrays<T>(params T[][] arrays)
         {
             int totalLength = 0;

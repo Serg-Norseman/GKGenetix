@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Windows.Forms.DataVisualization.Charting;
 using GenetixKit.Core;
 using GKGenetix.Core.Model;
+using GKGenetix.UI;
 
 namespace GenetixKit.Forms
 {
@@ -24,15 +25,15 @@ namespace GenetixKit.Forms
         }
 
 
-        public AdmixtureFrm(IList<KitDTO> selectedKits) : this(selectedKits[0].KitNo)
+        public AdmixtureFrm(IKitHost host, IList<KitDTO> selectedKits) : this(host, selectedKits[0].KitNo)
         {
         }
 
-        public AdmixtureFrm(string kit)
+        public AdmixtureFrm(IKitHost host, string kit) : base(host)
         {
             InitializeComponent();
 
-            GKUIFuncs.FixGridView(dgvAdmixture);
+            UIHelper.FixGridView(dgvAdmixture);
             dgvAdmixture.AddColumn("Population", "Population");
             dgvAdmixture.AddColumn("Location", "Geographic Location");
             dgvAdmixture.AddColumn("AtTotal", "Total Shared (cM)", "#0.00");
@@ -61,6 +62,8 @@ namespace GenetixKit.Forms
             Image img = (Image)Properties.Resources.world_map.Clone();
             using (Graphics g = Graphics.FromImage(img)) {
                 foreach (var row in dt) {
+                    if (row.Longitude == 0 && row.Latitude == 0) continue;
+
                     string item = row.Longitude + ":" + row.Latitude;
                     if (!plotted.Contains(item)) {
                         SetHeatMap(g, (int)row.Percentage, row.Longitude, row.Latitude);
@@ -77,7 +80,7 @@ namespace GenetixKit.Forms
 
             int radius_gap = 2;
             for (int i = 0; i < percent; i++) {
-                Pen pen1 = new Pen(GKUIFuncs.HeatMapColor(i, percent), 2);
+                Pen pen1 = new Pen(UIHelper.HeatMapColor(i, percent), 2);
                 g.DrawEllipse(pen1, x - 1 - i * radius_gap, y - 1 - i * radius_gap, 2 + i * 2 * radius_gap, 2 + i * 2 * radius_gap);
             }
         }
