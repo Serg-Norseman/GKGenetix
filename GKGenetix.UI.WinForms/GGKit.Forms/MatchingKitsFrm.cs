@@ -65,6 +65,14 @@ namespace GGKit.Forms
             this.kit = kit;
         }
 
+        public override void SetKit(IList<KitDTO> selectedKits)
+        {
+            if (CanBeUsed(selectedKits)) {
+                this.kit = selectedKits[0].KitNo;
+                UpdateView();
+            }
+        }
+
         private void MatchingKitsFrm_Load(object sender, EventArgs e)
         {
             UpdateView();
@@ -72,11 +80,12 @@ namespace GGKit.Forms
 
         private void UpdateView()
         {
-            btnKit.Text = kit;
-            lblName.Text = GKSqlFuncs.GetKitName(kit);
+            this.Text = $"Matching Kits : {kit} ({GKSqlFuncs.GetKitName(kit)})";
 
             var dt = GKSqlFuncs.GetMatchingKits(kit);
             dgvMatches.DataSource = dt;
+            dgvSegments.DataSource = null;
+            dgvAlleles.DataSource = null;
         }
 
         private void dgvMatches_SelectionChanged(object sender, EventArgs e)
@@ -84,7 +93,7 @@ namespace GGKit.Forms
             var selMatchRow = dgvMatches.GetSelectedObj<MatchingKit>();
             if (selMatchRow == null) return;
 
-            dgvAlleles.Columns[2].HeaderText = $"{kit} ({lblName.Text})";
+            dgvAlleles.Columns[2].HeaderText = $"{kit} ({GKSqlFuncs.GetKitName(kit)})";
             dgvAlleles.Columns[3].HeaderText = $"{selMatchRow.Kit} ({selMatchRow.Name})";
 
             Task.Factory.StartNew((object obj) => {
@@ -138,12 +147,6 @@ namespace GGKit.Forms
                 e.CellStyle.BackColor = Color.LightGray;
             else if (cellVal == "")
                 e.CellStyle.BackColor = Color.OrangeRed;
-        }
-
-        private void btnKit_Click(object sender, EventArgs e)
-        {
-            this.kit = _host.SelectKit();
-            UpdateView();
         }
 
         private void dgvSegments_CellDoubleClick(object sender, DataGridViewCellEventArgs e)

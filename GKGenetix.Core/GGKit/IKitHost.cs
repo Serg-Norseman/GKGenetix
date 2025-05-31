@@ -37,5 +37,7 @@ namespace GGKit.Core
         string SelectKit();
         void DeleteKit();
         void ImportKit();
+
+        void ChangeKits(IList<KitDTO> selectedKits);
     }
 }

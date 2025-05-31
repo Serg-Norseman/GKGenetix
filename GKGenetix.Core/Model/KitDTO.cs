@@ -23,7 +23,7 @@ using System.Data;
 
 namespace GKGenetix.Core.Model
 {
-    public class KitDTO
+    public class KitDTO : ITableRow
     {
         public string KitNo { get; set; }
         public string Name { get; set; }
@@ -39,8 +39,12 @@ namespace GKGenetix.Core.Model
         public string Location { get; set; }
 
 
+        public KitDTO()
+        {
+        }
+
         // kit_no, name, sex, disabled, coalesce(x, 0), coalesce(y, 0), last_modified
-        public KitDTO(IDataRecord values, bool convertSex, bool displayLocation)
+        public void Load(IDataRecord values)
         {
             KitNo = values.GetString(0);
             Name = values.GetString(1);
@@ -51,22 +55,21 @@ namespace GKGenetix.Core.Model
             LastModified = values.GetDateTime(6);
             Reference = values.GetInt32(7);
             RoH_Status = values.GetInt32(8);
+        }
 
-            if (convertSex) {
-                if (Sex == "U")
-                    Sex = "Unknown";
-                else if (Sex == "M")
-                    Sex = "Male";
-                else if (Sex == "F")
-                    Sex = "Female";
-            }
+        public void PrepareValues()
+        {
+            if (Sex == "U")
+                Sex = "Unknown";
+            else if (Sex == "M")
+                Sex = "Male";
+            else if (Sex == "F")
+                Sex = "Female";
 
-            if (displayLocation) {
-                string xy = Longitude + ":" + Latitude;
-                if (xy == "0:0")
-                    xy = "Unknown";
-                Location = xy;
-            }
+            string xy = Longitude + ":" + Latitude;
+            if (xy == "0:0")
+                xy = "Unknown";
+            Location = xy;
         }
     }
 }

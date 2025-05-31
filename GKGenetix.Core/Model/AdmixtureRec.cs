@@ -25,6 +25,7 @@ namespace GKGenetix.Core.Model
 {
     public class AdmixtureRec : ITableRow
     {
+        public string Name { get; private set; }
         public string Population { get; private set; }
         public string Location { get; private set; }
         public double AtTotal { get; private set; }
@@ -41,15 +42,19 @@ namespace GKGenetix.Core.Model
 
         public void Load(IDataRecord values)
         {
-            string valPL = values.GetString(0);
-            string[] data = valPL.Replace("_", " ").Split(new char[] { ',' });
-            Population = data[0];
-            Location = (data.Length > 1) ? data[1] : string.Empty;
-
+            Name = values.GetString(0);
             AtTotal = values.GetDouble(1);
             AtLongest = values.GetDouble(2);
             Longitude = values.GetInt32(3);
             Latitude = values.GetInt32(4);
+        }
+
+        public void PrepareValues()
+        {
+            string valPL = Name;
+            string[] data = valPL.Replace("_", " ").Split(new char[] { ',' });
+            Population = data[0];
+            Location = (data.Length > 1) ? data[1] : string.Empty;
         }
 
         public static void RecalcPercents(IList<AdmixtureRec> items)

@@ -47,6 +47,7 @@ namespace GGKit.Forms
         {
             kitLbl.Text = $"{kit} ({GKSqlFuncs.GetKitName(kit)})";
             var dt = GKSqlFuncs.GetAdmixture(kit, "> 3");
+            foreach (var row in dt) row.PrepareValues();
             AdmixtureRec.RecalcPercents(dt);
             dgvAdmixture.DataSource = dt;
 
