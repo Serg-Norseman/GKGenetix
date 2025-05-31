@@ -20,5 +20,7 @@ Planned:
 ## GGKit (Genetic Genealogy Kit)
 
 Management, analysis and matching tool for Autosomal, X, Y and Mitochondrial DNA.
+
 The MIT License (MIT)
+
 Copyright (c) 2014 Felix Jeyareuben Chandrakumar

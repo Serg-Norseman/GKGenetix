@@ -49,41 +49,16 @@ namespace GGKit.Core
 
         #endregion
 
+        private static SQLiteConnection _connection;
+
         #region Common database
 
         private static void ResetFactory()
         {
             if (File.Exists(SQLITE_DB))
                 File.Move(SQLITE_DB, SQLITE_DB + "-" + DateTime.Now.Ticks.ToString("X"));
-            SQLiteConnection connection = new SQLiteConnection(@"Data Source=" + SQLITE_DB + @";Version=3; Compress=True; New=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;");
-            connection.Open();
 
-            Dictionary<string, string> pragma = new Dictionary<string, string> {
-                { "foreign_keys", "ON" },
-                { "auto_vacuum", "FULL" },
-                { "journal_mode", "WAL" }
-            };
-
-            using (SQLiteTransaction trans = connection.BeginTransaction()) {
-                foreach (string key in pragma.Keys) {
-                    ExecCmd("PRAGMA " + key + " = " + pragma[key] + ";", connection, trans);
-                }
-
-                for (int idx = 0; idx < CreateTableSQL.Length; idx += 2) {
-                    ExecCmd(CreateTableSQL[idx + 1], connection, trans);
-                }
-
-                trans.Commit();
-            }
-            connection.Close();
-        }
-
-        private static SQLiteConnection GetDBConnection()
-        {
-            if (File.Exists(SQLITE_DB)) {
-                string connStr = @"Data Source=" + SQLITE_DB + @";Version=3; Compress=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;";
-
-                SQLiteConnection connection = new SQLiteConnection(connStr);
+            using (var connection = new SQLiteConnection(@"Data Source=" + SQLITE_DB + @";Version=3; Compress=True; New=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;")) {
                 connection.Open();
 
                 Dictionary<string, string> pragma = new Dictionary<string, string> {
@@ -92,44 +67,73 @@ namespace GGKit.Core
                     { "journal_mode", "WAL" }
                 };
 
-                foreach (string key in pragma.Keys) {
-                    ExecCmd("PRAGMA " + key + " = " + pragma[key] + ";", connection);
-                }
+                using (SQLiteTransaction trans = connection.BeginTransaction()) {
+                    foreach (string key in pragma.Keys) {
+                        ExecCmd("PRAGMA " + key + " = " + pragma[key] + ";", connection, trans);
+                    }
 
-                return connection;
+                    for (int idx = 0; idx < CreateTableSQL.Length; idx += 2) {
+                        ExecCmd(CreateTableSQL[idx + 1], connection, trans);
+                    }
+
+                    trans.Commit();
+                }
+            }
+        }
+
+        private static void GetDBConnection()
+        {
+            if (_connection != null) return;
+
+            if (File.Exists(SQLITE_DB)) {
+                string connStr = @"Data Source=" + SQLITE_DB + @";Version=3; Compress=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;";
+
+                _connection = new SQLiteConnection(connStr);
+                _connection.Open();
+
+                Dictionary<string, string> pragma = new Dictionary<string, string> {
+                    { "foreign_keys", "ON" },
+                    { "auto_vacuum", "FULL" },
+                    { "journal_mode", "WAL" }
+                };
+
+                foreach (string key in pragma.Keys) {
+                    ExecCmd("PRAGMA " + key + " = " + pragma[key] + ";", _connection);
+                }
             } else {
                 if (MessageBox.Show("Data file ggk.db doesn't exist. If this is the first time you are opening the software, you can ignore this error. Do you wish to create one? ", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes) {
                     ResetFactory();
-                    return GetDBConnection();
+                    GetDBConnection();
                 }
                 Application.Exit();
             }
-            return null;
         }
 
         public static void CheckIntegrity()
         {
-            using (var conn = GetDBConnection()) {
-                var list = new List<string>();
+            GetDBConnection();
 
-                using (SQLiteCommand ss = new SQLiteCommand("select tbl_name from sqlite_master where type='table'", conn))
-                using (SQLiteDataReader reader = ss.ExecuteReader()) {
-                    while (reader.Read())
-                        list.Add(reader["tbl_name"].ToString());
-                }
+            var list = new List<string>();
 
-                for (int idx = 0; idx < CreateTableSQL.Length; idx += 2) {
-                    if (!list.Contains(CreateTableSQL[idx])) {
-                        ExecCmd(CreateTableSQL[idx + 1], conn);
-                    }
+            using (SQLiteCommand ss = new SQLiteCommand("select tbl_name from sqlite_master where type='table'", _connection))
+            using (SQLiteDataReader reader = ss.ExecuteReader()) {
+                while (reader.Read())
+                    list.Add(reader["tbl_name"].ToString());
+            }
+
+            for (int idx = 0; idx < CreateTableSQL.Length; idx += 2) {
+                if (!list.Contains(CreateTableSQL[idx])) {
+                    ExecCmd(CreateTableSQL[idx + 1], _connection);
                 }
             }
+
         }
 
         public static string QueryValue(string sql)
         {
-            using (SQLiteConnection conn = GetDBConnection())
-            using (SQLiteCommand ss = new SQLiteCommand(sql, conn))
+            GetDBConnection();
+
+            using (SQLiteCommand ss = new SQLiteCommand(sql, _connection))
             using (SQLiteDataReader reader = ss.ExecuteReader()) {
                 while (reader.Read()) {
                     if (reader.FieldCount > 0) {
@@ -148,9 +152,10 @@ namespace GGKit.Core
 
         public static IList<T> GetRows<T>(string query) where T : ITableRow, new()
         {
-            using (SQLiteConnection conn = GetDBConnection())
-            using (SQLiteCommand ss = new SQLiteCommand(query, conn))
-            using (var reader = ss.ExecuteReader()) {
+            GetDBConnection();
+
+            using (SQLiteCommand ss = new SQLiteCommand(query, _connection))
+            using (SQLiteDataReader reader = ss.ExecuteReader()) {
                 var result = new List<T>();
                 while (reader.Read()) {
                     var row = new T();
@@ -186,17 +191,16 @@ namespace GGKit.Core
 
         public static void DeleteKit(string kit)
         {
-            SQLiteConnection conn = GetDBConnection();
-            using (SQLiteTransaction trans = conn.BeginTransaction()) {
-                ExecCmd($"delete from kit_master where kit_no = '{kit}'", conn, trans);
+            GetDBConnection();
+
+            using (SQLiteTransaction trans = _connection.BeginTransaction()) {
+                ExecCmd($"delete from kit_master where kit_no = '{kit}'", _connection, trans);
                 trans.Commit();
             }
         }
 
         public static IList<KitDTO> QueryKits(bool excludeDisabled = false, bool excludeRefs = true)
         {
-            var result = new List<KitDTO>();
-
             string where = "";
             if (excludeDisabled)
                 where = "where disabled = 0";
@@ -208,28 +212,19 @@ namespace GGKit.Core
             }
 
             string sql = $"select kit_no, name, sex, disabled, coalesce(x, 0), coalesce(y, 0), last_modified, reference, roh_status from kit_master {where} order by last_modified desc";
-
-            using (SQLiteConnection cnn = GetDBConnection())
-            using (SQLiteCommand query = new SQLiteCommand(sql, cnn))
-            using (SQLiteDataReader reader = query.ExecuteReader())
-                while (reader.Read()) {
-                    result.Add(new KitDTO(reader, true, true));
-                }
-
-            return result;
+            return GetRows<KitDTO>(sql);
         }
 
         public static void GetKit(string kitNo, out string name, out string sex)
         {
-            using (var conn = GetDBConnection()) {
-                SQLiteCommand query = new SQLiteCommand($"select name, sex from kit_master where kit_no = '{kitNo}'", conn);
-                SQLiteDataReader reader = query.ExecuteReader();
+            GetDBConnection();
+
+            using (SQLiteCommand query = new SQLiteCommand($"select name, sex from kit_master where kit_no = '{kitNo}'", _connection))
+            using (SQLiteDataReader reader = query.ExecuteReader()) {
                 if (reader.Read()) {
                     name = reader.GetString(0);
                     sex = reader.GetString(1);
                 }
-                reader.Close();
-                query.Dispose();
             }
 
             name = string.Empty;
@@ -238,25 +233,25 @@ namespace GGKit.Core
 
         public static void UpdateKit(string kit_no, string name, string sex)
         {
-            using (var conn = GetDBConnection()) {
-                ExecCmd($"update kit_master set name = '{name}', sex = '{sex[0]}' where kit_no = '{kit_no}'", conn);
-            }
+            GetDBConnection();
+
+            ExecCmd($"update kit_master set name = '{name}', sex = '{sex[0]}' where kit_no = '{kit_no}'", _connection);
         }
 
         public static void InsertKit(string kit_no, string name, string sex)
         {
-            using (var conn = GetDBConnection()) {
-                ExecCmd($"insert or replace into kit_master (kit_no, name, sex) values ('{kit_no}', '{name}', '{sex[0]}')", conn);
-            }
+            GetDBConnection();
+
+            ExecCmd($"insert or replace into kit_master (kit_no, name, sex) values ('{kit_no}', '{name}', '{sex[0]}')", _connection);
         }
 
         public static void SaveKit(string kit_no, string name, string sex, bool disabled, string x, string y)
         {
-            using (var conn = GetDBConnection()) {
-                sex = sex[0].ToString();
-                string dis = (disabled) ? "1" : "0";
-                ExecCmd($"update kit_master set name = '{name}', sex = '{sex}', disabled = {dis}, x = {x}, y = {y} where kit_no = '{kit_no}'", conn);
-            }
+            GetDBConnection();
+
+            sex = sex[0].ToString();
+            string dis = (disabled) ? "1" : "0";
+            ExecCmd($"update kit_master set name = '{name}', sex = '{sex}', disabled = {dis}, x = {x}, y = {y} where kit_no = '{kit_no}'", _connection);
         }
 
         #endregion
@@ -271,8 +266,9 @@ namespace GGKit.Core
             else
                 upCmd = @"delete from cmp_status";
 
-            using (var conn = GetDBConnection())
-                ExecCmd(upCmd, conn);
+            GetDBConnection();
+
+            ExecCmd(upCmd, _connection);
         }
 
         public static bool CheckAlreadyCompared(string kit1, string kit2)
@@ -304,29 +300,24 @@ namespace GGKit.Core
 
         public static void DeleteAutosomal(string kit_no)
         {
-            using (var conn = GetDBConnection())
-                ExecCmd($"delete from kit_autosomal where kit_no = '{kit_no}'", conn);
+            GetDBConnection();
+
+            ExecCmd($"delete from kit_autosomal where kit_no = '{kit_no}'", _connection);
         }
 
         public static void SaveAutosomalCmp(string kit1, string kit2, IList<CmpSegment> segment_idx, bool reference)
         {
-            SQLiteConnection cnn = GetDBConnection();
+            GetDBConnection();
 
-            ExecCmd($"delete from cmp_status where (kit1 = '{kit1}' and kit2 = '{kit2}') or (kit1 = '{kit2}' and kit2 = '{kit1}')", cnn);
+            ExecCmd($"delete from cmp_status where (kit1 = '{kit1}' and kit2 = '{kit2}') or (kit1 = '{kit2}' and kit2 = '{kit1}')", _connection);
 
             var stats = SegmentStats.CalculateSegmentStats(segment_idx);
 
             ExecCmd(
                 @"insert or replace into cmp_status (kit1, kit2, status_autosomal, at_longest, at_total, x_longest, x_total, mrca) " +
-                $"values ('{kit1}', '{kit2}', 1, {stats.Longest}, {stats.Total}, {stats.XLongest}, {stats.XTotal}, {stats.Mrca})", cnn);
+                $"values ('{kit1}', '{kit2}', 1, {stats.Longest}, {stats.Total}, {stats.XLongest}, {stats.XTotal}, {stats.Mrca})", _connection);
 
-            var upCmd = new SQLiteCommand($"select cmp_id from cmp_status where kit1 = '{kit1}' and kit2 = '{kit2}'", cnn);
-            SQLiteDataReader reader = upCmd.ExecuteReader();
-
-            string cmp_id = "-1";
-            if (reader.Read())
-                cmp_id = reader["cmp_id"].ToString();
-            reader.Close();
+            string cmp_id = QueryValue($"select cmp_id from cmp_status where kit1 = '{kit1}' and kit2 = '{kit2}'");
 
             for (int i = 0; i < segment_idx.Count; i++) {
                 var obj = segment_idx[i];
@@ -339,25 +330,18 @@ namespace GGKit.Core
 
                 ExecCmd(
                     @"insert or replace into cmp_autosomal (cmp_id, kit1, kit2, chromosome, start_position, end_position, segment_length_cm, snp_count) " +
-                    $"values ({cmp_id}, '{kit1}', '{kit2}', '{chromosome}', {start_position}, {end_position}, {segment_length_cm}, {snp_count})", cnn);
+                    $"values ({cmp_id}, '{kit1}', '{kit2}', '{chromosome}', {start_position}, {end_position}, {segment_length_cm}, {snp_count})", _connection);
 
                 if (!reference) {
-                    upCmd = new SQLiteCommand(
+                    var segment_id = QueryValue(
                         @"select segment_id from cmp_autosomal " +
-                        $"where kit1 = '{kit1}' and kit2 = '{kit2}' and chromosome = '{chromosome}' and start_position = '{start_position}' and end_position = '{end_position}'", cnn);
-                    reader = upCmd.ExecuteReader();
+                        $"where kit1 = '{kit1}' and kit2 = '{kit2}' and chromosome = '{chromosome}' and start_position = '{start_position}' and end_position = '{end_position}'");
 
-                    string segment_id = "-1";
-                    if (reader.Read()) {
-                        segment_id = reader.GetInt16(0).ToString();
-                    }
-                    reader.Close();
-
-                    using (var transaction = cnn.BeginTransaction()) {
+                    using (var transaction = _connection.BeginTransaction()) {
                         foreach (var row in obj.Rows) {
                             ExecCmd(
                                 "insert or replace into cmp_mrca (rsid, chromosome, position, kit1_genotype, kit2_genotype, match, segment_id) " +
-                                $"values ('{row.rsID}', '{row.Chromosome}', {row.Position}, '{row.Kit1Genotype}', '{row.Kit2Genotype}', '{row.Match}', '{segment_id}')", cnn, transaction);
+                                $"values ('{row.rsID}', '{row.Chromosome}', {row.Position}, '{row.Kit1Genotype}', '{row.Kit2Genotype}', '{row.Match}', '{segment_id}')", _connection, transaction);
                         }
                         transaction.Commit();
                     }
@@ -399,35 +383,35 @@ namespace GGKit.Core
         {
             DeleteAutosomal(kit_no);
 
-            using (var conn = GetDBConnection()) {
-                using (var transaction = conn.BeginTransaction()) {
-                    bool incomplete = false;
-                    foreach (DataGridViewRow row in rows) {
-                        if (row.IsNewRow)
-                            continue;
+            GetDBConnection();
 
-                        incomplete = false;
-                        for (int c = 0; c < row.Cells.Count; c++) {
-                            var val = Convert.ToString(row.Cells[c].Value).Trim();
-                            if (string.IsNullOrEmpty(val)) {
-                                incomplete = true;
-                                break;
-                            }
+            using (var transaction = _connection.BeginTransaction()) {
+                bool incomplete = false;
+                foreach (DataGridViewRow row in rows) {
+                    if (row.IsNewRow)
+                        continue;
+
+                    incomplete = false;
+                    for (int c = 0; c < row.Cells.Count; c++) {
+                        var val = Convert.ToString(row.Cells[c].Value).Trim();
+                        if (string.IsNullOrEmpty(val)) {
+                            incomplete = true;
+                            break;
                         }
-
-                        if (incomplete)
-                            continue;
-
-                        var rsid = row.Cells[0].Value.ToString();
-                        var chr = row.Cells[1].Value.ToString();
-                        var pos = row.Cells[2].Value.ToString();
-                        var gt = row.Cells[3].Value.ToString();
-
-                        ExecCmd($"insert or replace into kit_autosomal(kit_no, rsid, chromosome, position, genotype) values ('{kit_no}', '{rsid}', '{chr}', {pos}, '{gt}')", conn, transaction);
                     }
 
-                    transaction.Commit();
+                    if (incomplete)
+                        continue;
+
+                    var rsid = row.Cells[0].Value.ToString();
+                    var chr = row.Cells[1].Value.ToString();
+                    var pos = row.Cells[2].Value.ToString();
+                    var gt = row.Cells[3].Value.ToString();
+
+                    ExecCmd($"insert or replace into kit_autosomal(kit_no, rsid, chromosome, position, genotype) values ('{kit_no}', '{rsid}', '{chr}', {pos}, '{gt}')", _connection, transaction);
                 }
+
+                transaction.Commit();
             }
         }
 
@@ -438,32 +422,29 @@ namespace GGKit.Core
         public static bool CheckROHExists(string kit)
         {
             string roh = QueryValue($"select roh_status from kit_master where kit_no = '{kit}'");
-            if (roh == "0")
-                return false;
-            else
-                return true;
+            return (roh != "0");
         }
 
         public static void SaveROHCmp(string kit, IList<ROHSegment> segment_idx)
         {
-            using (SQLiteConnection cnn = GetDBConnection()) {
-                ExecCmd($"delete from kit_roh where kit_no = '{kit}'", cnn);
+            GetDBConnection();
 
-                using (SQLiteTransaction trans = cnn.BeginTransaction()) {
-                    for (int i = 0; i < segment_idx.Count; i++) {
-                        var obj = segment_idx[i];
+            ExecCmd($"delete from kit_roh where kit_no = '{kit}'", _connection);
 
-                        ExecCmd(
-                            "insert or replace into kit_roh (kit_no, chromosome, start_position, end_position, segment_length_cm, snp_count) " +
-                            $"values ('{kit}', '{obj.Chromosome}', {obj.StartPosition}, {obj.EndPosition}, {obj.SegmentLength_cm}, {obj.SNPCount})",
-                            cnn, trans);
-                    }
+            using (SQLiteTransaction trans = _connection.BeginTransaction()) {
+                for (int i = 0; i < segment_idx.Count; i++) {
+                    var obj = segment_idx[i];
 
-                    trans.Commit();
+                    ExecCmd(
+                        "insert or replace into kit_roh (kit_no, chromosome, start_position, end_position, segment_length_cm, snp_count) " +
+                        $"values ('{kit}', '{obj.Chromosome}', {obj.StartPosition}, {obj.EndPosition}, {obj.SegmentLength_cm}, {obj.SNPCount})",
+                        _connection, trans);
                 }
 
-                ExecCmd($"update kit_master set roh_status = 1 where kit_no = '{kit}'", cnn);
+                trans.Commit();
             }
+
+            ExecCmd($"update kit_master set roh_status = 1 where kit_no = '{kit}'", _connection);
         }
 
         public static IList<ROHSegment> GetROHCmp(string kit)
@@ -534,42 +515,44 @@ namespace GGKit.Core
 
         public static void SavePhasedKit(string father_kit, string mother_kit, string child_kit, IList<PhaseRow> dt)
         {
-            using (var conn = GetDBConnection()) {
-                ExecCmd($"delete from kit_phased where kit_no = '{child_kit}'", conn);
+            GetDBConnection();
 
-                if (father_kit == "Unknown")
-                    father_kit = "";
+            ExecCmd($"delete from kit_phased where kit_no = '{child_kit}'", _connection);
 
-                if (mother_kit == "Unknown")
-                    mother_kit = "";
+            if (father_kit == "Unknown")
+                father_kit = "";
 
-                using (var trans = conn.BeginTransaction()) {
-                    foreach (var row in dt) {
-                        string phasedPaternal = ("" + row.PhasedPaternal).Replace("\0", "").Trim();
-                        if (string.IsNullOrEmpty(phasedPaternal)) phasedPaternal = string.Empty;
+            if (mother_kit == "Unknown")
+                mother_kit = "";
 
-                        string phasedMaternal = ("" + row.PhasedMaternal).Replace("\0", "").Trim();
-                        if (string.IsNullOrEmpty(phasedMaternal)) phasedMaternal = string.Empty;
+            using (var trans = _connection.BeginTransaction()) {
+                foreach (var row in dt) {
+                    string phasedPaternal = ("" + row.PhasedPaternal).Replace("\0", "").Trim();
+                    if (string.IsNullOrEmpty(phasedPaternal)) phasedPaternal = string.Empty;
 
-                        ExecCmd(
-                            "insert or replace into kit_phased (kit_no, rsid, chromosome, position, paternal_genotype, maternal_genotype, paternal_kit_no, maternal_kit_no) " +
-                            $"values ('{child_kit}', '{row.rsID}', '{row.Chromosome}', {row.Position}, '{phasedPaternal}', '{phasedMaternal}', '{father_kit}', '{mother_kit}')", conn, trans);
-                    }
-                    trans.Commit();
+                    string phasedMaternal = ("" + row.PhasedMaternal).Replace("\0", "").Trim();
+                    if (string.IsNullOrEmpty(phasedMaternal)) phasedMaternal = string.Empty;
+
+                    ExecCmd(
+                        "insert or replace into kit_phased (kit_no, rsid, chromosome, position, paternal_genotype, maternal_genotype, paternal_kit_no, maternal_kit_no) " +
+                        $"values ('{child_kit}', '{row.rsID}', '{row.Chromosome}', {row.Position}, '{phasedPaternal}', '{phasedMaternal}', '{father_kit}', '{mother_kit}')", _connection, trans);
                 }
+                trans.Commit();
             }
         }
 
         public static void DeletePhasedKit(string kit)
         {
-            using (var conn = GetDBConnection())
-                ExecCmd($"delete from cmp_phased where phased_kit = '{kit}'", conn);
+            GetDBConnection();
+
+            ExecCmd($"delete from cmp_phased where phased_kit = '{kit}'", _connection);
         }
 
         public static IList<string> GetPhasedKits()
         {
-            using (SQLiteConnection conn = GetDBConnection())
-            using (SQLiteCommand ss = new SQLiteCommand("select distinct kit_no from kit_phased", conn))
+            GetDBConnection();
+
+            using (SQLiteCommand ss = new SQLiteCommand("select distinct kit_no from kit_phased", _connection))
             using (var reader = ss.ExecuteReader()) {
                 var result = new List<string>();
                 while (reader.Read()) {
@@ -592,24 +575,22 @@ namespace GGKit.Core
 
         public static void SaveKitMtDNA(string kit_no, string mutations, string fasta)
         {
-            using (var conn = GetDBConnection()) {
-                ExecCmd($"insert or replace into kit_mtdna (kit_no, mutations, fasta) values ('{kit_no}', '{mutations}', '{fasta}')", conn);
-            }
+            GetDBConnection();
+
+            ExecCmd($"insert or replace into kit_mtdna (kit_no, mutations, fasta) values ('{kit_no}', '{mutations}', '{fasta}')", _connection);
         }
 
         public static void GetMtDNA(string kit, out string mutations, out string fasta)
         {
-            using (var conn = GetDBConnection()) {
-                var query = new SQLiteCommand($"select mutations, fasta from kit_mtdna where kit_no = '{kit}'", conn);
+            GetDBConnection();
 
-                var reader = query.ExecuteReader();
+            using (var query = new SQLiteCommand($"select mutations, fasta from kit_mtdna where kit_no = '{kit}'", _connection))
+            using (var reader = query.ExecuteReader()) {
                 if (reader.Read()) {
                     mutations = reader.GetString(0);
                     fasta = reader.GetString(1);
                     return;
                 }
-                reader.Close();
-                query.Dispose();
             }
 
             mutations = string.Empty;
@@ -633,43 +614,33 @@ namespace GGKit.Core
 
         public static void SaveKitYSNPs(string kit_no, string ysnps_list)
         {
-            using (var conn = GetDBConnection()) {
-                ExecCmd($"insert or replace into kit_ysnps (kit_no, ysnps) values ('{kit_no}', '{ysnps_list}')", conn);
-            }
+            GetDBConnection();
+
+            ExecCmd($"insert or replace into kit_ysnps (kit_no, ysnps) values ('{kit_no}', '{ysnps_list}')", _connection);
         }
 
         public static string GetYSNPs(string kit)
         {
-            using (var conn = GetDBConnection()) {
-                var query = new SQLiteCommand($"select ysnps from kit_ysnps where kit_no = '{kit}'", conn);
-
-                var reader = query.ExecuteReader();
-                if (reader.Read()) {
-                    return reader.GetString(0);
-                }
-                reader.Close();
-                query.Dispose();
-            }
-            return string.Empty;
+            return QueryValue($"select ysnps from kit_ysnps where kit_no = '{kit}'");
         }
 
         public static void SaveYSTR(string kit_no, DataGridViewRow[] yRows)
         {
-            using (var conn = GetDBConnection()) {
-                using (var trans = conn.BeginTransaction()) {
-                    ExecCmd($"delete from kit_ystr where kit_no = '{kit_no}'", conn, trans);
+            GetDBConnection();
 
-                    foreach (DataGridViewRow row in yRows) {
-                        var marker = row.Cells[0].Value.ToString();
-                        var value = row.Cells[1].Value.ToString();
+            using (var trans = _connection.BeginTransaction()) {
+                ExecCmd($"delete from kit_ystr where kit_no = '{kit_no}'", _connection, trans);
 
-                        if (row.IsNewRow || value.Trim() == "") continue;
+                foreach (DataGridViewRow row in yRows) {
+                    var marker = row.Cells[0].Value.ToString();
+                    var value = row.Cells[1].Value.ToString();
 
-                        ExecCmd($"insert or replace into kit_ystr (kit_no, marker, value) values ('{kit_no}', '{marker}', '{value}')", conn, trans);
-                    }
+                    if (row.IsNewRow || value.Trim() == "") continue;
 
-                    trans.Commit();
+                    ExecCmd($"insert or replace into kit_ystr (kit_no, marker, value) values ('{kit_no}', '{marker}', '{value}')", _connection, trans);
                 }
+
+                trans.Commit();
             }
         }
 
@@ -681,10 +652,10 @@ namespace GGKit.Core
         {
             return GetRows<MatchingKit>(
                 "select cmp_id, kit, name, at_longest, at_total, x_longest, x_total, mrca from (" +
-                "select a.cmp_id,a.kit1'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca "+
-                $"from cmp_status a,kit_master b where a.at_total!=0 and a.kit1!='{kit}' and a.kit2='{kit}' and a.status_autosomal=1 and b.kit_no=a.kit1 and b.disabled=0 "+
-                "union select a.cmp_id,a.kit2'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca "+
-                $"from cmp_status a,kit_master b where a.at_total!=0 and a.kit2!='{kit}' and a.kit1='{kit}' and a.status_autosomal=1 and b.kit_no=a.kit2 and b.disabled=0 "+
+                "select a.cmp_id,a.kit1'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca " +
+                $"from cmp_status a,kit_master b where a.at_total!=0 and a.kit1!='{kit}' and a.kit2='{kit}' and a.status_autosomal=1 and b.kit_no=a.kit1 and b.disabled=0 " +
+                "union select a.cmp_id,a.kit2'kit',b.name,a.at_longest,a.at_total,a.x_longest,a.x_total,a.mrca " +
+                $"from cmp_status a,kit_master b where a.at_total!=0 and a.kit2!='{kit}' and a.kit1='{kit}' and a.status_autosomal=1 and b.kit_no=a.kit2 and b.disabled=0 " +
                 ") order by at_longest desc, at_total desc");
         }
 

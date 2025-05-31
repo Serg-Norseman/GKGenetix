@@ -55,6 +55,7 @@ namespace GKGenetix.Core.Model
             Chromosome = values.GetString(0);
             StartPosition = values.GetInt32(1);
             EndPosition = values.GetInt32(2);
+            //SegmentLength_cm = values.GetFloat(3); // exception
             SegmentLength_cm = Convert.ToDouble(values[3]);
             SNPCount = values.GetInt32(4);
         }

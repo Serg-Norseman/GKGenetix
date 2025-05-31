@@ -75,6 +75,8 @@ namespace GGKit.Forms
         public void UpdateView()
         {
             tblKits = GKSqlFuncs.QueryKits();
+            foreach (var kit in tblKits) kit.PrepareValues();
+
             dgvEditKit.DataSource = tblKits;
         }
 
@@ -153,6 +155,7 @@ namespace GGKit.Forms
 
         private void dgvEditKit_DoubleClick(object sender, EventArgs e)
         {
+            _host?.ChangeKits(this.SelectedKits);
         }
     }
 }

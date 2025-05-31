@@ -26,6 +26,15 @@ namespace GGKit.Forms
             kitsExplorer.SelectionChanged += kitsExplorer_SelectionChanged;
         }
 
+        public void ChangeKits(IList<KitDTO> selectedKits)
+        {
+            var widget = panWidget.Controls.Count > 0 ? panWidget.Controls[0] as GKWidget : null;
+            if (widget != null) {
+                widget.SetKit(selectedKits);
+                lblWidgetTitle.Text = widget.Text;
+            }
+        }
+
         #region Handlers
 
         private void GKMainFrm_Load(object sender, EventArgs e)
@@ -323,6 +332,10 @@ namespace GGKit.Forms
                 Closing?.Invoke(this, EventArgs.Empty);
             }
             base.Dispose(disposing);
+        }
+
+        public virtual void SetKit(IList<KitDTO> selectedKits)
+        {
         }
     }
 }
