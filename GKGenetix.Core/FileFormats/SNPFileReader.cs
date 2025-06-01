@@ -19,8 +19,9 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using GGKit.Core;
 using GKGenetix.Core.Model;
 
 namespace GKGenetix.Core.FileFormats
@@ -33,20 +34,6 @@ namespace GKGenetix.Core.FileFormats
         private char fFieldSeparator;
         private char fHeaderMark;
         private StreamReader fReader;
-
-        protected SNPFileReader(string fileName)
-        {
-            fReader = new StreamReader(fileName, Encoding.UTF8, true, BufferSize);
-            fCanDisposed = true;
-            SetParsingParameters();
-        }
-
-        protected SNPFileReader(Stream stream)
-        {
-            fReader = new StreamReader(stream, Encoding.UTF8, true, BufferSize);
-            fCanDisposed = true;
-            SetParsingParameters();
-        }
 
         protected SNPFileReader(StreamReader reader)
         {
@@ -83,10 +70,15 @@ namespace GKGenetix.Core.FileFormats
         {
             var result = new DNAData();
 
+            char[] rsrs = GKData.RSRS;
+
             try {
                 int snpIdx = 0;
                 SNP prev_snp = null;
                 Region curr_chr = null;
+
+                List<string> ysnp = new List<string>();
+                List<string> mtdna = new List<string>();
 
                 while (fReader.Peek() != -1) {
                     string line = fReader.ReadLine();
@@ -116,6 +108,8 @@ namespace GKGenetix.Core.FileFormats
                             result.Chromosomes.Add(curr_chr);
                         }
 
+                        ProcessSNP(snp, ysnp, mtdna, rsrs);
+
                         snpIdx++;
                         prev_snp = snp;
                     }
@@ -124,11 +118,32 @@ namespace GKGenetix.Core.FileFormats
                 if (curr_chr != null) {
                     curr_chr.EndPosition = snpIdx - 1;
                 }
+
+                result.ydna = ysnp;
+                result.mtdna = mtdna;
             } catch (Exception e) {
                 Console.WriteLine("The file could not be read: " + e.Message);
             }
-
             return result;
+        }
+
+        private void ProcessSNP(SNP snpx, List<string> ysnp, List<string> mtdna, char[] rsrs)
+        {
+            var pos = snpx.Position.ToString();
+            string genotype = snpx.Genotype.ToString();
+
+            if (snpx.Chromosome == (byte)Chromosome.CHR_Y) {
+                if (GKData.YMap.ContainsKey(pos)) {
+                    string[] snp = GKGenFuncs.GetYSNP(pos, genotype);
+                    if (snp[0].IndexOf(";") == -1)
+                        ysnp.Add(snp[0] + snp[1]);
+                    else
+                        ysnp.Add(snp[0].Substring(0, snp[0].IndexOf(";")) + snp[1]);
+                }
+            } else if (snpx.Chromosome == (byte)Chromosome.MT) {
+                if (rsrs[int.Parse(pos) - 1] != genotype[0] && genotype[0] != '-')
+                    mtdna.Add(rsrs[int.Parse(pos) - 1].ToString() + pos + genotype);
+            }
         }
     }
 }

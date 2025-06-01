@@ -28,14 +28,6 @@ namespace GKGenetix.Core.FileFormats
     /// </summary>
     public sealed class VCFFileReader : SNPFileReader
     {
-        public VCFFileReader(string fileName) : base(fileName)
-        {
-        }
-
-        public VCFFileReader(Stream stream) : base(stream)
-        {
-        }
-
         public VCFFileReader(StreamReader reader) : base(reader)
         {
         }

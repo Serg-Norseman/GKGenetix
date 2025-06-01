@@ -41,9 +41,9 @@ namespace GKGenetix.Core.Model
         {
         }
 
-        public CmpSegment(string chromosome, int startPosition, int endPosition, double segmentLength_cm, IList<CmpSegmentRow> rows)
+        public CmpSegment(byte chromosome, int startPosition, int endPosition, double segmentLength_cm, IList<CmpSegmentRow> rows)
         {
-            Chromosome = chromosome;
+            Chromosome = chromosome.ToString();
             StartPosition = startPosition;
             EndPosition = endPosition;
             SegmentLength_cm = segmentLength_cm;
@@ -69,10 +69,10 @@ namespace GKGenetix.Core.Model
     public class CmpSegmentRow : ISNPHeader, ITableRow
     {
         public string rsID { get; private set; }
-        public string Chromosome { get; private set; }
+        public byte Chromosome { get; private set; }
         public int Position { get; private set; }
-        public string Kit1Genotype { get; private set; }
-        public string Kit2Genotype { get; private set; }
+        public Genotype Genotype1 { get; private set; }
+        public Genotype Genotype2 { get; private set; }
         public string Match { get; private set; }
 
 
@@ -80,23 +80,23 @@ namespace GKGenetix.Core.Model
         {
         }
 
-        public CmpSegmentRow(string rsid, string chromosome, int position, string kit1Genotype, string kit2Genotype, string match)
+        public CmpSegmentRow(string rsid, byte chromosome, int position, Genotype genotype1, Genotype genotype2, string match)
         {
             rsID = rsid;
             Chromosome = chromosome;
             Position = position;
-            Kit1Genotype = kit1Genotype;
-            Kit2Genotype = kit2Genotype;
+            Genotype1 = genotype1;
+            Genotype2 = genotype2;
             Match = match;
         }
 
         public void Load(IDataRecord values)
         {
             rsID = values.GetString(0);
-            Chromosome = values.GetString(1);
+            Chromosome = (byte)values.GetString(1).ParseChromosome();
             Position = values.GetInt32(2);
-            Kit1Genotype = values.GetString(3);
-            Kit2Genotype = values.GetString(4);
+            Genotype1 = new Genotype(values.GetString(3));
+            Genotype2 = new Genotype(values.GetString(4));
             Match = values.GetString(5);
         }
     }

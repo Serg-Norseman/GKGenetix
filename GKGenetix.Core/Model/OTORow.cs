@@ -25,10 +25,10 @@ namespace GKGenetix.Core.Model
     public class OTORow : ISNPHeader, ITableRow
     {
         public string rsID { get; private set; }
-        public string Chromosome { get; private set; }
+        public byte Chromosome { get; private set; }
         public int Position { get; private set; }
-        public string Genotype1 { get; private set; }
-        public string Genotype2 { get; private set; }
+        public Genotype Genotype1 { get; private set; }
+        public Genotype Genotype2 { get; private set; }
         public int Count { get; private set; }
 
 
@@ -39,10 +39,10 @@ namespace GKGenetix.Core.Model
         public void Load(IDataRecord values)
         {
             rsID = values.GetString(0);
-            Chromosome = values.GetString(1);
+            Chromosome = (byte)values.GetString(1).ParseChromosome();
             Position = values.GetInt32(2);
-            Genotype1 = values.GetString(3);
-            Genotype2 = values.GetString(4);
+            Genotype1 = new Genotype(values.GetString(3));
+            Genotype2 = new Genotype(values.GetString(4));
             Count = values.GetInt32(5);
         }
     }

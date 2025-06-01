@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using GGKit.Core;
 using GKGenetix.Core;
+using GKGenetix.Core.FileFormats;
 using GKGenetix.Core.Model;
 using GKGenetix.UI;
 
@@ -186,12 +187,13 @@ namespace GGKit.Forms
                 string[] filePaths = (string[])e.Argument;
 
                 foreach (string file_path in filePaths) {
-                    DNARec dnaout = GKGenFuncs.LoadDNAFile(_host, file_path, bwNewKitAutosomalJob);
+                    DNAData dnaout = FileFormatsHelper.ReadFile(file_path);
 
+                    var atdna = dnaout.SNP;
                     var ysnps_arr = dnaout.ydna;
                     var mtdna_arr = dnaout.mtdna;
 
-                    bwNewKitAutosomalJob.ReportProgress(-1, dnaout.atdna.Count.ToString() + " SNPs found in " + Path.GetFileName(file_path));
+                    bwNewKitAutosomalJob.ReportProgress(-1, atdna.Count.ToString() + " SNPs found in " + Path.GetFileName(file_path));
 
                     if (ysnps_arr.Count != 0) {
                         ysnps_arr = ysnps_arr.Distinct().ToList();
@@ -213,7 +215,7 @@ namespace GGKit.Forms
                     }
 
                     this.Invoke(new MethodInvoker(delegate {
-                        dgvAutosomal.DataSource = dnaout.atdna;
+                        dgvAutosomal.DataSource = atdna;
 
                         if (ysnps != null)
                             txtYDNA.Text = ysnps;

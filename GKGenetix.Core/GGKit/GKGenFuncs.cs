@@ -21,12 +21,6 @@ namespace GGKit.Core
 {
     public static class GKGenFuncs
     {
-        public const int AUTOSOMAL_FTDNA = 0;
-        public const int AUTOSOMAL_23ANDME = 1;
-        public const int AUTOSOMAL_ANCESTRY = 2;
-        public const int AUTOSOMAL_DECODEME = 3;
-        public const int AUTOSOMAL_GENO2 = 4;
-
         private static readonly List<string> markers_new = new List<string>();
 
 
@@ -73,120 +67,6 @@ namespace GGKit.Core
             return cm;
         }
 
-        public static DNARec LoadDNAFile(IKitHost host, string file, BackgroundWorker bgw)
-        {
-            var rows = new List<SNP>();
-
-            char[] rsrs = GKData.RSRS;
-            string[] lines;
-            if (file.EndsWith(".gz")) {
-                string tmp = Encoding.UTF8.GetString(Utilities.GUnzip2Bytes(File.ReadAllBytes(file)));
-
-                // ugly but required 
-                tmp = tmp.Replace("\r\n", "\r");
-                tmp = tmp.Replace("\n", "\r");
-                tmp = tmp.Replace("\r\r", "\r");
-                lines = tmp.Split("\r".ToCharArray());
-            } else
-                lines = File.ReadAllLines(file);
-
-            int type = DetectDNAFileType(lines);
-
-            if (type == -1) {
-                host.ShowMessage("Unable to identify file format for " + file);
-                return new DNARec(new List<SNP>(), new List<string>(), new List<string>());
-            }
-
-            string rsid = null;
-            string chr = null;
-            string pos = null;
-            string genotype = null;
-            List<string> ysnp = new List<string>();
-            List<string> mtdna = new List<string>();
-
-            foreach (string xline in lines) {
-                string line = xline.Trim();
-                if (line == "") continue;
-
-                string[] data;
-
-                if (type == AUTOSOMAL_FTDNA) {
-                    if (line.StartsWith("RSID")) continue;
-
-                    string tLine = line.Replace("\"", "");
-                    data = tLine.Split(",".ToCharArray());
-                    rsid = data[0];
-                    chr = data[1];
-                    pos = data[2];
-                    genotype = data[3];
-                }
-
-                if (type == AUTOSOMAL_23ANDME) {
-                    if (line.StartsWith("#")) continue;
-
-                    data = line.Split("\t".ToCharArray());
-                    rsid = data[0];
-                    chr = data[1];
-                    pos = data[2];
-                    genotype = data[3];
-                }
-
-                if (type == AUTOSOMAL_ANCESTRY) {
-                    if (line.StartsWith("#")) continue;
-                    if (line.StartsWith("rsid\t")) continue;
-
-                    data = line.Split("\t".ToCharArray());
-
-                    rsid = data[0];
-                    chr = data[1];
-                    if (chr == "23")
-                        chr = "X";
-                    pos = data[2];
-                    genotype = data[3] + data[4];
-                }
-
-                if (type == AUTOSOMAL_GENO2) {
-                    if (line.StartsWith("SNP,")) continue;
-
-                    data = line.Split(",".ToCharArray());
-                    rsid = data[0];
-                    chr = data[1];
-                    pos = GetPosition(rsid);
-                    genotype = data[2] + data[3];
-                }
-
-                if (type == AUTOSOMAL_DECODEME) {
-                    if (line.StartsWith("Name,")) continue;
-
-                    data = line.Split(",".ToCharArray());
-                    rsid = data[0];
-                    chr = data[2];
-                    pos = data[3];
-                    genotype = data[5];
-                }
-
-                if (chr != "Y" && chr != "MT") {
-                    if (chr != "0")
-                        rows.Add(new SNP(rsid, chr, int.Parse(pos), genotype));
-                } else {
-                    if (chr == "Y") {
-                        if (GKData.YMap.ContainsKey(pos)) {
-                            string[] snp = GetYSNP(pos, genotype);
-                            if (snp[0].IndexOf(";") == -1)
-                                ysnp.Add(snp[0] + snp[1]);
-                            else
-                                ysnp.Add(snp[0].Substring(0, snp[0].IndexOf(";")) + snp[1]);
-                        }
-                    } else if (chr == "MT") {
-                        if (rsrs[int.Parse(pos) - 1] != genotype[0] && genotype[0] != '-')
-                            mtdna.Add(rsrs[int.Parse(pos) - 1].ToString() + pos + genotype);
-                    }
-                }
-            }
-
-            return new DNARec(rows, ysnp, mtdna);
-        }
-
         public static string[] GetYSNP(string pos, string gt)
         {
             string[] data = GKData.YMap[pos];
@@ -197,43 +77,6 @@ namespace GGKit.Core
                 data[1] = "-";
 
             return data;
-        }
-
-        private static int DetectDNAFileType(string[] lines)
-        {
-            int count = 0;
-            foreach (string line in lines) {
-                if (line == "RSID,CHROMOSOME,POSITION,RESULT")
-                    return AUTOSOMAL_FTDNA;
-                if (line == "# rsid\tchromosome\tposition\tgenotype")
-                    return AUTOSOMAL_23ANDME;
-                if (line == "rsid\tchromosome\tposition\tallele1\tallele2")
-                    return AUTOSOMAL_ANCESTRY;
-                if (line == "Name,Variation,Chromosome,Position,Strand,YourCode")
-                    return AUTOSOMAL_DECODEME;
-                if (line == "SNP,Chr,Allele1,Allele2")
-                    return AUTOSOMAL_GENO2;
-                /* if above doesn't work */
-                if (line.Split("\t".ToCharArray()).Length == 4)
-                    return AUTOSOMAL_23ANDME;
-                if (line.Split("\t".ToCharArray()).Length == 5)
-                    return AUTOSOMAL_ANCESTRY;
-                if (line.Split(",".ToCharArray()).Length == 4)
-                    return AUTOSOMAL_FTDNA;
-                if (line.Split(",".ToCharArray()).Length == 6)
-                    return AUTOSOMAL_DECODEME;
-                if (count > 100) {
-                    // detection useless... 
-                    break;
-                }
-                count++;
-            }
-            return -1;
-        }
-
-        private static string GetPosition(string rsid)
-        {
-            return "0";
         }
 
         private static Process ExecuteDiff(string file1, string file2, string diff_work_dir)
@@ -496,7 +339,7 @@ namespace GGKit.Core
             return snpList;
         }
 
-        public static void DontMatchProc(int start_pos, int end_pos, string prev_chr, string chromosome, IList<CmpSegment> segments_idx, ref List<CmpSegmentRow> tmp, bool reference)
+        public static void DontMatchProc(int start_pos, int end_pos, byte prev_chr, byte chromosome, IList<CmpSegment> segments_idx, ref List<CmpSegmentRow> tmp, bool reference)
         {
             double cm_len, cm_th;
             int snp_th;
@@ -509,7 +352,7 @@ namespace GGKit.Core
                 cm_th = GKData.Admixture_Threshold_cM;
                 overTh = diffPos > 5000;
             } else {
-                if (chromosome == "X") {
+                if (chromosome == (byte)Chromosome.CHR_X) {
                     cm_th = GKData.Compare_X_Threshold_cM;
                     snp_th = GKData.Compare_X_Threshold_SNPs;
                 } else {
@@ -775,7 +618,7 @@ namespace GGKit.Core
 
                 var tmp = new List<CmpSegmentRow>();
 
-                string prev_chr = "";
+                byte prev_chr = 0;
                 int start_pos = 0;
                 int end_pos = 0;
                 int prev_snp_count = 0;
@@ -787,46 +630,40 @@ namespace GGKit.Core
                         break;
 
                     string rsid = rd.rsID;
-                    string chromosome = rd.Chromosome;
+                    byte chromosome = rd.Chromosome;
                     int position = rd.Position;
-                    string gt1 = rd.Genotype1;
-                    string gt2 = rd.Genotype2;
+                    var gt1 = rd.Genotype1;
+                    var gt2 = rd.Genotype2;
                     int cnt = rd.Count;
 
-                    if (prev_chr == "") prev_chr = chromosome;
-                    if (gt1.Length == 1) gt1 += gt1;
-                    if (gt2.Length == 1) gt2 += gt2;
+                    if (prev_chr == 0) prev_chr = chromosome;
+                    //gt1.CheckCompleteness();
+                    //gt2.CheckCompleteness();
 
                     if (prev_chr == chromosome) {
-                        float errorRadius = (chromosome == "X") ? GKData.Compare_X_Threshold_SNPs / 2 : GKData.Compare_Autosomal_Threshold_SNPs / 2;
+                        float errorRadius = (chromosome == (byte)Chromosome.CHR_X) ? GKData.Compare_X_Threshold_SNPs / 2 : GKData.Compare_Autosomal_Threshold_SNPs / 2;
 
                         if (cnt == 1) {
                             // match both alleles
-                            tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt1));
-                            if (start_pos == 0)
-                                start_pos = position;
+                            tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt1.ToString()));
+                            if (start_pos == 0) start_pos = position;
                         } else if (cnt == 2) {
                             // match 1 allele
-                            if (gt1 == Utilities.Reverse(gt2)) {
-                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt1));
-                                if (start_pos == 0)
-                                    start_pos = position;
-                            } else if (gt1[0] == gt2[0]) {
-                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt2[0].ToString()));
-                                if (start_pos == 0)
-                                    start_pos = position;
-                            } else if (gt1[0] == gt2[1]) {
-                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt2[1].ToString()));
-                                if (start_pos == 0)
-                                    start_pos = position;
-                            } else if (gt1[1] == gt2[0]) {
-                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt2[0].ToString()));
-                                if (start_pos == 0)
-                                    start_pos = position;
-                            } else if (gt1[1] == gt2[1]) {
-                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt2[1].ToString()));
-                                if (start_pos == 0)
-                                    start_pos = position;
+                            if (gt1.Equals(gt2)) {
+                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt1.ToString()));
+                                if (start_pos == 0) start_pos = position;
+                            } else if (gt1.A1 == gt2.A1) {
+                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt2.A1.ToString()));
+                                if (start_pos == 0) start_pos = position;
+                            } else if (gt1.A1 == gt2.A2) {
+                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt2.A2.ToString()));
+                                if (start_pos == 0) start_pos = position;
+                            } else if (gt1.A2 == gt2.A1) {
+                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt2.A1.ToString()));
+                                if (start_pos == 0) start_pos = position;
+                            } else if (gt1.A2 == gt2.A2) {
+                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt2.A2.ToString()));
+                                if (start_pos == 0) start_pos = position;
                             } else {
                                 no_call_counter++;
                                 if (no_call_counter > no_call_limit) {
@@ -835,30 +672,9 @@ namespace GGKit.Core
                                     no_call_counter = 0;
                                     DontMatchProc(start_pos, end_pos, prev_chr, chromosome, segments_idx, ref tmp, reference);
                                     start_pos = position;
-                                } else if (gt1 == "--" || gt1 == "??" || gt1 == "00") {
+                                } else if (gt1.IsEmptyOrUnknown() || gt2.IsEmptyOrUnknown()) {
                                     tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, "-"));
-                                    if (start_pos == 0)
-                                        start_pos = position;
-                                } else if (gt2 == "--" || gt2 == "??" || gt2 == "00") {
-                                    tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, "-"));
-                                    if (start_pos == 0)
-                                        start_pos = position;
-                                } else if (gt1[0] == '-' || gt1[0] == '?' || gt1[0] == '0') {
-                                    tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, "-"));
-                                    if (start_pos == 0)
-                                        start_pos = position;
-                                } else if (gt1[1] == '-' || gt1[1] == '?' || gt1[1] == '0') {
-                                    tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, "-"));
-                                    if (start_pos == 0)
-                                        start_pos = position;
-                                } else if (gt2[0] == '-' || gt2[0] == '?' || gt2[0] == '0') {
-                                    tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, "-"));
-                                    if (start_pos == 0)
-                                        start_pos = position;
-                                } else if (gt2[1] == '-' || gt2[1] == '?' || gt2[1] == '0') {
-                                    tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, "-"));
-                                    if (start_pos == 0)
-                                        start_pos = position;
+                                    if (start_pos == 0) start_pos = position;
                                 } else if (tmp.Count - prev_snp_count >= errorRadius && no_call_counter <= no_call_limit) {
                                     prev_snp_count = tmp.Count;
                                     no_call_counter = 0;
@@ -893,13 +709,13 @@ namespace GGKit.Core
             return segments_idx;
         }
 
-        public static IList<ROHSegment> ROH(string kit)
+        public static IList<ROHSegment> ROH(string kit, bool justUpdate)
         {
             IList<ROHSegment> segments_idx = new List<ROHSegment>();
 
             bool exists = GKSqlFuncs.CheckROHExists(kit);
 
-            if (exists) {
+            if (exists && !justUpdate) {
                 segments_idx = GKSqlFuncs.GetROHCmp(kit);
 
                 foreach (var row in segments_idx) {
@@ -925,11 +741,7 @@ namespace GGKit.Core
                         prev_chr = chromosome;
 
                     if (prev_chr == chromosome) {
-                        float errorRadius;
-                        if (chromosome == (byte)Chromosome.CHR_X)
-                            errorRadius = GKData.Compare_X_Threshold_SNPs / 2;
-                        else
-                            errorRadius = GKData.Compare_Autosomal_Threshold_SNPs / 2;
+                        float errorRadius = (chromosome == (byte)Chromosome.CHR_X) ? GKData.Compare_X_Threshold_SNPs / 2 : GKData.Compare_Autosomal_Threshold_SNPs / 2;
 
                         var genotype = snp.Genotype;
                         char gt0 = genotype.A1;
@@ -942,14 +754,12 @@ namespace GGKit.Core
                         if (gt0 == gt1 && !gt0_unk) {
                             // match 
                             tmp.Add(snp);
-                            if (start_pos == 0)
-                                start_pos = position;
+                            if (start_pos == 0) start_pos = position;
                         } else if ((!gt0_unk && gt1_unk) || (!gt1_unk && gt0_unk)) {
                             no_call_counter++;
                             if (no_call_counter <= no_call_limit) {
                                 tmp.Add(snp);
-                                if (start_pos == 0)
-                                    start_pos = position;
+                                if (start_pos == 0) start_pos = position;
                             } else {
                                 no_call_counter = 0;
                                 // exceeded no call count.
@@ -960,8 +770,7 @@ namespace GGKit.Core
                         } else if (tmp.Count - prev_snp_count >= errorRadius) {
                             prev_snp_count = tmp.Count;
                             tmp.Add(snp);
-                            if (start_pos == 0)
-                                start_pos = position;
+                            if (start_pos == 0) start_pos = position;
                         } else {
                             // doesn't match on same chromosome
                             prev_snp_count = 0;
@@ -1007,7 +816,7 @@ namespace GGKit.Core
 
                 // check
                 if ((father.Replace(child[0].ToString(), "").Replace(child[1].ToString(), "") == father || mother.Replace(child[0].ToString(), "").Replace(child[1].ToString(), "") == mother)
-                    && o.Chromosome != "X" && father != "--" && mother != "--" && child != "--") {
+                    && o.Chromosome != (byte)Chromosome.CHR_X && father != "--" && mother != "--" && child != "--") {
                     o.Mutated = true;
                 }
 
@@ -1027,13 +836,13 @@ namespace GGKit.Core
                     continue;
                 }
 
-                if ((child == "--" || child == "??") && father[0] == father[1] && father == mother && o.Chromosome != "X") {
+                if ((child == "--" || child == "??") && father[0] == father[1] && father == mother && o.Chromosome != (byte)Chromosome.CHR_X) {
                     o.PhasedPaternal = father[0];
                     o.PhasedMaternal = father[0];
                     continue;
                 }
 
-                if (male && o.Chromosome == "X") {
+                if (male && o.Chromosome == (byte)Chromosome.CHR_X) {
                     child = child[0].ToString();
                     if (child == "-" && mother != "--") {
                         o.PhasedPaternal = ZeroChar;
@@ -1048,9 +857,9 @@ namespace GGKit.Core
                     }
                 }
 
-                if (o.Chromosome != "X") {
+                if (o.Chromosome != (byte)Chromosome.CHR_X) {
                     AutosomalSingleSNPPhase(child, father, mother, o, ref phased_paternal, ref phased_maternal);
-                } else if (o.Chromosome == "X") {
+                } else if (o.Chromosome == (byte)Chromosome.CHR_X) {
                     if (male) {
                         o.ChildGenotype = child[0].ToString();
                         o.PaternalGenotype = "";

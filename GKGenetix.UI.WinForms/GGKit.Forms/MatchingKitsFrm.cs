@@ -58,8 +58,8 @@ namespace GGKit.Forms
             UIHelper.FixGridView(dgvAlleles);
             dgvAlleles.AddColumn("RSID", "RSID");
             dgvAlleles.AddColumn("Position", "Position");
-            dgvAlleles.AddColumn("Kit1Genotype", "");
-            dgvAlleles.AddColumn("Kit2Genotype", "");
+            dgvAlleles.AddColumn("Genotype1", "");
+            dgvAlleles.AddColumn("Genotype2", "");
             dgvAlleles.AddColumn("Match", "Match");
 
             this.kit = kit;

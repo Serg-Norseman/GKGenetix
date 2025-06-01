@@ -17,7 +17,7 @@ namespace GGKit.Forms
 {
     public partial class ROHFrm : GKWidget
     {
-        private readonly string kit = null;
+        private string kit = null;
         private IList<ROHSegment> roh_results;
 
 
@@ -51,18 +51,32 @@ namespace GGKit.Forms
             dgvMatching.AddColumn("Genotype", "Genotype");
         }
 
-        private void ROHFrm_Load(object sender, EventArgs e)
+        public override void SetKit(IList<KitDTO> selectedKits)
+        {
+            if (CanBeUsed(selectedKits)) {
+                this.kit = selectedKits[0].KitNo;
+                ReloadData();
+            }
+        }
+
+        private void ReloadData()
         {
             _host.SetStatus("Calculating ROH ...");
             this.Text = $"Runs of Homozygosity - {kit} ({GKSqlFuncs.GetKitName(kit)})";
+            dgvMatching.DataSource = null;
 
             Task.Factory.StartNew(() => {
-                roh_results = GKGenFuncs.ROH(kit);
+                roh_results = GKGenFuncs.ROH(kit, false);
 
                 this.Invoke(new MethodInvoker(delegate {
                     UpdateView();
                 }));
             });
+        }
+
+        private void ROHFrm_Load(object sender, EventArgs e)
+        {
+            ReloadData();
         }
 
         private void UpdateView()

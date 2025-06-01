@@ -25,14 +25,6 @@ namespace GKGenetix.Core.FileFormats
 {
     public sealed class SNPdeCODEmeFileReader : SNPFileReader
     {
-        public SNPdeCODEmeFileReader(string fileName) : base(fileName)
-        {
-        }
-
-        public SNPdeCODEmeFileReader(Stream stream) : base(stream)
-        {
-        }
-
         public SNPdeCODEmeFileReader(StreamReader reader) : base(reader)
         {
         }

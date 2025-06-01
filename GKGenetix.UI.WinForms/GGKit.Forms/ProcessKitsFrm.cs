@@ -197,7 +197,7 @@ namespace GGKit.Forms
 
                 if (roh == 0) {
                     bwROH.ReportProgress(progress, msg0 + " - Processing ...");
-                    GKGenFuncs.ROH(kit);
+                    GKGenFuncs.ROH(kit, true);
                 } else if (roh == 1) {
                     bwROH.ReportProgress(progress, msg0 + " - Already Exists. Skipping..");
                 }

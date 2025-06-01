@@ -94,6 +94,24 @@ namespace GKGenetix.Core.Model
             return /*a == UnknownAllele ||*/ a == '-' || a == '?';
         }
 
+        public bool IsEmptyOrUnknown()
+        {
+            return (A1 == UnknownAllele || A1 == '-' || A1 == '?') || (A2 == UnknownAllele || A2 == '-' || A2 == '?');
+        }
+
+        public void CheckCompleteness()
+        {
+            // questionable decision?
+            if (A2 == UnknownAllele || A2 == '-' || A2 == '?') {
+                A2 = A1;
+            }
+        }
+
+        public Genotype Reverse()
+        {
+            return new Genotype(A2, A1);
+        }
+
         public bool Equals(Genotype other)
         {
             return (A1 == other.A1 && A2 == other.A2) ||

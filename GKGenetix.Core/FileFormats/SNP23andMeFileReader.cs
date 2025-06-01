@@ -25,14 +25,6 @@ namespace GKGenetix.Core.FileFormats
 {
     public sealed class SNP23andMeFileReader : SNPFileReader
     {
-        public SNP23andMeFileReader(string fileName) : base(fileName)
-        {
-        }
-
-        public SNP23andMeFileReader(Stream stream) : base(stream)
-        {
-        }
-
         public SNP23andMeFileReader(StreamReader reader) : base(reader)
         {
         }

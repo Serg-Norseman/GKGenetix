@@ -39,6 +39,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analytics.cs" />
+    <Compile Include="FileFormats\SNPFTDNAFileReader.cs" />
+    <Compile Include="FileFormats\SNPGeno2FileReader.cs" />
     <Compile Include="GGKit\GKData.cs" />
     <Compile Include="GGKit\GKGenFuncs.cs" />
     <Compile Include="GGKit\GKSqlFuncs.cs" />
@@ -57,7 +59,6 @@
     <Compile Include="JsonHelper.cs" />
     <Compile Include="Model\AdmixtureRec.cs" />
     <Compile Include="Model\CmpSegment.cs" />
-    <Compile Include="Model\DNARec.cs" />
     <Compile Include="Model\ISNPHeader.cs" />
     <Compile Include="Model\ISNPSegment.cs" />
     <Compile Include="Model\ITableRow.cs" />

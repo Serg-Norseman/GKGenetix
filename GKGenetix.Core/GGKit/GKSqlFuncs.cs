@@ -341,7 +341,7 @@ namespace GGKit.Core
                         foreach (var row in obj.Rows) {
                             ExecCmd(
                                 "insert or replace into cmp_mrca (rsid, chromosome, position, kit1_genotype, kit2_genotype, match, segment_id) " +
-                                $"values ('{row.rsID}', '{row.Chromosome}', {row.Position}, '{row.Kit1Genotype}', '{row.Kit2Genotype}', '{row.Match}', '{segment_id}')", _connection, transaction);
+                                $"values ('{row.rsID}', '{row.Chromosome}', {row.Position}, '{row.Genotype1}', '{row.Genotype2}', '{row.Match}', '{segment_id}')", _connection, transaction);
                         }
                         transaction.Commit();
                     }

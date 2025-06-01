@@ -39,7 +39,9 @@ namespace GKGenetix.Core.Model
         /// </summary>
         public int RHABuild { get; set; }
 
-        public IList<SNP> SNP { get; private set; }
+        public IList<SNP> SNP { get; private set; } // 0, atdna
+        public List<string> ydna { get; set; } // 1
+        public List<string> mtdna { get; set; } // 2
 
         /// <summary>
         /// Pointers to beginning of each chromosome.
@@ -60,6 +62,13 @@ namespace GKGenetix.Core.Model
             SNP = new List<SNP>(702000);
             Chromosomes = new List<Region>(26);
             Sex = GeneticSex.Unknown;
+        }
+
+        public DNAData(List<SNP> atdna, List<string> ydna, List<string> mtdna)
+        {
+            this.SNP = atdna;
+            this.ydna = ydna;
+            this.mtdna = mtdna;
         }
 
         /// <summary>
