@@ -17,7 +17,7 @@ namespace GGKit.Forms
 {
     public partial class IsoggYTreeFrm : GKWidget
     {
-        private readonly string kit = null;
+        private string kit = null;
         private IList<string> snpArray = null;
 
 
@@ -37,7 +37,15 @@ namespace GGKit.Forms
             this.kit = kit;
         }
 
-        private void MainFrm_Load(object sender, EventArgs e)
+        public override void SetKit(IList<KitDTO> selectedKits)
+        {
+            if (CanBeUsed(selectedKits)) {
+                this.kit = selectedKits[0].KitNo;
+                ReloadData();
+            }
+        }
+
+        private void ReloadData()
         {
             lblKitName.Text = GKSqlFuncs.GetKitName(kit);
             _host.SetStatus("Plotting on ISOGG Y-Tree ...");
@@ -70,6 +78,11 @@ namespace GGKit.Forms
                     _host.SetStatus("Done.");
                 }));
             });
+        }
+
+        private void MainFrm_Load(object sender, EventArgs e)
+        {
+            ReloadData();
         }
 
         private void BuildTree(TreeView treeView, TreeNode treeNode, ISOGGYTreeNode pnNode)

@@ -27,7 +27,7 @@ namespace GKGenetix.Core.Model
     public class CmpSegment : ISNPSegment, ITableRow
     {
         public int SegmentId { get; private set; }
-        public string Chromosome { get; private set; }
+        public byte Chromosome { get; private set; }
         public int StartPosition { get; private set; }
         public int EndPosition { get; private set; }
         public double SegmentLength_cm { get; private set; }
@@ -43,7 +43,7 @@ namespace GKGenetix.Core.Model
 
         public CmpSegment(byte chromosome, int startPosition, int endPosition, double segmentLength_cm, IList<CmpSegmentRow> rows)
         {
-            Chromosome = chromosome.ToString();
+            Chromosome = chromosome;
             StartPosition = startPosition;
             EndPosition = endPosition;
             SegmentLength_cm = segmentLength_cm;
@@ -54,7 +54,7 @@ namespace GKGenetix.Core.Model
         public void Load(IDataRecord values)
         {
             SegmentId = values.GetInt32(0);
-            Chromosome = values.GetString(1);
+            Chromosome = (byte)values.GetString(1).ParseChromosome();
             StartPosition = values.GetInt32(2);
             EndPosition = values.GetInt32(3);
 

@@ -47,6 +47,9 @@
     <Compile Include="GGKit.Forms\GKMainFrm.Designer.cs">
       <DependentUpon>GKMainFrm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GGKit.Forms\GKWidget.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="GGKit.Forms\IsoggYTreeFrm.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -125,6 +128,7 @@
     <Compile Include="GGKit.Forms\SelectKitFrm.Designer.cs">
       <DependentUpon>SelectKitFrm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GGKit.Forms\WFImage.cs" />
     <Compile Include="UIHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

@@ -16,7 +16,7 @@ namespace GGKit.Forms
 {
     public partial class AdmixtureFrm : GKWidget
     {
-        private readonly string kit = null;
+        private string kit;
 
 
         public static bool CanBeUsed(IList<KitDTO> selectedKits)
@@ -43,9 +43,18 @@ namespace GGKit.Forms
             this.kit = kit;
         }
 
-        private void AdmixtureFrm_Load(object sender, EventArgs e)
+        public override void SetKit(IList<KitDTO> selectedKits)
         {
-            kitLbl.Text = $"{kit} ({GKSqlFuncs.GetKitName(kit)})";
+            if (CanBeUsed(selectedKits)) {
+                this.kit = selectedKits[0].KitNo;
+                ReloadData();
+            }
+        }
+
+        private void ReloadData()
+        {
+            this.Text = $"Admixture : {kit} ({GKSqlFuncs.GetKitName(kit)})";
+
             var dt = GKSqlFuncs.GetAdmixture(kit, "> 3");
             foreach (var row in dt) row.PrepareValues();
             AdmixtureRec.RecalcPercents(dt);
@@ -73,6 +82,11 @@ namespace GGKit.Forms
                 }
             }
             pbWorldMap.Image = img;
+        }
+
+        private void AdmixtureFrm_Load(object sender, EventArgs e)
+        {
+            ReloadData();
         }
 
         private static void SetHeatMap(Graphics g, int percent, int x, int y)

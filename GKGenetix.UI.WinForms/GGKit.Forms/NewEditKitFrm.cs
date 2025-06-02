@@ -431,11 +431,18 @@ namespace GGKit.Forms
             if (err)
                 return;
 
-            DataGridViewRow[] yRows;
-            yRows = Utilities.MergeArrays(dgvY12.Rows.GetArray(), dgvY25.Rows.GetArray(), dgvY37.Rows.GetArray(), dgvY67.Rows.GetArray(), dgvY111.Rows.GetArray(), dgvYMisc.Rows.GetArray());
+            var yRows = Utilities.MergeArrays(true, dgvY12.Rows.GetArray(), dgvY25.Rows.GetArray(), dgvY37.Rows.GetArray(), dgvY67.Rows.GetArray(), dgvY111.Rows.GetArray(), dgvYMisc.Rows.GetArray());
+            var ySTRlist = new List<YSTR>(yRows.Length);
+            foreach (DataGridViewRow row in yRows) {
+                var marker = row.Cells[0].Value.ToString();
+                var value = row.Cells[1].Value.ToString();
+                if (row.IsNewRow || value.Trim() == "") continue;
+
+                ySTRlist.Add(new YSTR(marker, value));
+            }
 
             object[] args = new object[] {
-                txtKit.Text, txtName.Text, dgvAutosomal.Rows, txtYDNA.Text, txtMtDNA.Text, yRows, cbSex.Text, txtFASTA.Text
+                txtKit.Text, txtName.Text, dgvAutosomal.DataSource, txtYDNA.Text, txtMtDNA.Text, ySTRlist, cbSex.Text, txtFASTA.Text
             };
 
             _host.DisableSave();
@@ -452,10 +459,10 @@ namespace GGKit.Forms
 
             string kit_no = args[0].ToString();
             string name = args[1].ToString();
-            DataGridViewRowCollection rows = (DataGridViewRowCollection)args[2];
+            var atdna = (List<SNP>)args[2];
             string ysnps_list = args[3].ToString();
             string mutations = args[4].ToString();
-            DataGridViewRow[] yRows = (DataGridViewRow[])args[5];
+            var yRows = (List<YSTR>)args[5];
             string sex = args[6].ToString();
             string fasta = args[7].ToString();
 
@@ -468,18 +475,20 @@ namespace GGKit.Forms
                 }
 
                 bwSave.ReportProgress(35, "Saving Autosomal data ...");
-                GKSqlFuncs.SaveAutosomal(kit_no, rows);
+                GKSqlFuncs.SaveAutosomal(kit_no, atdna);
 
-                bwSave.ReportProgress(75, "Saving Y-SNPs ...");
                 if (!string.IsNullOrEmpty(ysnps_list)) {
+                    bwSave.ReportProgress(75, "Saving Y-SNPs ...");
                     GKSqlFuncs.SaveKitYSNPs(kit_no, ysnps_list);
                 }
 
-                bwSave.ReportProgress(80, "Saving Y-STR Values ...");
-                GKSqlFuncs.SaveYSTR(kit_no, yRows);
+                if (yRows.Count > 0) {
+                    bwSave.ReportProgress(80, "Saving Y-STR Values ...");
+                    GKSqlFuncs.SaveYSTR(kit_no, yRows);
+                }
 
-                bwSave.ReportProgress(90, "Saving mtDNA mutations ...");
                 if (mutations.Trim() != "" || fasta.Trim() != "") {
+                    bwSave.ReportProgress(90, "Saving mtDNA mutations ...");
                     GKSqlFuncs.SaveKitMtDNA(kit_no, mutations, fasta);
                 }
 
@@ -504,7 +513,7 @@ namespace GGKit.Forms
             this.Enabled = true;
             _host.EnableToolbar();
             //if (saveSuccess)
-                //this.Close();
+            //this.Close();
         }
 
         #endregion

@@ -19,26 +19,26 @@ namespace GGKit.Forms
     {
         private readonly string phasedKit = null;
         private readonly string unphasedKit = null;
-        private readonly string chromosome = null;
+        private readonly byte chromosome = 0;
         private readonly int startPosition;
         private readonly int endPosition;
         private Image original = null;
         private IList<PhaseSegment> tblSegments = null;
 
 
-        public PhasedSegmentFrm(string phased_kit, string unphased_kit, string chr, int startPos, int endPos)
+        public PhasedSegmentFrm(string phasedKit, string unphasedKit, byte chr, int startPos, int endPos)
         {
             InitializeComponent();
 
             UIHelper.FixGridView(dgvSegment);
 
             dgvSegment.AddColumn("Position", "Position");
-            dgvSegment.AddColumn("Genotype", GKSqlFuncs.GetKitName(unphased_kit));
-            dgvSegment.AddColumn("PaternalGenotype", GKSqlFuncs.GetKitName(phased_kit) + " (Paternal)");
-            dgvSegment.AddColumn("MaternalGenotype", GKSqlFuncs.GetKitName(phased_kit) + " (Maternal)");
+            dgvSegment.AddColumn("Genotype", GKSqlFuncs.GetKitName(unphasedKit));
+            dgvSegment.AddColumn("PaternalGenotype", GKSqlFuncs.GetKitName(phasedKit) + " (Paternal)");
+            dgvSegment.AddColumn("MaternalGenotype", GKSqlFuncs.GetKitName(phasedKit) + " (Maternal)");
 
-            this.phasedKit = phased_kit;
-            this.unphasedKit = unphased_kit;
+            this.phasedKit = phasedKit;
+            this.unphasedKit = unphasedKit;
             this.chromosome = chr;
             this.startPosition = startPos;
             this.endPosition = endPos;
@@ -50,9 +50,10 @@ namespace GGKit.Forms
             statusLbl.Text = "Loading ...";
 
             Task.Factory.StartNew(() => {
-                tblSegments = GKSqlFuncs.GetPhaseSegments(unphasedKit, startPosition, endPosition, chromosome, phasedKit);
+                tblSegments = GKSqlFuncs.GetPhaseSegments(phasedKit, unphasedKit, chromosome, startPosition, endPosition);
                 if (tblSegments.Count > 0 && this.IsHandleCreated) {
-                    original = GKGenFuncs.GetPhasedSegmentImage(tblSegments, chromosome);
+                    var xImg = GKGenFuncs.GetPhasedSegmentImage<WFImage>(tblSegments, chromosome);
+                    original = xImg.Value;
                 }
 
                 this.Invoke(new MethodInvoker(delegate {

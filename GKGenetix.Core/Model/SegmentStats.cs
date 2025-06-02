@@ -54,7 +54,7 @@ namespace GKGenetix.Core.Model
 
             foreach (var row in segment_idx) {
                 double seg_len = row.SegmentLength_cm;
-                if (row.Chromosome == "X" || row.Chromosome == "23") {
+                if (row.Chromosome == (byte)Chromosome.CHR_X) {
                     x_total += seg_len;
                     if (x_longest < seg_len)
                         x_longest = seg_len;

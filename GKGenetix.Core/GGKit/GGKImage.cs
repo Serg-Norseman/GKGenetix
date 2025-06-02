@@ -18,14 +18,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace GKGenetix.Core.Model
+using System;
+
+namespace GGKit.Core
 {
-    public interface ISNPSegment
+    public abstract class GGKImage : IDisposable
     {
-        byte Chromosome { get; }
-        int StartPosition { get; }
-        int EndPosition { get; }
-        double SegmentLength_cm { get; }
-        int SNPCount { get; }
+        public GGKImage()
+        {
+        }
+
+        public abstract void Dispose();
+
+        public abstract void SetSize(int width, int height);
+
+        public abstract void SetPen(int alpha, int red, int green, int blue, float width);
+
+        public abstract void DrawLine(float x1, float y1, float x2, float y2);
     }
 }

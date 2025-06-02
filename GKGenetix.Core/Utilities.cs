@@ -123,7 +123,7 @@ namespace GKGenetix.Core
             return result;
         }
 
-        public static T[] MergeArrays<T>(params T[][] arrays)
+        public static T[] MergeArrays<T>(bool refValues, params T[][] arrays)
         {
             int totalLength = 0;
             for (int i = 0; i < arrays.Length; i++) {
@@ -137,7 +137,11 @@ namespace GKGenetix.Core
             for (int i = 0; i < arrays.Length; i++) {
                 T[] array = arrays[i];
 
-                Buffer.BlockCopy(array, 0, combinedArray, offset, array.Length);
+                if (refValues) {
+                    Array.Copy(array, 0, combinedArray, offset, array.Length);
+                } else {
+                    Buffer.BlockCopy(array, 0, combinedArray, offset, array.Length);
+                }
 
                 offset += array.Length;
             }

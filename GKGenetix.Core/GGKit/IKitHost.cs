@@ -19,9 +19,11 @@ namespace GGKit.Core
         void DisableToolbar();
         void EnableDelete();
         void DisableDelete();
+        void EnableExplore();
+        void DisableExplore();
 
         void ShowAdmixture(IList<KitDTO> selectedKits);
-        void ShowPhasedSegmentVisualizer(string kit1, string kit2, string chr, int startPos, int endPos);
+        void ShowPhasedSegmentVisualizer(string kit1, string kit2, byte chr, int startPos, int endPos);
         void ShowProcessKits();
         void ShowMatchingKits(IList<KitDTO> selectedKits);
         void ShowROH(IList<KitDTO> selectedKits);
@@ -31,6 +33,8 @@ namespace GGKit.Core
         void ShowOneToOneCmp(IList<KitDTO> selectedKits);
         void SelectLocation(ref int lng, ref int lat);
         void ShowMessage(string msg);
+        void Exit();
+        bool ShowQuestion(string msg);
 
         void NewKit();
         void OpenKit(string kit, bool disabled);

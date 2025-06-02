@@ -17,7 +17,7 @@ namespace GGKit.Forms
 {
     public partial class MtPhylogenyFrm : GKWidget
     {
-        private readonly string kit = null;
+        private string kit = null;
 
 
         public static bool CanBeUsed(IList<KitDTO> selectedKits)
@@ -36,7 +36,15 @@ namespace GGKit.Forms
             this.kit = kit;
         }
 
-        private void MainFrm_Load(object sender, EventArgs e)
+        public override void SetKit(IList<KitDTO> selectedKits)
+        {
+            if (CanBeUsed(selectedKits)) {
+                this.kit = selectedKits[0].KitNo;
+                ReloadData();
+            }
+        }
+
+        private void ReloadData()
         {
             lblKit.Text = $"{kit} ({GKSqlFuncs.GetKitName(kit)})";
             this.Text = $"Mitocondrial Phylogeny - {lblKit.Text}";
@@ -65,6 +73,11 @@ namespace GGKit.Forms
                     treeView1.EndUpdate();
                 }));
             });
+        }
+
+        private void MainFrm_Load(object sender, EventArgs e)
+        {
+            ReloadData();
         }
 
         private void BuildTree(TreeView treeView, TreeNode treeNode, MtDNAPhylogenyNode pnNode)

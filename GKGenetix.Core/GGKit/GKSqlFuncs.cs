@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
-using System.Windows.Forms;
 using GKGenetix.Core.Model;
 
 namespace GGKit.Core
@@ -50,10 +49,16 @@ namespace GGKit.Core
         #endregion
 
         private static SQLiteConnection _connection;
+        private static IKitHost _host;
+
+        public static void SetHost(IKitHost host)
+        {
+            _host = host;
+        }
 
         #region Common database
 
-        private static void ResetFactory()
+        private static void ResetTables()
         {
             if (File.Exists(SQLITE_DB))
                 File.Move(SQLITE_DB, SQLITE_DB + "-" + DateTime.Now.Ticks.ToString("X"));
@@ -81,7 +86,7 @@ namespace GGKit.Core
             }
         }
 
-        private static void GetDBConnection()
+        private static void CheckConnection()
         {
             if (_connection != null) return;
 
@@ -101,17 +106,16 @@ namespace GGKit.Core
                     ExecCmd("PRAGMA " + key + " = " + pragma[key] + ";", _connection);
                 }
             } else {
-                if (MessageBox.Show("Data file ggk.db doesn't exist. If this is the first time you are opening the software, you can ignore this error. Do you wish to create one? ", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes) {
-                    ResetFactory();
-                    GetDBConnection();
-                }
-                Application.Exit();
+                if (_host.ShowQuestion("Data file ggk.db doesn't exist. If this is the first time you are opening the software, you can ignore this error. Do you wish to create one?")) {
+                    ResetTables();
+                    CheckConnection();
+                } else _host.Exit();
             }
         }
 
         public static void CheckIntegrity()
         {
-            GetDBConnection();
+            CheckConnection();
 
             var list = new List<string>();
 
@@ -129,9 +133,9 @@ namespace GGKit.Core
 
         }
 
-        public static string QueryValue(string sql)
+        private static string QueryValue(string sql)
         {
-            GetDBConnection();
+            CheckConnection();
 
             using (SQLiteCommand ss = new SQLiteCommand(sql, _connection))
             using (SQLiteDataReader reader = ss.ExecuteReader()) {
@@ -150,9 +154,9 @@ namespace GGKit.Core
                 cmd.ExecuteNonQuery();
         }
 
-        public static IList<T> GetRows<T>(string query) where T : ITableRow, new()
+        private static IList<T> GetRows<T>(string query) where T : ITableRow, new()
         {
-            GetDBConnection();
+            CheckConnection();
 
             using (SQLiteCommand ss = new SQLiteCommand(query, _connection))
             using (SQLiteDataReader reader = ss.ExecuteReader()) {
@@ -170,28 +174,15 @@ namespace GGKit.Core
 
         #region Kits
 
-        private static Dictionary<string, string> kitNames = null;
-
         public static string GetKitName(string kit)
         {
-            if (kitNames == null)
-                kitNames = new Dictionary<string, string>();
-
-            if (kitNames.TryGetValue(kit, out string value))
-                return value;
-            else {
-                string kitName = QueryValue($"select name from kit_master where kit_no='{kit}'");
-                if (!string.IsNullOrEmpty(kitName)) {
-                    kitNames.Add(kit, kitName);
-                    return kitName;
-                }
-                return "Unknown";
-            }
+            string kitName = QueryValue($"select name from kit_master where kit_no='{kit}'");
+            return !string.IsNullOrEmpty(kitName) ? kitName : "Unknown";
         }
 
         public static void DeleteKit(string kit)
         {
-            GetDBConnection();
+            CheckConnection();
 
             using (SQLiteTransaction trans = _connection.BeginTransaction()) {
                 ExecCmd($"delete from kit_master where kit_no = '{kit}'", _connection, trans);
@@ -217,7 +208,7 @@ namespace GGKit.Core
 
         public static void GetKit(string kitNo, out string name, out string sex)
         {
-            GetDBConnection();
+            CheckConnection();
 
             using (SQLiteCommand query = new SQLiteCommand($"select name, sex from kit_master where kit_no = '{kitNo}'", _connection))
             using (SQLiteDataReader reader = query.ExecuteReader()) {
@@ -233,21 +224,21 @@ namespace GGKit.Core
 
         public static void UpdateKit(string kit_no, string name, string sex)
         {
-            GetDBConnection();
+            CheckConnection();
 
             ExecCmd($"update kit_master set name = '{name}', sex = '{sex[0]}' where kit_no = '{kit_no}'", _connection);
         }
 
         public static void InsertKit(string kit_no, string name, string sex)
         {
-            GetDBConnection();
+            CheckConnection();
 
             ExecCmd($"insert or replace into kit_master (kit_no, name, sex) values ('{kit_no}', '{name}', '{sex[0]}')", _connection);
         }
 
         public static void SaveKit(string kit_no, string name, string sex, bool disabled, string x, string y)
         {
-            GetDBConnection();
+            CheckConnection();
 
             sex = sex[0].ToString();
             string dis = (disabled) ? "1" : "0";
@@ -266,7 +257,7 @@ namespace GGKit.Core
             else
                 upCmd = @"delete from cmp_status";
 
-            GetDBConnection();
+            CheckConnection();
 
             ExecCmd(upCmd, _connection);
         }
@@ -300,14 +291,14 @@ namespace GGKit.Core
 
         public static void DeleteAutosomal(string kit_no)
         {
-            GetDBConnection();
+            CheckConnection();
 
             ExecCmd($"delete from kit_autosomal where kit_no = '{kit_no}'", _connection);
         }
 
         public static void SaveAutosomalCmp(string kit1, string kit2, IList<CmpSegment> segment_idx, bool reference)
         {
-            GetDBConnection();
+            CheckConnection();
 
             ExecCmd($"delete from cmp_status where (kit1 = '{kit1}' and kit2 = '{kit2}') or (kit1 = '{kit2}' and kit2 = '{kit1}')", _connection);
 
@@ -322,7 +313,7 @@ namespace GGKit.Core
             for (int i = 0; i < segment_idx.Count; i++) {
                 var obj = segment_idx[i];
 
-                string chromosome = obj.Chromosome;
+                var chromosome = obj.Chromosome;
                 string start_position = obj.StartPosition.ToString();
                 string end_position = obj.EndPosition.ToString();
                 string segment_length_cm = obj.SegmentLength_cm.ToString();
@@ -379,34 +370,21 @@ namespace GGKit.Core
                 ") group by rsid order by cast(chr as integer), pos");
         }
 
-        public static void SaveAutosomal(string kit_no, DataGridViewRowCollection rows)
+        public static void SaveAutosomal(string kit_no, List<SNP> rows)
         {
             DeleteAutosomal(kit_no);
 
-            GetDBConnection();
+            CheckConnection();
 
             using (var transaction = _connection.BeginTransaction()) {
-                bool incomplete = false;
-                foreach (DataGridViewRow row in rows) {
-                    if (row.IsNewRow)
+                foreach (var row in rows) {
+                    var rsid = row.rsID;
+                    var chr = row.Chromosome.ToString();
+                    var pos = row.Position.ToString();
+                    var gt = row.Genotype.ToString();
+
+                    if (string.IsNullOrEmpty(rsid) || string.IsNullOrEmpty(chr) || string.IsNullOrEmpty(pos) || string.IsNullOrEmpty(gt))
                         continue;
-
-                    incomplete = false;
-                    for (int c = 0; c < row.Cells.Count; c++) {
-                        var val = Convert.ToString(row.Cells[c].Value).Trim();
-                        if (string.IsNullOrEmpty(val)) {
-                            incomplete = true;
-                            break;
-                        }
-                    }
-
-                    if (incomplete)
-                        continue;
-
-                    var rsid = row.Cells[0].Value.ToString();
-                    var chr = row.Cells[1].Value.ToString();
-                    var pos = row.Cells[2].Value.ToString();
-                    var gt = row.Cells[3].Value.ToString();
 
                     ExecCmd($"insert or replace into kit_autosomal(kit_no, rsid, chromosome, position, genotype) values ('{kit_no}', '{rsid}', '{chr}', {pos}, '{gt}')", _connection, transaction);
                 }
@@ -427,7 +405,7 @@ namespace GGKit.Core
 
         public static void SaveROHCmp(string kit, IList<ROHSegment> segment_idx)
         {
-            GetDBConnection();
+            CheckConnection();
 
             ExecCmd($"delete from kit_roh where kit_no = '{kit}'", _connection);
 
@@ -452,7 +430,7 @@ namespace GGKit.Core
             return GetRows<ROHSegment>($"select chromosome, start_position, end_position, segment_length_cm, snp_count from kit_roh where kit_no = '{kit}'");
         }
 
-        public static IList<SNP> GetROHSeg(string kit, string chromosome, int startPos, int endPos)
+        public static IList<SNP> GetROHSeg(string kit, byte chromosome, int startPos, int endPos)
         {
             return GetRows<SNP>(
                 "select rsid, chromosome, position, genotype from kit_autosomal " +
@@ -474,56 +452,56 @@ namespace GGKit.Core
             return !string.IsNullOrEmpty(val);
         }
 
-        public static IList<UnphasedSegment> GetUnphasedSegments(string phased_kit)
+        public static IList<UnphasedSegment> GetUnphasedSegments(string phasedKit)
         {
             return GetRows<UnphasedSegment>(
                 "select unphased_kit, chromosome, start_position, end_position from (" +
-                $"select kit1'unphased_kit', chromosome, start_position, end_position from cmp_autosomal where kit2='{phased_kit}' " +
-                $"union select kit2'unphased_kit', chromosome, start_position, end_position from cmp_autosomal where kit1='{phased_kit}'" +
+                $"select kit1'unphased_kit', chromosome, start_position, end_position from cmp_autosomal where kit2='{phasedKit}' " +
+                $"union select kit2'unphased_kit', chromosome, start_position, end_position from cmp_autosomal where kit1='{phasedKit}'" +
                 ") order by cast(chromosome as integer), start_position");
         }
 
-        public static bool HasUnphasedSegment(string phased_kit, string unphased_kit, string chromosome, string start_position, string end_position)
+        public static bool HasUnphasedSegment(string phasedKit, string unphasedKit, byte chromosome, string startPosition, string endPosition)
         {
             var val = QueryValue(
-                $"select phased_kit from cmp_phased where phased_kit='{phased_kit}' and match_kit='{unphased_kit}' and chromosome='{chromosome}' and start_position={start_position} and end_position={end_position}");
+                $"select phased_kit from cmp_phased where phased_kit='{phasedKit}' and match_kit='{unphasedKit}' and chromosome='{chromosome}' and start_position={startPosition} and end_position={endPosition}");
             return !string.IsNullOrEmpty(val);
         }
 
-        public static IList<PhaseSegment> GetPhaseSegments(string unphased_kit, int start_position, int end_position, string chromosome, string phased_kit)
+        public static IList<PhaseSegment> GetPhaseSegments(string phasedKit, string unphasedKit, byte chromosome, int startPosition, int endPosition)
         {
             return GetRows<PhaseSegment>(
-                $"select a.position, a.genotype, p.paternal_genotype, p.maternal_genotype from kit_autosomal a, kit_phased p where a.kit_no = '{unphased_kit}' " +
-                $"and a.position > {start_position} and a.position < {end_position} and a.chromosome = '{chromosome}' " +
-                $"and p.rsid = a.rsid and p.kit_no = '{phased_kit}' order by a.position");
+                $"select a.position, a.genotype, p.paternal_genotype, p.maternal_genotype from kit_autosomal a, kit_phased p where a.kit_no = '{unphasedKit}' " +
+                $"and a.position > {startPosition} and a.position < {endPosition} and a.chromosome = '{chromosome}' " +
+                $"and p.rsid = a.rsid and p.kit_no = '{phasedKit}' order by a.position");
         }
 
-        public static IList<PhaseRow> GetPhaseRows(string father_kit, string mother_kit, string child_kit)
+        public static IList<PhaseRow> GetPhaseRows(string fatherKit, string motherKit, string childKit)
         {
             string query = "";
 
             // [rsid], [chromosome], [position], "Child", "Father", "Mother", "Phased Paternal", "Phased Maternal"
-            if (father_kit != "Unknown" && mother_kit != "Unknown")
-                query = ("select c.[rsid], c.[chromosome], c.[position], c.[genotype]\"Child\", coalesce(f.[genotype],'--')\"Father\", coalesce(m.[genotype],'--')\"Mother\", ''\"Phased Paternal\",''\"Phased Maternal\"  from kit_autosomal c left outer join kit_autosomal f,kit_autosomal m on f.rsid=c.rsid and m.rsid=c.rsid where c.kit_no='" + child_kit + "' and f.kit_no='" + father_kit + "' and m.[kit_no]='" + mother_kit + "' order by cast(c.chromosome as integer),c.position");
-            else if (father_kit != "Unknown" && mother_kit == "Unknown")
-                query = ("select c.[rsid], c.[chromosome], c.[position], c.[genotype]\"Child\", coalesce(f.[genotype],'--')\"Father\", '--'\"Mother\", ''\"Phased Paternal\", ''\"Phased Maternal\"  from kit_autosomal c left outer join kit_autosomal f on f.rsid=c.rsid  where c.kit_no='" + child_kit + "' and f.kit_no='" + father_kit + "' order by cast(c.chromosome as integer), c.position");
-            else if (father_kit == "Unknown" && mother_kit != "Unknown")
-                query = ("select c.[rsid], c.[chromosome], c.[position], c.[genotype]\"Child\", '--'\"Father\", coalesce(m.[genotype],'--')\"Mother\", ''\"Phased Paternal\", ''\"Phased Maternal\"  from kit_autosomal c left outer join kit_autosomal m on m.rsid=c.rsid where c.kit_no='" + child_kit + "' and m.kit_no='" + mother_kit + "' order by cast(c.chromosome as integer), c.position");
+            if (fatherKit != "Unknown" && motherKit != "Unknown")
+                query = ("select c.[rsid], c.[chromosome], c.[position], c.[genotype]\"Child\", coalesce(f.[genotype],'--')\"Father\", coalesce(m.[genotype],'--')\"Mother\", ''\"Phased Paternal\",''\"Phased Maternal\"  from kit_autosomal c left outer join kit_autosomal f,kit_autosomal m on f.rsid=c.rsid and m.rsid=c.rsid where c.kit_no='" + childKit + "' and f.kit_no='" + fatherKit + "' and m.[kit_no]='" + motherKit + "' order by cast(c.chromosome as integer),c.position");
+            else if (fatherKit != "Unknown" && motherKit == "Unknown")
+                query = ("select c.[rsid], c.[chromosome], c.[position], c.[genotype]\"Child\", coalesce(f.[genotype],'--')\"Father\", '--'\"Mother\", ''\"Phased Paternal\", ''\"Phased Maternal\"  from kit_autosomal c left outer join kit_autosomal f on f.rsid=c.rsid  where c.kit_no='" + childKit + "' and f.kit_no='" + fatherKit + "' order by cast(c.chromosome as integer), c.position");
+            else if (fatherKit == "Unknown" && motherKit != "Unknown")
+                query = ("select c.[rsid], c.[chromosome], c.[position], c.[genotype]\"Child\", '--'\"Father\", coalesce(m.[genotype],'--')\"Mother\", ''\"Phased Paternal\", ''\"Phased Maternal\"  from kit_autosomal c left outer join kit_autosomal m on m.rsid=c.rsid where c.kit_no='" + childKit + "' and m.kit_no='" + motherKit + "' order by cast(c.chromosome as integer), c.position");
 
             return GetRows<PhaseRow>(query);
         }
 
-        public static void SavePhasedKit(string father_kit, string mother_kit, string child_kit, IList<PhaseRow> dt)
+        public static void SavePhasedKit(string fatherKit, string motherKit, string childKit, IList<PhaseRow> dt)
         {
-            GetDBConnection();
+            CheckConnection();
 
-            ExecCmd($"delete from kit_phased where kit_no = '{child_kit}'", _connection);
+            ExecCmd($"delete from kit_phased where kit_no = '{childKit}'", _connection);
 
-            if (father_kit == "Unknown")
-                father_kit = "";
+            if (fatherKit == "Unknown")
+                fatherKit = "";
 
-            if (mother_kit == "Unknown")
-                mother_kit = "";
+            if (motherKit == "Unknown")
+                motherKit = "";
 
             using (var trans = _connection.BeginTransaction()) {
                 foreach (var row in dt) {
@@ -535,7 +513,7 @@ namespace GGKit.Core
 
                     ExecCmd(
                         "insert or replace into kit_phased (kit_no, rsid, chromosome, position, paternal_genotype, maternal_genotype, paternal_kit_no, maternal_kit_no) " +
-                        $"values ('{child_kit}', '{row.rsID}', '{row.Chromosome}', {row.Position}, '{phasedPaternal}', '{phasedMaternal}', '{father_kit}', '{mother_kit}')", _connection, trans);
+                        $"values ('{childKit}', '{row.rsID}', '{row.Chromosome}', {row.Position}, '{phasedPaternal}', '{phasedMaternal}', '{fatherKit}', '{motherKit}')", _connection, trans);
                 }
                 trans.Commit();
             }
@@ -543,14 +521,14 @@ namespace GGKit.Core
 
         public static void DeletePhasedKit(string kit)
         {
-            GetDBConnection();
+            CheckConnection();
 
             ExecCmd($"delete from cmp_phased where phased_kit = '{kit}'", _connection);
         }
 
         public static IList<string> GetPhasedKits()
         {
-            GetDBConnection();
+            CheckConnection();
 
             using (SQLiteCommand ss = new SQLiteCommand("select distinct kit_no from kit_phased", _connection))
             using (var reader = ss.ExecuteReader()) {
@@ -575,14 +553,14 @@ namespace GGKit.Core
 
         public static void SaveKitMtDNA(string kit_no, string mutations, string fasta)
         {
-            GetDBConnection();
+            CheckConnection();
 
             ExecCmd($"insert or replace into kit_mtdna (kit_no, mutations, fasta) values ('{kit_no}', '{mutations}', '{fasta}')", _connection);
         }
 
         public static void GetMtDNA(string kit, out string mutations, out string fasta)
         {
-            GetDBConnection();
+            CheckConnection();
 
             using (var query = new SQLiteCommand($"select mutations, fasta from kit_mtdna where kit_no = '{kit}'", _connection))
             using (var reader = query.ExecuteReader()) {
@@ -614,7 +592,7 @@ namespace GGKit.Core
 
         public static void SaveKitYSNPs(string kit_no, string ysnps_list)
         {
-            GetDBConnection();
+            CheckConnection();
 
             ExecCmd($"insert or replace into kit_ysnps (kit_no, ysnps) values ('{kit_no}', '{ysnps_list}')", _connection);
         }
@@ -624,20 +602,17 @@ namespace GGKit.Core
             return QueryValue($"select ysnps from kit_ysnps where kit_no = '{kit}'");
         }
 
-        public static void SaveYSTR(string kit_no, DataGridViewRow[] yRows)
+        public static void SaveYSTR(string kit_no, List<YSTR> yRows)
         {
-            GetDBConnection();
+            CheckConnection();
 
             using (var trans = _connection.BeginTransaction()) {
                 ExecCmd($"delete from kit_ystr where kit_no = '{kit_no}'", _connection, trans);
 
-                foreach (DataGridViewRow row in yRows) {
-                    var marker = row.Cells[0].Value.ToString();
-                    var value = row.Cells[1].Value.ToString();
+                foreach (var row in yRows) {
+                    if (row.Repeats.Trim() == "") continue;
 
-                    if (row.IsNewRow || value.Trim() == "") continue;
-
-                    ExecCmd($"insert or replace into kit_ystr (kit_no, marker, value) values ('{kit_no}', '{marker}', '{value}')", _connection, trans);
+                    ExecCmd($"insert or replace into kit_ystr (kit_no, marker, value) values ('{kit_no}', '{row.Marker}', '{row.Repeats}')", _connection, trans);
                 }
 
                 trans.Commit();

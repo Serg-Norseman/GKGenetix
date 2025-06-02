@@ -25,6 +25,8 @@ namespace GKGenetix.Core.Model
     /// </summary>
     public enum Chromosome : byte
     {
+        CHR_NN = 00,
+
         CHR_01 = 01,
         CHR_02 = 02,
         CHR_03 = 03,

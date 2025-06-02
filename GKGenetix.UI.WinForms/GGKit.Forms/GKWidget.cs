@@ -18,14 +18,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace GKGenetix.Core.Model
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
+using GGKit.Core;
+using GKGenetix.Core.Model;
+
+namespace GGKit.Forms
 {
-    public interface ISNPSegment
+    public class GKWidget : UserControl
     {
-        byte Chromosome { get; }
-        int StartPosition { get; }
-        int EndPosition { get; }
-        double SegmentLength_cm { get; }
-        int SNPCount { get; }
+        protected IKitHost _host;
+
+        public event EventHandler Closing;
+
+        protected GKWidget(IKitHost host)
+        {
+            _host = host;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) {
+                Closing?.Invoke(this, EventArgs.Empty);
+            }
+            base.Dispose(disposing);
+        }
+
+        public virtual void SetKit(IList<KitDTO> selectedKits)
+        {
+        }
     }
 }

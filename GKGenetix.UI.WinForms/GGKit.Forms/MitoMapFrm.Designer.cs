@@ -7,37 +7,34 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage mtMapTab;
         private System.Windows.Forms.TabPage details;
-        private System.Windows.Forms.DataGridView dgvmtdna;
+        private System.Windows.Forms.DataGridView dgvMtDna;
         private System.Windows.Forms.TabControl tabControl2;
         private System.Windows.Forms.TabPage rsrs;
         private System.Windows.Forms.DataGridView dgvNucleotides;
         private System.Windows.Forms.TabPage tabFASTA;
         private System.Windows.Forms.RichTextBox rtbFASTA;
-        private System.Windows.Forms.Label label1;
 
         private void InitializeComponent()
         {
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MitoMapFrm));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.mtMapTab = new System.Windows.Forms.TabPage();
             this.mtdna_chart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.details = new System.Windows.Forms.TabPage();
-            this.dgvmtdna = new System.Windows.Forms.DataGridView();
+            this.dgvMtDna = new System.Windows.Forms.DataGridView();
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.rsrs = new System.Windows.Forms.TabPage();
             this.dgvNucleotides = new System.Windows.Forms.DataGridView();
             this.tabFASTA = new System.Windows.Forms.TabPage();
             this.rtbFASTA = new System.Windows.Forms.RichTextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.mtMapTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mtdna_chart)).BeginInit();
             this.details.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvmtdna)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvMtDna)).BeginInit();
             this.tabControl2.SuspendLayout();
             this.rsrs.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvNucleotides)).BeginInit();
@@ -49,14 +46,12 @@
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 70F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 30F));
-            this.tableLayoutPanel1.Controls.Add(this.tabControl1, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.tabControl2, 1, 1);
-            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.tabControl1, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.tabControl2, 1, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 2;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(784, 562);
             this.tableLayoutPanel1.TabIndex = 0;
@@ -113,7 +108,7 @@
             // 
             // details
             // 
-            this.details.Controls.Add(this.dgvmtdna);
+            this.details.Controls.Add(this.dgvMtDna);
             this.details.Location = new System.Drawing.Point(4, 22);
             this.details.Name = "details";
             this.details.Padding = new System.Windows.Forms.Padding(3);
@@ -122,14 +117,14 @@
             this.details.Text = "Details";
             this.details.UseVisualStyleBackColor = true;
             // 
-            // dgvmtdna
+            // dgvMtDna
             // 
-            this.dgvmtdna.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvmtdna.Location = new System.Drawing.Point(3, 3);
-            this.dgvmtdna.Name = "dgvmtdna";
-            this.dgvmtdna.Size = new System.Drawing.Size(528, 494);
-            this.dgvmtdna.TabIndex = 0;
-            this.dgvmtdna.SelectionChanged += new System.EventHandler(this.dgvmtdna_SelectionChanged);
+            this.dgvMtDna.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvMtDna.Location = new System.Drawing.Point(3, 3);
+            this.dgvMtDna.Name = "dgvMtDna";
+            this.dgvMtDna.Size = new System.Drawing.Size(528, 494);
+            this.dgvMtDna.TabIndex = 0;
+            this.dgvMtDna.SelectionChanged += new System.EventHandler(this.dgvMtDna_SelectionChanged);
             // 
             // tabControl2
             // 
@@ -160,6 +155,7 @@
             this.dgvNucleotides.Name = "dgvNucleotides";
             this.dgvNucleotides.Size = new System.Drawing.Size(216, 494);
             this.dgvNucleotides.TabIndex = 0;
+            this.dgvNucleotides.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(dgvNucleotides_CellFormatting);
             // 
             // tabFASTA
             // 
@@ -187,16 +183,6 @@
             this.rtbFASTA.Text = "";
             this.rtbFASTA.WordWrap = false;
             // 
-            // label1
-            // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 8);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(13, 13);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "..";
-            // 
             // MitoMapFrm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -212,7 +198,7 @@
             this.mtMapTab.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.mtdna_chart)).EndInit();
             this.details.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dgvmtdna)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvMtDna)).EndInit();
             this.tabControl2.ResumeLayout(false);
             this.rsrs.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvNucleotides)).EndInit();

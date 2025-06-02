@@ -8,13 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using GKGenetix.Core;
 using GKGenetix.Core.Model;
 
 namespace GGKit.Core
@@ -430,13 +428,13 @@ namespace GGKit.Core
                  K = G/T
                  M = A/C             
          */
-        public static Image GetPhasedSegmentImage(IList<PhaseSegment> dt, string chromosome)
+        public static T GetPhasedSegmentImage<T>(IList<PhaseSegment> dt, byte chromosome) where T : GGKImage, new()
         {
             int paternal_error_position = 0;
             int maternal_error_position = 0;
             int snp_th;
             int errorRadius;
-            if (chromosome == "X") {
+            if (chromosome == (byte)Chromosome.CHR_X) {
                 snp_th = GKData.Compare_X_Threshold_SNPs;
                 errorRadius = snp_th / 2;
             } else {
@@ -451,8 +449,9 @@ namespace GGKit.Core
 
             int width = 600;
             int height = 150;
-            Image img = new Bitmap(width, height);
-            Graphics g = Graphics.FromImage(img);
+
+            var img = new T();
+            img.SetSize(width, height);
 
             int begin_maternal_pos = 0;
             int begin_paternal_pos = 0;
@@ -480,9 +479,9 @@ namespace GGKit.Core
                             if (val > snp_th)
                                 val = snp_th;
                             int tmp = (snp_th - val) * 255 / snp_th;
-                            Pen p1 = new Pen(Color.FromArgb(255, tmp, tmp, 255), 1);
+                            img.SetPen(255, tmp, tmp, 255, 1);
                             for (int i = begin_paternal_pos * width / dt.Count; i < x; i++)
-                                g.DrawLine(p1, i, 0, i, height / 2);
+                                img.DrawLine(i, 0, i, height / 2);
                         }
 
                         // don't allow but reset no call counter.
@@ -507,9 +506,9 @@ namespace GGKit.Core
                             if (val > snp_th)
                                 val = snp_th;
                             int tmp = (snp_th - val) * 255 / snp_th;
-                            Pen p1 = new Pen(Color.FromArgb(255, 255, tmp, tmp), 1);
+                            img.SetPen(255, 255, tmp, tmp, 1);
                             for (int i = begin_maternal_pos * width / dt.Count; i < x; i++)
-                                g.DrawLine(p1, i, height / 2, i, height);
+                                img.DrawLine(i, height / 2, i, height);
                         }
                         // don't allow but reset no call counter.
                         maternal_no_call_count = 0;
@@ -524,9 +523,9 @@ namespace GGKit.Core
                 if (val > snp_th)
                     val = snp_th;
                 int tmp = (snp_th - val) * 255 / snp_th;
-                Pen p1 = new Pen(Color.FromArgb(255, tmp, tmp, 255), 1);
+                img.SetPen(255, tmp, tmp, 255, 1);
                 for (int i = begin_paternal_pos * width / dt.Count; i < x; i++)
-                    g.DrawLine(p1, i, 0, i, height / 2);
+                    img.DrawLine(i, 0, i, height / 2);
             }
 
             if (curr_pos - begin_maternal_pos > 5) {
@@ -534,12 +533,10 @@ namespace GGKit.Core
                 if (val > snp_th)
                     val = snp_th;
                 int tmp = (snp_th - val) * 255 / snp_th;
-                Pen p1 = new Pen(Color.FromArgb(255, 255, tmp, tmp), 1);
+                img.SetPen(255, 255, tmp, tmp, 1);
                 for (int i = begin_maternal_pos * width / dt.Count; i < x; i++)
-                    g.DrawLine(p1, i, height / 2, i, height);
+                    img.DrawLine(i, height / 2, i, height);
             }
-
-            g.Save();
             return img;
         }
 
@@ -932,7 +929,7 @@ namespace GGKit.Core
                         break;
 
                     string unphased_kit = unphSeg.UnphasedKit;
-                    string chromosome = unphSeg.Chromosome;
+                    var chromosome = unphSeg.Chromosome;
                     string start_position = unphSeg.StartPosition.ToString();
                     string end_position = unphSeg.EndPosition.ToString();
 

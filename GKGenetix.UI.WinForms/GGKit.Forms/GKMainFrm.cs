@@ -22,6 +22,8 @@ namespace GGKit.Forms
         {
             InitializeComponent();
 
+            GKSqlFuncs.SetHost(this);
+
             kitsExplorer.SetHost(this);
             kitsExplorer.SelectionChanged += kitsExplorer_SelectionChanged;
         }
@@ -59,6 +61,8 @@ namespace GGKit.Forms
             var selKits = kitsExplorer.SelectedKits;
 
             miOpen.Enabled = selKits != null && selKits.Count == 1;
+            miDelete.Enabled = selKits != null && selKits.Count > 0;
+
             miAdmixture.Enabled = AdmixtureFrm.CanBeUsed(selKits);
             miISOGGYTree.Enabled = IsoggYTreeFrm.CanBeUsed(selKits);
             miOneToMany.Enabled = MatchingKitsFrm.CanBeUsed(selKits);
@@ -245,6 +249,20 @@ namespace GGKit.Forms
             miDelete.Enabled = false;
         }
 
+        public void EnableExplore()
+        {
+            kitsExplorer.Enabled = true;
+            menuStripGGK.Enabled = true;
+            btnWidgetClose.Enabled = true;
+        }
+
+        public void DisableExplore()
+        {
+            kitsExplorer.Enabled = false;
+            menuStripGGK.Enabled = false;
+            btnWidgetClose.Enabled = false;
+        }
+
         public void ShowAdmixture(IList<KitDTO> selectedKits)
         {
             ShowWidget(new AdmixtureFrm(this, selectedKits));
@@ -255,7 +273,7 @@ namespace GGKit.Forms
             ShowWidget(new ProcessKitsFrm(this));
         }
 
-        public void ShowPhasedSegmentVisualizer(string kit1, string kit2, string chr, int startPos, int endPos)
+        public void ShowPhasedSegmentVisualizer(string kit1, string kit2, byte chr, int startPos, int endPos)
         {
             using (var frm = new PhasedSegmentFrm(kit1, kit2, chr, startPos, endPos))
                 frm.ShowDialog(this);
@@ -312,30 +330,15 @@ namespace GGKit.Forms
         {
             MessageBox.Show(msg);
         }
-    }
 
-
-    public class GKWidget : UserControl
-    {
-        protected IKitHost _host;
-
-        public event EventHandler Closing;
-
-        protected GKWidget(IKitHost host)
+        public void Exit()
         {
-            _host = host;
+            Application.Exit();
         }
 
-        protected override void Dispose(bool disposing)
+        public bool ShowQuestion(string msg)
         {
-            if (disposing) {
-                Closing?.Invoke(this, EventArgs.Empty);
-            }
-            base.Dispose(disposing);
-        }
-
-        public virtual void SetKit(IList<KitDTO> selectedKits)
-        {
+            return (MessageBox.Show(msg, "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes);
         }
     }
 }

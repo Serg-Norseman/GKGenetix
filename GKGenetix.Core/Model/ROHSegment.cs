@@ -26,7 +26,7 @@ namespace GKGenetix.Core.Model
 {
     public class ROHSegment : ISNPSegment, ITableRow
     {
-        public string Chromosome { get; private set; }
+        public byte Chromosome { get; private set; }
         public int StartPosition { get; private set; }
         public int EndPosition { get; private set; }
         public double SegmentLength_cm { get; private set; }
@@ -42,7 +42,7 @@ namespace GKGenetix.Core.Model
 
         public ROHSegment(byte chromosome, int startPosition, int endPosition, double segmentLength_cm, IList<SNP> rows)
         {
-            Chromosome = chromosome.ToString();
+            Chromosome = chromosome;
             StartPosition = startPosition;
             EndPosition = endPosition;
             SegmentLength_cm = segmentLength_cm;
@@ -52,7 +52,7 @@ namespace GKGenetix.Core.Model
 
         public void Load(IDataRecord values)
         {
-            Chromosome = values.GetString(0);
+            Chromosome = (byte)values.GetString(0).ParseChromosome();
             StartPosition = values.GetInt32(1);
             EndPosition = values.GetInt32(2);
             //SegmentLength_cm = values.GetFloat(3); // exception

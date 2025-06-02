@@ -2,7 +2,6 @@
 {
     partial class MtPhylogenyFrm
     {
-        private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
@@ -22,16 +21,11 @@
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null)) {
-                components.Dispose();
-            }
             base.Dispose(disposing);
         }
 
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MtPhylogenyFrm));
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.treeView1 = new System.Windows.Forms.TreeView();

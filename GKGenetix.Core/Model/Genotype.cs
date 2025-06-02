@@ -32,7 +32,7 @@ namespace GKGenetix.Core.Model
 
 
     /// <summary>
-    /// 
+    /// 23andMe: alleles can be "--" and 1 char for X/Y/MT positions.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Genotype : IEquatable<Genotype>
@@ -112,6 +112,16 @@ namespace GKGenetix.Core.Model
             return new Genotype(A2, A1);
         }
 
+        public static bool operator ==(Genotype gt, Genotype other)
+        {
+            return (gt.A1 == other.A1 && gt.A2 == other.A2);
+        }
+
+        public static bool operator !=(Genotype gt, Genotype other)
+        {
+            return (gt.A1 != other.A1 && gt.A2 != other.A2);
+        }
+
         public bool Equals(Genotype other)
         {
             return (A1 == other.A1 && A2 == other.A2) ||
@@ -146,19 +156,27 @@ namespace GKGenetix.Core.Model
                 case 'A':
                     result = Nucleotide.A;
                     break;
+
                 case 'C':
                     result = Nucleotide.C;
                     break;
+
                 case 'G':
                     result = Nucleotide.G;
                     break;
+
                 case 'T':
                     result = Nucleotide.T;
                     break;
+
                 case 'U':
                     result = Nucleotide.U;
                     break;
+
                 case 'N':
+                case '0':
+                case '-':
+                case '?':
                 default:
                     result = Nucleotide.None;
                     break;

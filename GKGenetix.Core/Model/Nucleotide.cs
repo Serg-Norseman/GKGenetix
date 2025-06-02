@@ -25,31 +25,54 @@ namespace GKGenetix.Core.Model
     [Flags]
     public enum Nucleotide : byte
     {
+        /// <summary>
+        /// ("0")
+        /// </summary>
         None = 0,
 
         /// <summary>
         /// Adenine (complementary pair - T/U)
         /// </summary>
-        A = 1 << 0,
+        A = 1,
 
         /// <summary>
         /// Cytosine (complementary pair - G)
         /// </summary>
-        C = 1 << 1,
+        C = 2,
 
         /// <summary>
         /// Guanine (complementary pair - C)
         /// </summary>
-        G = 1 << 2,
+        G = 3,
 
         /// <summary>
         /// Thymine (DNA only; complementary pair - A)
         /// </summary>
-        T = 1 << 3,
+        T = 4,
 
         /// <summary>
         /// Uracil (RNA only; complementary pair - A)
         /// </summary>
-        U = 1 << 4,
+        U = 5,
+
+        /// <summary>
+        /// Insertion ("I")
+        /// </summary>
+        I = 6,
+
+        /// <summary>
+        /// Deletion ("D")
+        /// </summary>
+        D = 7,
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Homozygous = 8,
+
+        /// <summary>
+        /// ("-")
+        /// </summary>
+        NoCall = 9,
     }
 }

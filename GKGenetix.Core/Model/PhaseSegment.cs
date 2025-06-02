@@ -80,7 +80,7 @@ namespace GKGenetix.Core.Model
     public class UnphasedSegment : ITableRow
     {
         public string UnphasedKit { get; private set; }
-        public string Chromosome { get; private set; }
+        public byte Chromosome { get; private set; }
         public int StartPosition { get; private set; }
         public int EndPosition { get; private set; }
 
@@ -92,7 +92,7 @@ namespace GKGenetix.Core.Model
         public void Load(IDataRecord values)
         {
             UnphasedKit = values.GetString(0);
-            Chromosome = values.GetString(1);
+            Chromosome = (byte)values.GetString(1).ParseChromosome();
             StartPosition = values.GetInt32(2);
             EndPosition = values.GetInt32(3);
         }

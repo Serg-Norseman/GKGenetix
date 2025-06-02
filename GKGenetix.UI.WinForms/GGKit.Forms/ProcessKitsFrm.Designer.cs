@@ -15,7 +15,6 @@
 
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ProcessKitsFrm));
             this.btnStart = new System.Windows.Forms.Button();
             this.bwCompare = new System.ComponentModel.BackgroundWorker();
             this.lblComparing = new System.Windows.Forms.Label();

@@ -15,9 +15,6 @@ namespace GGKit.Forms
 {
     public partial class ProcessKitsFrm : GKWidget
     {
-        private string kit1 = null;
-        private string kit2 = null;
-        private IList<CmpSegment> cmpResults;
         private IList<KitDTO> dt;
 
 
@@ -45,6 +42,7 @@ namespace GGKit.Forms
                 _host.SetStatus("Done.");
                 _host.SetProgress(-1);
             }
+            _host.EnableExplore();
         }
 
         private void btnStart_Click(object sender, EventArgs e)
@@ -54,6 +52,7 @@ namespace GGKit.Forms
                 if (bwCompare.IsBusy) {
                     MessageBox.Show("Process is busy!", "Please Wait!", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 } else {
+                    _host.DisableExplore();
                     bwCompare.RunWorkerAsync();
                     btnStart.Text = "Stop";
                 }
@@ -66,8 +65,21 @@ namespace GGKit.Forms
                     bwPhaseVisualizer.CancelAsync();
                     btnStart.Text = "Cancelling";
                     btnStart.Enabled = false;
+                    _host.EnableExplore();
                 }
             }
+        }
+
+        private class ProcessItem
+        {
+            public string Kit1;
+            public string Kit2;
+
+            public int Ref1;
+            public int Ref2;
+
+            public string Name1;
+            public string Name2;
         }
 
         private void bwCompare_DoWork(object sender, DoWorkEventArgs e)
@@ -79,63 +91,49 @@ namespace GGKit.Forms
 
             dt = GKSqlFuncs.QueryKits(true);
 
-            int total = 0;
+            var items = new List<ProcessItem>();
             for (int i = 0; i < dt.Count; i++) {
                 for (int j = i; j < dt.Count; j++) {
-                    if (dt[i].KitNo != dt[j].KitNo && (dt[i].Reference != 1 || dt[j].Reference != 1))
-                        total++;
+                    if (dt[i].KitNo != dt[j].KitNo && (dt[i].Reference != 1 || dt[j].Reference != 1)) {
+                        items.Add(new ProcessItem() {
+                            Kit1 = dt[i].KitNo,
+                            Ref1 = dt[i].Reference,
+                            Name1 = dt[i].Name,
+                            Kit2 = dt[j].KitNo,
+                            Ref2 = dt[j].Reference,
+                            Name2 = dt[j].Name
+                        });
+                    }
                 }
             }
 
-            int progress = 0;
-            int idx = 0;
-            for (int i = 0; i < dt.Count; i++) {
-                for (int j = i; j < dt.Count; j++) {
-                    if (bwCompare.CancellationPending)
-                        break;
+            if (bwCompare.CancellationPending) return;
 
-                    kit1 = dt[i].KitNo;
-                    kit2 = dt[j].KitNo;
-                    if (kit1 == kit2)
-                        continue;
+            for (int i = 0; i < items.Count; i++) {
+                var itm = items[i];
 
-                    int ref1 = dt[i].Reference;
-                    int ref2 = dt[j].Reference;
-                    if (ref1 == 1 && ref2 == 1)
-                        continue;
-
-                    bool reference = (ref1 == 1 || ref2 == 1);
-
-                    string name1 = dt[i].Name;
-                    string name2 = dt[j].Name;
-                    idx++;
-
-                    if (reference) {
-                        WriteStatus($"Comparing Reference {kit1} ({name1}) and {kit2} ({name2})", true);
-                    } else {
-                        WriteStatus($"Comparing Kits {kit1} ({name1}) and {kit2} ({name2})", true);
-                    }
-
-                    progress = idx * 100 / total;
-
-                    cmpResults = GKGenFuncs.CompareOneToOne(kit1, kit2, bwCompare, reference, true);
-
-                    if (bwCompare.CancellationPending)
-                        break;
-
-                    if (cmpResults.Count > 0 || redoAgain) {
-                        if (!this.IsHandleCreated)
-                            break;
-
-                        if (reference)
-                            WriteStatus($"{cmpResults.Count} compound segments found.", true);
-                        else
-                            WriteStatus($"{cmpResults.Count} matching segments found.", true);
-                    } else {
-                        WriteStatus("Earlier comparison exists. Skipping.", true);
-                    }
-                    bwCompare.ReportProgress(progress, progress.ToString() + "%");
+                bool reference = (itm.Ref1 == 1 || itm.Ref2 == 1);
+                if (reference) {
+                    WriteStatus($"Comparing Reference {itm.Kit1} ({itm.Name1}) and {itm.Kit2} ({itm.Name2})", true);
+                } else {
+                    WriteStatus($"Comparing Kits {itm.Kit1} ({itm.Name1}) and {itm.Kit2} ({itm.Name2})", true);
                 }
+
+                var cmpResults = GKGenFuncs.CompareOneToOne(itm.Kit1, itm.Kit2, bwCompare, reference, true);
+                if (cmpResults.Count > 0 || redoAgain) {
+                    if (!this.IsHandleCreated)
+                        break;
+
+                    if (reference)
+                        WriteStatus($"{cmpResults.Count} compound segments found.", true);
+                    else
+                        WriteStatus($"{cmpResults.Count} matching segments found.", true);
+                } else {
+                    WriteStatus("Earlier comparison exists. Skipping.", true);
+                }
+
+                int progress = i * 100 / items.Count;
+                bwCompare.ReportProgress(progress, progress.ToString() + "%");
 
                 if (bwCompare.CancellationPending || !this.IsHandleCreated)
                     break;
@@ -238,6 +236,8 @@ namespace GGKit.Forms
             _host.SetProgress(-1);
 
             WriteStatusMsg("Phased Segment Processing Completed.");
+
+            _host.EnableExplore();
         }
 
         private void bwPhaseVisualizer_ProgressChanged(object sender, ProgressChangedEventArgs e)

@@ -185,14 +185,14 @@
             // miDNA
             // 
             this.miDNA.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.miProcessKits,
+            this.miPhasing,
+            this.toolStripMenuItem1,
             this.miOneToOne,
             this.miOneToMany,
             this.miAdmixture,
             this.miRunsOfHomozygosity,
-            this.miPhasing,
             this.toolStripSeparator3,
-            this.miProcessKits,
-            this.toolStripMenuItem1,
             this.miMtDnaPhylogeny,
             this.miMitoMap,
             this.miISOGGYTree});
