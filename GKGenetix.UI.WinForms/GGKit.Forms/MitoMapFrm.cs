@@ -19,28 +19,10 @@ namespace GGKit.Forms
 {
     public partial class MitoMapFrm : GKWidget
     {
-        /*internal class MDNucleotide
-        {
-            public int Pos { get; }
-            public string A1 { get; }
-            public string A2 { get; }
-
-            public bool Mut;
-            public bool Ins;
-
-            public MDNucleotide(int pos, string a1, string a2)
-            {
-                Pos = pos;
-                A1 = a1;
-                A2 = a2;
-            }
-        }*/
-
         private string kit = null;
         private readonly SortedDictionary<int, List<string>> kitMutations = new SortedDictionary<int, List<string>>();
         private readonly SortedDictionary<int, List<string>> kitInsertions = new SortedDictionary<int, List<string>>();
         private int initialValue = -1;
-        private DataGridViewCellStyle styleMut, styleIns;
 
 
         public static bool CanBeUsed(IList<KitDTO> selectedKits)
@@ -57,9 +39,6 @@ namespace GGKit.Forms
         {
             InitializeComponent();
 
-            styleMut = new DataGridViewCellStyle { BackColor = Color.Blue, ForeColor = Color.White };
-            styleIns = new DataGridViewCellStyle { BackColor = Color.Green, ForeColor = Color.White };
-
             UIHelper.FixGridView(dgvMtDna);
             dgvMtDna.AddColumn("MapLocus", "Map Locus");
             dgvMtDna.AddColumn("Starting", "Start Position");
@@ -69,9 +48,9 @@ namespace GGKit.Forms
             dgvMtDna.AddColumn("Description", "Description");
 
             UIHelper.FixGridView(dgvNucleotides);
-            dgvNucleotides.AddColumn("pos", "Position");
-            dgvNucleotides.AddColumn("rsrsname", "RSRS");
-            dgvNucleotides.AddColumn("ckit", "Kit");
+            dgvNucleotides.AddColumn("Pos", "Position");
+            dgvNucleotides.AddColumn("RSRS", "RSRS");
+            dgvNucleotides.AddColumn("Kit", "Kit");
 
             this.kit = kit;
         }
@@ -121,80 +100,30 @@ namespace GGKit.Forms
             var selRow = dgvMtDna.GetSelectedObj<MDMapRow>();
             if (selRow == null) return;
 
-            int start = int.Parse(selRow.Starting);
-            int end = int.Parse(selRow.Ending);
             string title = selRow.MapLocus;
-
             foreach (DataPoint dp in mtdna_chart.Series[0].Points) {
                 dp.LabelBackColor = (dp.Label == title) ? Color.LightBlue : Color.White;
             }
-
             tabControl2.TabPages[0].Text = "Nucleotides - " + title;
 
-            int end_tmp = end;
-            if (end < start)
-                end_tmp = 16569;
-
-            PopulateNucleotides(start, end, end_tmp);
+            int start = int.Parse(selRow.Starting);
+            int end = int.Parse(selRow.Ending);
+            dgvNucleotides.DataSource = GKGenFuncs.PopulateMtDnaNucleotides(start, end, kitMutations, kitInsertions);
             PopulateFASTA(title, start, end);
-        }
-
-        private void PopulateNucleotides(int start, int end, int end_tmp)
-        {
-            var nucleotides = new Dictionary<int, string[]>();
-            var RSRS = GKData.RSRS;
-            for (int i = 0; i < RSRS.Length; i++)
-                nucleotides.Add(i + 1, new string[] { (i + 1).ToString(), RSRS[i].ToString(), RSRS[i].ToString() });
-
-            DataGridViewRowCollection dgvRows = dgvNucleotides.Rows;
-            dgvRows.Clear();
-
-            for (int i = start; i <= end_tmp; i++)
-                dgvRows.Add(nucleotides[i]);
-
-            if (end < start) {
-                for (int i = 1; i <= end; i++)
-                    dgvRows.Add(nucleotides[i]);
-            }
-
-            foreach (KeyValuePair<int, List<string>> a in kitMutations) {
-                if ((a.Key >= start && a.Key <= end_tmp) || (end < start && a.Key <= end)) {
-                    string akey = a.Key.ToString();
-                    for (int i = 0; i < dgvRows.Count; i++) {
-                        if (dgvRows[i].Cells[0].Value.ToString() == akey) {
-                            dgvRows[i].Cells[2].Value = a.Value[0];
-                            dgvRows[i].DefaultCellStyle = styleMut;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            foreach (KeyValuePair<int, List<string>> a in kitInsertions) {
-                if ((a.Key >= start && a.Key <= end_tmp) || (end < start && a.Key <= end)) {
-                    string akey1 = (a.Key + 1).ToString();
-                    for (int i = 0; i < dgvRows.Count; i++) {
-                        if (dgvRows[i].Cells[0].Value.ToString() == akey1) {
-                            foreach (string v in a.Value) {
-                                dgvRows.Insert(i, new object[] { a.Key, "", v });
-                                dgvRows[i].DefaultCellStyle = styleIns;
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
         }
 
         private void dgvNucleotides_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-            /*var row = tblAlleles[e.RowIndex];
-            var cellVal = row.Match.ToString();
+            var nucleotides = (List<MDNucleotide>)dgvNucleotides.DataSource;
+            var row = nucleotides[e.RowIndex];
 
-            if (cellVal == "-")
-                e.CellStyle.BackColor = Color.LightGray;
-            else if (cellVal == "")
-                e.CellStyle.BackColor = Color.OrangeRed;*/
+            if (row.Mut) {
+                e.CellStyle.BackColor = Color.Blue;
+                e.CellStyle.ForeColor = Color.White;
+            } else if (row.Ins) {
+                e.CellStyle.BackColor = Color.Green;
+                e.CellStyle.ForeColor = Color.White;
+            }
         }
 
         private void mtdna_chart_MouseDown(object sender, MouseEventArgs e)
@@ -279,18 +208,25 @@ namespace GGKit.Forms
             StringBuilder sb = new StringBuilder();
             int width = 0;
             Dictionary<int, Color> list = new Dictionary<int, Color>();
-            sb.Append(">" + kit + "|" + locus + "|" + start + "-" + end + "\r\n");
+            sb.Append(">" + kit + "|" + locus + "|" + start + "-" + end + "\r");
+            // with \r\n sb.Length has wrong value for format
 
-            foreach (DataGridViewRow row in dgvNucleotides.Rows) {
-                string val = row.Cells[2].Value.ToString();
+            var nucleotides = (List<MDNucleotide>)dgvNucleotides.DataSource;
+            foreach (var row in nucleotides) {
+                string val = row.Kit;
 
-                if (width % 50 == 0 && width != 0)
-                    sb.Append("\r\n");
-                if (row.DefaultCellStyle.BackColor == Color.Blue || row.DefaultCellStyle.BackColor == Color.Green) {
+                if (width % 30 == 0 && width != 0)
+                    sb.Append("\r");
+
+                if (row.Mut) {
                     sb.Append(val);
-                    list.Add(sb.Length - 1, row.DefaultCellStyle.BackColor);
-                } else
+                    list.Add(sb.Length - 1, Color.Blue);
+                } else if (row.Ins) {
                     sb.Append(val);
+                    list.Add(sb.Length - 1, Color.Green);
+                } else {
+                    sb.Append(val);
+                }
 
                 width++;
             }

@@ -21,7 +21,7 @@ namespace GGKit.Forms
         private string motherKit = "Unknown";
         private string childKit = "Unknown";
         private IList<PhaseRow> dt = null;
-        private bool male = true;
+        private string chSex;
 
 
         public PhasingFrm(IKitHost host) : base(host)
@@ -56,19 +56,19 @@ namespace GGKit.Forms
 
         private void btnFather_Click(object sender, EventArgs e)
         {
-            fatherKit = _host.SelectKit();
+            fatherKit = _host.SelectKit('M');
             UpdateControls();
         }
 
         private void btnMother_Click(object sender, EventArgs e)
         {
-            motherKit = _host.SelectKit();
+            motherKit = _host.SelectKit('F');
             UpdateControls();
         }
 
         private void btnChild_Click(object sender, EventArgs e)
         {
-            childKit = _host.SelectKit();
+            childKit = _host.SelectKit('U');
             UpdateControls();
         }
 
@@ -76,7 +76,9 @@ namespace GGKit.Forms
         {
             btnFather.Text = GKSqlFuncs.GetKitName(fatherKit);
             btnMother.Text = GKSqlFuncs.GetKitName(motherKit);
-            btnChild.Text = GKSqlFuncs.GetKitName(childKit);
+
+            GKSqlFuncs.GetKit(childKit, out string chName, out chSex);
+            btnChild.Text = chName;
 
             btnPhasing.Enabled = ((fatherKit != "Unknown" || motherKit != "Unknown") && childKit != "Unknown");
         }
@@ -89,10 +91,8 @@ namespace GGKit.Forms
             btnChild.Enabled = false;
             btnFather.Enabled = false;
             btnMother.Enabled = false;
-            rbMale.Enabled = false;
-            rbFemale.Enabled = false;
 
-            male = rbMale.Checked;
+            bool male = chSex[0] == 'M';
 
             Task.Factory.StartNew(() => {
                 GKGenFuncs.DoPhasing(fatherKit, motherKit, childKit, ref dt, male);
@@ -112,8 +112,6 @@ namespace GGKit.Forms
             btnChild.Enabled = true;
             btnFather.Enabled = true;
             btnMother.Enabled = true;
-            rbMale.Enabled = true;
-            rbFemale.Enabled = true;
 
             _host.SetStatus("Done.");
         }

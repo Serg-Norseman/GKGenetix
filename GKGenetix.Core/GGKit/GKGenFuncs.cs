@@ -187,13 +187,15 @@ namespace GGKit.Core
 
         private static string FastaSeq(string file)
         {
-            StreamReader sr = new StreamReader(file);
             StringBuilder sb = new StringBuilder();
-            string line = sr.ReadLine(); // skip first line
-            while ((line = sr.ReadLine()) != null) {
-                sb.Append(line);
+
+            using (StreamReader sr = new StreamReader(file)) {
+                string line = sr.ReadLine(); // skip first line
+                while ((line = sr.ReadLine()) != null) {
+                    sb.Append(line);
+                }
             }
-            sr.Close();
+
             return sb.ToString();
         }
 
@@ -219,7 +221,6 @@ namespace GGKit.Core
                 }
             }
 
-            char f, u;
             var new_mut = new List<string>();
             foreach (var kvp in ht) {
                 int start = kvp.Key;
@@ -228,13 +229,9 @@ namespace GGKit.Core
                 char[] fasta_char = rsrs.ToCharArray();
                 char[] user_char = user.ToCharArray();
                 for (int i = start; i <= end; i++) {
-                    int offset;
-                    if (i > 3107)
-                        offset = 1;
-                    else
-                        offset = 0;
-                    f = fasta_char[i - offset];
-                    u = user_char[i];
+                    int offset = i > 3107 ? 1 : 0;
+                    char f = fasta_char[i - offset];
+                    char u = user_char[i];
                     if (f != u) {
                         if ((f == 'A' && u == 'G') ||
                           (f == 'G' && u == 'A') ||
@@ -301,35 +298,35 @@ namespace GGKit.Core
 
         public static List<string> LoadYDNAFile(string file)
         {
-            var ymap = GKData.YMap;
-
-            string[] lines = File.ReadAllLines(file);
             var snpList = new List<string>();
-            string[] data = null;
-            string[] snp = null;
-            foreach (string line in lines) {
-                data = line.Replace("\"", "").Split(new char[] { ',' });
 
-                // "Type" 0, "Position" 1, "SNPName" 2, "Derived" 3, "OnTree" 4, "Reference" 5, "Genotype" 6, "Confidence" 7
-                string valType = data[0];
-                string valPos = data[1];
-                string valSNP = data[2];
-                string valDerived = data[3];
-                string valGt = data[6];
+            var ymap = GKData.YMap;
+            using (StreamReader sr = new StreamReader(file)) {
+                string line;
+                while ((line = sr.ReadLine()) != null) {
+                    string[] data = line.Replace("\"", "").Split(new char[] { ',' });
 
-                if (valType == "Known SNP") {
-                    if (valDerived == "Yes(+)") {
-                        snpList.Add(valSNP + "+");
-                    } else if (valDerived == "No(-)") {
-                        snpList.Add(valSNP + "-");
-                    }
-                } else if (valType == "Novel Variant") {
-                    if (ymap.ContainsKey(valPos)) {
-                        snp = GKGenFuncs.GetYSNP(valPos, valGt);
-                        if (snp[0].IndexOf(";") == -1)
-                            snpList.Add(snp[0] + snp[1]);
-                        else
-                            snpList.Add(snp[0].Substring(0, snp[0].IndexOf(";")) + snp[1]);
+                    // "Type" 0, "Position" 1, "SNPName" 2, "Derived" 3, "OnTree" 4, "Reference" 5, "Genotype" 6, "Confidence" 7
+                    string valType = data[0];
+                    string valPos = data[1];
+                    string valSNP = data[2];
+                    string valDerived = data[3];
+                    string valGt = data[6];
+
+                    if (valType == "Known SNP") {
+                        if (valDerived == "Yes(+)") {
+                            snpList.Add(valSNP + "+");
+                        } else if (valDerived == "No(-)") {
+                            snpList.Add(valSNP + "-");
+                        }
+                    } else if (valType == "Novel Variant") {
+                        if (ymap.ContainsKey(valPos)) {
+                            string[] snp = GetYSNP(valPos, valGt);
+                            if (snp[0].IndexOf(";") == -1)
+                                snpList.Add(snp[0] + snp[1]);
+                            else
+                                snpList.Add(snp[0].Substring(0, snp[0].IndexOf(";")) + snp[1]);
+                        }
                     }
                 }
             }
@@ -930,12 +927,11 @@ namespace GGKit.Core
 
                     string unphased_kit = unphSeg.UnphasedKit;
                     var chromosome = unphSeg.Chromosome;
-                    string start_position = unphSeg.StartPosition.ToString();
-                    string end_position = unphSeg.EndPosition.ToString();
+                    int start_position = unphSeg.StartPosition;
+                    int end_position = unphSeg.EndPosition;
 
                     var exists = GKSqlFuncs.HasUnphasedSegment(phased_kit, unphased_kit, chromosome, start_position, end_position);
                     if (exists) {
-                        //already exists...
                         if (!redoVisual) {
                             if (bw != null)
                                 bw.ReportProgress(percent, $"Segment [{GKSqlFuncs.GetKitName(phased_kit)}:{GKSqlFuncs.GetKitName(unphased_kit)}] Chr {chromosome}: {start_position}-{end_position}, Already Processed. Skipping ...");
@@ -948,7 +944,7 @@ namespace GGKit.Core
                     if (bw != null)
                         bw.ReportProgress(percent, $"Segment [{GKSqlFuncs.GetKitName(phased_kit)}:{GKSqlFuncs.GetKitName(unphased_kit)}] Chr {chromosome}: {start_position}-{end_position}, Processing ...");
 
-                    /*var dt = GGKSqlFuncs.GetPhaseSegments(unphased_kit, start_position, end_position, chromosome, phased_kit);
+                    /*var dt = GKSqlFuncs.GetPhaseSegments(phased_kit, unphased_kit, chromosome, start_position, end_position);
                     if (dt.Count > 0) {
                         if (bwPhaseVisualizer.CancellationPending)
                             break;
@@ -1260,6 +1256,73 @@ namespace GGKit.Core
                     kitMutations.Add(pos, alleles);
                 }
             }
+        }
+
+        public static List<MDNucleotide> PopulateMtDnaNucleotides(int start, int end,
+            SortedDictionary<int, List<string>> kitMutations,
+            SortedDictionary<int, List<string>> kitInsertions)
+        {
+            int end_tmp = end;
+            if (end < start)
+                end_tmp = 16569; // Full mtDNA length
+
+            var nucRes = new List<MDNucleotide>(end_tmp - start + 1);
+            {
+                var RSRS = GKData.RSRS;
+                var nucleotides = new SortedList<int, MDNucleotide>(RSRS.Length);
+                for (int i = 0; i < RSRS.Length; i++) {
+                    var akey = i + 1;
+                    nucleotides.Add(akey, new MDNucleotide(akey, RSRS[i].ToString(), RSRS[i].ToString()));
+                }
+
+                // Handles both normal sequences and circular wrap-around cases
+                for (int i = start; i <= end_tmp; i++)
+                    nucRes.Add(nucleotides[i]);
+
+                if (end < start) {
+                    for (int i = 1; i <= end; i++)
+                        nucRes.Add(nucleotides[i]);
+                }
+            }
+
+            // Create a lookup dictionary for faster access
+            /*var mutationLookup = new Dictionary<int, string>(kitMutations.Count);
+            foreach (var pair in kitMutations)
+                mutationLookup[pair.Key] = pair.Value[0];
+
+            Parallel.For(0, nucRes.Count, i =>
+            {
+                var nuc = nucRes[i];
+                if (mutationLookup.TryGetValue(nuc.Pos, out string mutation)) {
+                    nuc.Kit = mutation;
+                    nuc.Mut = true;
+                }
+            });*/
+
+            foreach (KeyValuePair<int, List<string>> a in kitMutations) {
+                if ((a.Key >= start && a.Key <= end_tmp) || (end < start && a.Key <= end)) {
+                    var nuc = nucRes.Find((x) => x.Pos == a.Key);
+                    if (nuc != null) {
+                        nuc.Kit = a.Value[0];
+                        nuc.Mut = true;
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<int, List<string>> a in kitInsertions) {
+                if ((a.Key >= start && a.Key <= end_tmp) || (end < start && a.Key <= end)) {
+                    var akey1 = (a.Key + 1);
+                    var nucIdx = nucRes.FindIndex((x) => x.Pos == akey1);
+                    if (nucIdx >= 0) {
+                        foreach (string v in a.Value) {
+                            nucRes.Insert(nucIdx, new MDNucleotide(a.Key, "", v, false, true));
+                        }
+                        break;
+                    }
+                }
+            }
+
+            return nucRes;
         }
     }
 }

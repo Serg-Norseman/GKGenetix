@@ -190,7 +190,7 @@ namespace GGKit.Core
             }
         }
 
-        public static IList<KitDTO> QueryKits(bool excludeDisabled = false, bool excludeRefs = true)
+        public static IList<KitDTO> QueryKits(bool excludeDisabled = false, bool excludeRefs = true, char requestedSex = 'U')
         {
             string where = "";
             if (excludeDisabled)
@@ -200,6 +200,12 @@ namespace GGKit.Core
                 if (string.IsNullOrEmpty(where))
                     where = " where reference = 0";
                 else where += " and reference = 0";
+            }
+
+            if (requestedSex != 'U') {
+                if (string.IsNullOrEmpty(where))
+                    where = $" where sex = '{requestedSex}'";
+                else where += $" and sex = '{requestedSex}'";
             }
 
             string sql = $"select kit_no, name, sex, disabled, coalesce(x, 0), coalesce(y, 0), last_modified, reference, roh_status from kit_master {where} order by last_modified desc";
@@ -215,6 +221,7 @@ namespace GGKit.Core
                 if (reader.Read()) {
                     name = reader.GetString(0);
                     sex = reader.GetString(1);
+                    return;
                 }
             }
 
@@ -461,7 +468,7 @@ namespace GGKit.Core
                 ") order by cast(chromosome as integer), start_position");
         }
 
-        public static bool HasUnphasedSegment(string phasedKit, string unphasedKit, byte chromosome, string startPosition, string endPosition)
+        public static bool HasUnphasedSegment(string phasedKit, string unphasedKit, byte chromosome, int startPosition, int endPosition)
         {
             var val = QueryValue(
                 $"select phased_kit from cmp_phased where phased_kit='{phasedKit}' and match_kit='{unphasedKit}' and chromosome='{chromosome}' and start_position={startPosition} and end_position={endPosition}");

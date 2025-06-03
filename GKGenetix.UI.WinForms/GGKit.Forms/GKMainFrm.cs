@@ -100,7 +100,7 @@ namespace GGKit.Forms
 
         private void miImport_Click(object sender, EventArgs e)
         {
-            ImportKit();
+            ImportTest();
         }
 
         private void miDelete_Click(object sender, EventArgs e)
@@ -215,7 +215,7 @@ namespace GGKit.Forms
             ShowWidget(newKitFrm);
         }
 
-        public void ImportKit()
+        public void ImportTest()
         {
         }
 
@@ -279,9 +279,9 @@ namespace GGKit.Forms
                 frm.ShowDialog(this);
         }
 
-        public string SelectKit()
+        public string SelectKit(char sex)
         {
-            using (var open = new SelectKitFrm()) {
+            using (var open = new SelectKitFrm(sex)) {
                 open.ShowDialog(this);
                 return open.GetSelectedKit();
             }

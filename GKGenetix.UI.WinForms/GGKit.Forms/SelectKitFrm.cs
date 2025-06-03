@@ -18,13 +18,14 @@ namespace GGKit.Forms
     {
         private string kit = "Unknown";
         private IList<KitDTO> tbl;
+        private char requestedSex;
 
         public string GetSelectedKit()
         {
             return kit;
         }
 
-        public SelectKitFrm()
+        public SelectKitFrm(char sex)
         {
             InitializeComponent();
 
@@ -33,13 +34,15 @@ namespace GGKit.Forms
             dgvKits.AddColumn("Name", "Name");
             dgvKits.AddCheckedColumn("Disabled", "Disabled");
             dgvKits.AddColumn("LastModified", "Last Modified");
+
+            requestedSex = sex;
         }
 
         private void OpenKitFrm_Load(object sender, EventArgs e)
         {
             btnOpen.Text = "Select";
 
-            tbl = GKSqlFuncs.QueryKits(false, true);
+            tbl = GKSqlFuncs.QueryKits(false, true, requestedSex);
             dgvKits.DataSource = tbl;
 
             if (tbl.Count == 0) {

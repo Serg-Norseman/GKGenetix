@@ -38,9 +38,9 @@ namespace GGKit.Core
 
         void NewKit();
         void OpenKit(string kit, bool disabled);
-        string SelectKit();
+        string SelectKit(char sex);
         void DeleteKit();
-        void ImportKit();
+        void ImportTest();
 
         void ChangeKits(IList<KitDTO> selectedKits);
     }

@@ -16,6 +16,7 @@ namespace GGKit.Forms
     public partial class ProcessKitsFrm : GKWidget
     {
         private IList<KitDTO> dt;
+        private bool redoRoH;
 
 
         public ProcessKitsFrm(IKitHost host) : base(host)
@@ -84,7 +85,7 @@ namespace GGKit.Forms
 
         private void bwCompare_DoWork(object sender, DoWorkEventArgs e)
         {
-            var redoAgain = cbDontSkip.Checked;
+            var redoAgain = chkDontSkip.Checked;
 
             if (redoAgain)
                 GKSqlFuncs.ClearAllComparisons(false);
@@ -154,11 +155,9 @@ namespace GGKit.Forms
         {
             if (!onlyLocal) _host.SetStatus(msg);
 
-            lblComparing.Text = msg;
-
-            tbStatus.Text += $"{msg}\r\n";
-            tbStatus.Select(tbStatus.Text.Length - 1, 0);
-            tbStatus.ScrollToCaret();
+            txtStatus.Text += $"{msg}\r\n";
+            txtStatus.Select(txtStatus.Text.Length - 1, 0);
+            txtStatus.ScrollToCaret();
         }
 
         private void bwCompare_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -168,36 +167,32 @@ namespace GGKit.Forms
 
             WriteStatusMsg("Comparison Completed.", true);
 
+            redoRoH = chkRedoRoH.Checked;
             bwROH.RunWorkerAsync();
-            progressBar.Value = 0;
         }
 
         private void bwCompare_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             _host.SetProgress(e.ProgressPercentage);
             _host.SetStatus(e.UserState.ToString());
-            progressBar.Value = e.ProgressPercentage;
         }
 
         private void bwROH_DoWork(object sender, DoWorkEventArgs e)
         {
             for (int i = 0; i < dt.Count; i++) {
-                KitDTO row = dt[i];
-
                 if (bwROH.CancellationPending)
                     break;
 
+                KitDTO row = dt[i];
                 string kit = row.KitNo;
-                int roh = row.RoH_Status;
-
                 int progress = i * 100 / dt.Count;
                 string msg0 = $"Runs of Homozygosity for kit #{kit} ({GKSqlFuncs.GetKitName(kit)})";
 
-                if (roh == 0) {
-                    bwROH.ReportProgress(progress, msg0 + " - Processing ...");
-                    GKGenFuncs.ROH(kit, true);
-                } else if (roh == 1) {
+                if (row.RoH_Status == 1 && !redoRoH) {
                     bwROH.ReportProgress(progress, msg0 + " - Already Exists. Skipping..");
+                } else {
+                    bwROH.ReportProgress(progress, msg0 + " - Processing ...");
+                    GKGenFuncs.ROH(kit, redoRoH);
                 }
             }
         }
@@ -207,14 +202,12 @@ namespace GGKit.Forms
             string rohStatus = e.UserState.ToString();
 
             _host.SetProgress(e.ProgressPercentage);
-            progressBar.Value = e.ProgressPercentage;
 
             WriteStatusMsg(rohStatus);
         }
 
         private void bwROH_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            progressBar.Value = 0;
             _host.SetProgress(-1);
 
             WriteStatusMsg("Runs of Homozygosity Processing Completed.");
@@ -224,13 +217,11 @@ namespace GGKit.Forms
 
         private void bwPhaseVisualizer_DoWork(object sender, DoWorkEventArgs e)
         {
-            var redoVisual = cbRedoVisual.Checked;
-            GKGenFuncs.DoPhaseVisualizer(redoVisual, bwPhaseVisualizer);
+            GKGenFuncs.DoPhaseVisualizer(false, bwPhaseVisualizer);
         }
 
         private void bwPhaseVisualizer_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            progressBar.Value = 0;
             btnStart.Text = "Start";
             btnStart.Enabled = true;
             _host.SetProgress(-1);
@@ -245,7 +236,6 @@ namespace GGKit.Forms
             string phStatus = e.UserState.ToString();
 
             _host.SetProgress(e.ProgressPercentage);
-            progressBar.Value = e.ProgressPercentage;
 
             WriteStatusMsg(phStatus);
         }

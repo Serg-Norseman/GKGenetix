@@ -63,6 +63,7 @@
     <Compile Include="Model\KitDTO.cs" />
     <Compile Include="Model\MatchingKit.cs" />
     <Compile Include="Model\MDMapRow.cs" />
+    <Compile Include="Model\MDNucleotide.cs" />
     <Compile Include="Model\OTORow.cs" />
     <Compile Include="Model\PhaseSegment.cs" />
     <Compile Include="Model\PhylogenyNode.cs" />
