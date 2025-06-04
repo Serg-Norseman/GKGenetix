@@ -18,20 +18,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
-using System.Windows.Forms;
-using GKGenetix.UI.Forms;
-
-namespace GKGenetix
+namespace GKGenetix.Core.Model
 {
-    internal static class Program
+    public sealed class MtDNANucleotide
     {
-        [STAThread]
-        static void Main()
+        public int Pos { get; }
+        public string RSRS { get; set; }
+        public string Kit { get; set; }
+
+        public bool Mut;
+        public bool Ins;
+
+        public MtDNANucleotide(int pos, string a1, string a2)
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GKMainFrm());
+            Pos = pos;
+            RSRS = a1;
+            Kit = a2;
+        }
+
+        public MtDNANucleotide(int pos, string a1, string a2, bool mut, bool ins) : this(pos, a1, a2)
+        {
+            Mut = mut;
+            Ins = ins;
         }
     }
 }

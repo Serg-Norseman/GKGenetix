@@ -19,19 +19,34 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
-using GKGenetix.UI.Forms;
+using GKGenetix.Core;
+using GKGenetix.Core.Database;
 
-namespace GKGenetix
+namespace GKGenetix.UI
 {
-    internal static class Program
+    public class GKWidget : UserControl
     {
-        [STAThread]
-        static void Main()
+        protected IKitHost _host;
+
+        public event EventHandler Closing;
+
+        protected GKWidget(IKitHost host)
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GKMainFrm());
+            _host = host;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) {
+                Closing?.Invoke(this, EventArgs.Empty);
+            }
+            base.Dispose(disposing);
+        }
+
+        public virtual void SetKit(IList<TestRecord> selectedKits)
+        {
         }
     }
 }

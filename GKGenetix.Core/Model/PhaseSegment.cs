@@ -18,11 +18,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System.Data;
-
 namespace GKGenetix.Core.Model
 {
-    public class PhaseSegment : ITableRow
+    public class PhaseSegment : IDataRecord
     {
         public int Position { get; private set; }
         public string Genotype { get; private set; }
@@ -33,18 +31,10 @@ namespace GKGenetix.Core.Model
         public PhaseSegment()
         {
         }
-
-        public void Load(IDataRecord values)
-        {
-            Position = values.GetInt32(0);
-            Genotype = values.GetString(1);
-            PaternalGenotype = values.GetString(2);
-            MaternalGenotype = values.GetString(3);
-        }
     }
 
 
-    public class PhaseRow : ISNPHeader, ITableRow
+    public class PhaseRow : ISNPHeader, IDataRecord
     {
         public string rsID { get; private set; } // 0
         public byte Chromosome { get; private set; } // 1
@@ -61,23 +51,16 @@ namespace GKGenetix.Core.Model
         public bool Ambiguous { get; set; }
 
 
+        public string ChrStr { get { return Chromosome.ToString(); } set { Chromosome = (byte)value.ParseChromosome(); } }
+
+
         public PhaseRow()
         {
-        }
-
-        public void Load(IDataRecord values)
-        {
-            rsID = values.GetString(0);
-            Chromosome = (byte)values.GetString(1).ParseChromosome();
-            Position = values.GetInt32(2);
-            ChildGenotype = values.GetString(3);
-            PaternalGenotype = values.GetString(4);
-            MaternalGenotype = values.GetString(5);
         }
     }
 
 
-    public class UnphasedSegment : ITableRow
+    public class UnphasedSegment : IDataRecord
     {
         public string UnphasedKit { get; private set; }
         public byte Chromosome { get; private set; }
@@ -85,16 +68,11 @@ namespace GKGenetix.Core.Model
         public int EndPosition { get; private set; }
 
 
+        public string ChrStr { get { return Chromosome.ToString(); } set { Chromosome = (byte)value.ParseChromosome(); } }
+
+
         public UnphasedSegment()
         {
-        }
-
-        public void Load(IDataRecord values)
-        {
-            UnphasedKit = values.GetString(0);
-            Chromosome = (byte)values.GetString(1).ParseChromosome();
-            StartPosition = values.GetInt32(2);
-            EndPosition = values.GetInt32(3);
         }
     }
 }

@@ -19,7 +19,6 @@
  */
 
 using System.Collections.Generic;
-using System.Data;
 using System.Text;
 
 namespace GKGenetix.Core.Model
@@ -28,7 +27,7 @@ namespace GKGenetix.Core.Model
     /// Single-nucleotide polymorphism (SNP).
     /// Substitution of a single nucleotide at a specific position in the genome.
     /// </summary>
-    public sealed class SNP : ITableRow
+    public sealed class SNP : IDataRecord
     {
         /// <summary>
         /// The rsID number ("rs#"; "refSNP cluster") is a unique label ("rs" followed by a number) used by researchers and databases to identify a specific SNP.
@@ -58,6 +57,10 @@ namespace GKGenetix.Core.Model
         public float cM { get; set; }
 
 
+        public string ChrStr { get { return Chromosome.ToString(); } set { Chromosome = (byte)value.ParseChromosome(); } }
+        public string GtStr { get { return Genotype.ToString(); } set { Genotype = new Genotype(value); } }
+
+
         public SNP()
         {
         }
@@ -68,14 +71,6 @@ namespace GKGenetix.Core.Model
             Chromosome = (byte)chromosome.ParseChromosome();
             Position = position;
             Genotype = new Genotype(genotype);
-        }
-
-        public void Load(IDataRecord values)
-        {
-            rsID = values.GetString(0);
-            Chromosome = (byte)values.GetString(1).ParseChromosome();
-            Position = values.GetInt32(2);
-            Genotype = new Genotype(values.GetString(3));
         }
 
         public override string ToString()

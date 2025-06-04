@@ -22,113 +22,111 @@
       <HintPath>..\libs\BSLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DevConsole.cs">
+    <Compile Include="Forms\DevConsole.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DevConsole.Designer.cs">
+    <Compile Include="Forms\DevConsole.Designer.cs">
       <DependentUpon>DevConsole.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\AdmixtureFrm.cs">
+    <Compile Include="Forms\AdmixtureFrm.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\AdmixtureFrm.Designer.cs">
+    <Compile Include="Forms\AdmixtureFrm.Designer.cs">
       <DependentUpon>AdmixtureFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\GKMainFrm.cs">
+    <Compile Include="Forms\GKMainFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\GKMainFrm.Designer.cs">
+    <Compile Include="Forms\GKMainFrm.Designer.cs">
       <DependentUpon>GKMainFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\GKWidget.cs">
+    <Compile Include="GKWidget.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\IsoggYTreeFrm.cs">
+    <Compile Include="Forms\IsoggYTreeFrm.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\IsoggYTreeFrm.designer.cs">
+    <Compile Include="Forms\IsoggYTreeFrm.designer.cs">
       <DependentUpon>IsoggYTreeFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\KitsExplorer.cs">
+    <Compile Include="Forms\KitsExplorer.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\KitsExplorer.Designer.cs">
+    <Compile Include="Forms\KitsExplorer.Designer.cs">
       <DependentUpon>KitsExplorer.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\LocationSelectFrm.cs">
+    <Compile Include="Forms\LocationSelectFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\LocationSelectFrm.Designer.cs">
+    <Compile Include="Forms\LocationSelectFrm.Designer.cs">
       <DependentUpon>LocationSelectFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\MatchingKitsFrm.cs">
+    <Compile Include="Forms\MatchingKitsFrm.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\MatchingKitsFrm.Designer.cs">
+    <Compile Include="Forms\MatchingKitsFrm.Designer.cs">
       <DependentUpon>MatchingKitsFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\MitoMapFrm.cs">
+    <Compile Include="Forms\MitoMapFrm.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\MitoMapFrm.Designer.cs">
+    <Compile Include="Forms\MitoMapFrm.Designer.cs">
       <DependentUpon>MitoMapFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\MtPhylogenyFrm.cs">
+    <Compile Include="Forms\MtPhylogenyFrm.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\MtPhylogenyFrm.designer.cs">
+    <Compile Include="Forms\MtPhylogenyFrm.designer.cs">
       <DependentUpon>MtPhylogenyFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\NewEditKitFrm.cs">
+    <Compile Include="Forms\NewEditKitFrm.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\NewEditKitFrm.Designer.cs">
+    <Compile Include="Forms\NewEditKitFrm.Designer.cs">
       <DependentUpon>NewEditKitFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\OneToOneCmpFrm.cs">
+    <Compile Include="Forms\OneToOneCmpFrm.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\OneToOneCmpFrm.Designer.cs">
+    <Compile Include="Forms\OneToOneCmpFrm.Designer.cs">
       <DependentUpon>OneToOneCmpFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\PhasedSegmentFrm.cs">
+    <Compile Include="Forms\PhasedSegmentFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\PhasedSegmentFrm.Designer.cs">
+    <Compile Include="Forms\PhasedSegmentFrm.Designer.cs">
       <DependentUpon>PhasedSegmentFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\PhasingFrm.cs">
+    <Compile Include="Forms\PhasingFrm.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\PhasingFrm.Designer.cs">
+    <Compile Include="Forms\PhasingFrm.Designer.cs">
       <DependentUpon>PhasingFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\ProcessKitsFrm.cs">
+    <Compile Include="Forms\ProcessKitsFrm.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\ProcessKitsFrm.Designer.cs">
+    <Compile Include="Forms\ProcessKitsFrm.Designer.cs">
       <DependentUpon>ProcessKitsFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\ROHFrm.cs">
+    <Compile Include="Forms\ROHFrm.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\ROHFrm.Designer.cs">
+    <Compile Include="Forms\ROHFrm.Designer.cs">
       <DependentUpon>ROHFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\SelectKitFrm.cs">
+    <Compile Include="Forms\SelectKitFrm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GGKit.Forms\SelectKitFrm.Designer.cs">
+    <Compile Include="Forms\SelectKitFrm.Designer.cs">
       <DependentUpon>SelectKitFrm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GGKit.Forms\WFImage.cs" />
+    <Compile Include="WFImage.cs" />
     <Compile Include="UIHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">

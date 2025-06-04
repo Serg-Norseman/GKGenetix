@@ -21,8 +21,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using GGKit.Core;
 using GKGenetix.Core.Model;
+using GKGenetix.Core.Reference;
 
 namespace GKGenetix.Core.FileFormats
 {
@@ -70,7 +70,7 @@ namespace GKGenetix.Core.FileFormats
         {
             var result = new DNAData();
 
-            char[] rsrs = GKData.RSRS;
+            char[] rsrs = RefData.RSRS;
 
             try {
                 int snpIdx = 0;
@@ -133,7 +133,7 @@ namespace GKGenetix.Core.FileFormats
             string genotype = snpx.Genotype.ToString();
 
             if (snpx.Chromosome == (byte)Chromosome.CHR_Y) {
-                if (GKData.YMap.ContainsKey(pos)) {
+                if (RefData.YMap.ContainsKey(pos)) {
                     string[] snp = GKGenFuncs.GetYSNP(pos, genotype);
                     if (snp[0].IndexOf(";") == -1)
                         ysnp.Add(snp[0] + snp[1]);

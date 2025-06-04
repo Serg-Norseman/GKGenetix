@@ -18,11 +18,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System.Data;
-
 namespace GKGenetix.Core.Model
 {
-    public class YSTR : ITableRow
+    /// <summary>
+    /// A short tandem repeat (STR) is a section of DNA which repeats several times in a row on a DNA strand.
+    /// The STRs present and the number of times they repeat is used distinguish one DNA sample from another.
+    /// </summary>
+    public sealed class YSTR : IDataRecord
     {
         public string Marker { get; private set; }
         public string Repeats { get; private set; }
@@ -36,12 +38,6 @@ namespace GKGenetix.Core.Model
         {
             Marker = marker;
             Repeats = value;
-        }
-
-        public void Load(IDataRecord values)
-        {
-            Marker = values.GetString(0);
-            Repeats = values.GetString(1);
         }
     }
 }

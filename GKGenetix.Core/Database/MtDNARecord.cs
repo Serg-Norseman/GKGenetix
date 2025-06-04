@@ -18,20 +18,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
-using System.Windows.Forms;
-using GKGenetix.UI.Forms;
-
-namespace GKGenetix
+namespace GKGenetix.Core.Database
 {
-    internal static class Program
+    public class MtDNARecord
     {
-        [STAThread]
-        static void Main()
-        {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GKMainFrm());
-        }
+        public string Mutations { get; set; }
+        public string Fasta { get; set; }
     }
 }

@@ -18,20 +18,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
-using System.Windows.Forms;
-using GKGenetix.UI.Forms;
-
-namespace GKGenetix
+namespace GKGenetix.Core.Reference
 {
-    internal static class Program
+    public sealed class MtDNAMapItem
     {
-        [STAThread]
-        static void Main()
+        public string MapLocus { get; }
+        public string Starting { get; }
+        public string Ending { get; }
+        public string bpLength { get; }
+        public string Shorthand { get; }
+        public string Description { get; }
+
+        public MtDNAMapItem(string mapLocus, string starting, string ending, string bpLength, string shorthand, string description)
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GKMainFrm());
+            MapLocus = mapLocus;
+            Starting = starting;
+            Ending = ending;
+            this.bpLength = bpLength;
+            Shorthand = shorthand;
+            Description = description;
         }
     }
 }

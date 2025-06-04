@@ -18,11 +18,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System.Data;
-
 namespace GKGenetix.Core.Model
 {
-    public class OTORow : ISNPHeader, ITableRow
+    public class OTORow : ISNPHeader, IDataRecord
     {
         public string rsID { get; private set; }
         public byte Chromosome { get; private set; }
@@ -32,18 +30,13 @@ namespace GKGenetix.Core.Model
         public int Count { get; private set; }
 
 
+        public string ChrStr { get { return Chromosome.ToString(); } set { Chromosome = (byte)value.ParseChromosome(); } }
+        public string Gt1Str { get { return Genotype1.ToString(); } set { Genotype1 = new Genotype(value); } }
+        public string Gt2Str { get { return Genotype2.ToString(); } set { Genotype2 = new Genotype(value); } }
+
+
         public OTORow()
         {
-        }
-
-        public void Load(IDataRecord values)
-        {
-            rsID = values.GetString(0);
-            Chromosome = (byte)values.GetString(1).ParseChromosome();
-            Position = values.GetInt32(2);
-            Genotype1 = new Genotype(values.GetString(3));
-            Genotype2 = new Genotype(values.GetString(4));
-            Count = values.GetInt32(5);
         }
     }
 }

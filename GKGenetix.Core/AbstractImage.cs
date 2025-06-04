@@ -19,19 +19,21 @@
  */
 
 using System;
-using System.Windows.Forms;
-using GKGenetix.UI.Forms;
 
-namespace GKGenetix
+namespace GKGenetix.Core
 {
-    internal static class Program
+    public abstract class AbstractImage : IDisposable
     {
-        [STAThread]
-        static void Main()
+        public AbstractImage()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GKMainFrm());
         }
+
+        public abstract void Dispose();
+
+        public abstract void SetSize(int width, int height);
+
+        public abstract void SetPen(int alpha, int red, int green, int blue, float width);
+
+        public abstract void DrawLine(float x1, float y1, float x2, float y2);
     }
 }

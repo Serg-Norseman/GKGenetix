@@ -18,11 +18,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System.Data;
-
 namespace GKGenetix.Core.Model
 {
-    public class MatchingKit : SegmentStats, ITableRow
+    public class MatchingKit : SegmentStats, IDataRecord
     {
         public int CmpId { get; private set; }
         public string Kit {  get; private set; }
@@ -30,19 +28,6 @@ namespace GKGenetix.Core.Model
 
         public MatchingKit()
         {
-        }
-
-        // cmp_id, kit, name, at_longest, at_total, x_longest, x_total, mrca
-        public void Load(IDataRecord values)
-        {
-            CmpId = values.GetInt32(0);
-            Kit = values.GetString(1);
-            Name = values.GetString(2);
-            Longest = values.GetDouble(3);
-            Total = values.GetDouble(4);
-            XLongest = values.GetDouble(5);
-            XTotal = values.GetDouble(6);
-            Mrca = values.GetInt32(7);
         }
     }
 }

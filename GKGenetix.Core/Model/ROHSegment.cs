@@ -18,19 +18,20 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
 using System.Collections.Generic;
-using System.Data;
 
 namespace GKGenetix.Core.Model
 {
-    public class ROHSegment : ISNPSegment, ITableRow
+    public class ROHSegment : ISNPSegment, IDataRecord
     {
         public byte Chromosome { get; private set; }
         public int StartPosition { get; private set; }
         public int EndPosition { get; private set; }
         public double SegmentLength_cm { get; private set; }
         public int SNPCount { get; private set; }
+
+
+        public string ChrStr { get { return Chromosome.ToString(); } set { Chromosome = (byte)value.ParseChromosome(); } }
 
 
         public IList<SNP> Rows { get; set; }
@@ -48,16 +49,6 @@ namespace GKGenetix.Core.Model
             SegmentLength_cm = segmentLength_cm;
             SNPCount = rows.Count;
             Rows = rows;
-        }
-
-        public void Load(IDataRecord values)
-        {
-            Chromosome = (byte)values.GetString(0).ParseChromosome();
-            StartPosition = values.GetInt32(1);
-            EndPosition = values.GetInt32(2);
-            //SegmentLength_cm = values.GetFloat(3); // exception
-            SegmentLength_cm = Convert.ToDouble(values[3]);
-            SNPCount = values.GetInt32(4);
         }
     }
 }
