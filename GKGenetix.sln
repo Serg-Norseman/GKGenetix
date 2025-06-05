@@ -8,6 +8,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D70FBAFF-6595-49FA-B5B4-55E51E0DBF10}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GKGenetix", "GKGenetix\GKGenetix.csproj", "{DDBB40FA-52F2-4719-8FB9-D8F774AC8BE4}"

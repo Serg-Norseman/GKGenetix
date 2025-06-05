@@ -52,7 +52,7 @@ namespace GKGenetix.Core.FileFormats
         public static string FileFilter_deCODEme = "deCODEme data files|*.csv";
         public static string FileFilter_VCF = "VCF variations files|*.vcf;*.vcf.gz";
         public static string FileFilter_Geno2 = "Geno2 data files|*.csv;*.csv.gz";
-        public static string FileFilter_FTDNA = "FTDNA data files|*.???";
+        public static string FileFilter_FTDNA = "FTDNA data files|*.csv";
 
 
         public static Haplogroup ReadHaplogroupTree(string gzName)
@@ -125,31 +125,48 @@ namespace GKGenetix.Core.FileFormats
             }
 
             string ext = Path.GetExtension(filePath);
+
+            var type = DetectFileType(inputStream);
+            inputStream.Seek(0, SeekOrigin.Begin);
+
             using (var streamReader = new StreamReader(inputStream, Encoding.ASCII)) {
-                switch (ext) {
-                    case ".txt":
-                        result = ReadTabbedTextFile(streamReader);
-                        break;
+                if (ext == ".vcf") {
+                    using (var reader = new VCFFileReader(streamReader)) {
+                        result = reader.ReadData();
+                    }
+                } else {
+                    SNPFileReader snpReader = null;
+                    switch (type) {
+                        case RawFileFormat.RFF_UNKNOWN:
+                            throw new Exception("Unable to identify file format for " + filePath);
 
-                    case ".csv":
-                        result = ReadCommaSeparatedTextFile(streamReader);
-                        break;
+                        case RawFileFormat.RFF_23ANDME:
+                            snpReader = new SNP23andMeFileReader(streamReader);
+                            break;
 
-                    case ".vcf":
-                        using (var reader = new VCFFileReader(streamReader)) {
-                            result = reader.ReadData();
-                        }
-                        break;
+                        case RawFileFormat.RFF_ANCESTRY:
+                            snpReader = new SNPAncestryDNAFileReader(streamReader);
+                            break;
 
-                    default:
-                        throw new Exception("Unknown file format");
+                        case RawFileFormat.RFF_DECODEME:
+                            snpReader = new SNPdeCODEmeFileReader(streamReader);
+                            break;
+
+                        case RawFileFormat.RFF_FTDNA:
+                            snpReader = new SNPFTDNAFileReader(streamReader);
+                            break;
+
+                        case RawFileFormat.RFF_GENO2:
+                            snpReader = new SNPGeno2FileReader(streamReader);
+                            break;
+                    }
+
+                    if (snpReader != null) {
+                        result = snpReader.ReadData();
+
+                        snpReader.Dispose();
+                    }
                 }
-
-                /*var type = DetectDNAFileType(lines);
-                if (type == RawFileFormat.RFF_UNKNOWN) {
-                    throw new Exception("Unable to identify file format for " + filePath);
-                    return new DNAData(new List<SNP>(), new List<string>(), new List<string>());
-                }*/
             }
 
             if (result != null) {
@@ -159,94 +176,42 @@ namespace GKGenetix.Core.FileFormats
             return result;
         }
 
-        private static RawFileFormat DetectDNAFileType(string[] lines)
+        private static RawFileFormat DetectFileType(Stream inputStream)
         {
-            int count = 0;
-            foreach (string line in lines) {
-                if (line == "RSID,CHROMOSOME,POSITION,RESULT")
-                    return RawFileFormat.RFF_FTDNA;
-                if (line == "# rsid\tchromosome\tposition\tgenotype")
-                    return RawFileFormat.RFF_23ANDME;
-                if (line == "rsid\tchromosome\tposition\tallele1\tallele2")
-                    return RawFileFormat.RFF_ANCESTRY;
-                if (line == "Name,Variation,Chromosome,Position,Strand,YourCode")
-                    return RawFileFormat.RFF_DECODEME;
-                if (line == "SNP,Chr,Allele1,Allele2")
-                    return RawFileFormat.RFF_GENO2;
+            using (var streamReader = new StreamReader(inputStream, Encoding.ASCII, false, 16 * 1024, true)) {
+                int count = 0;
+                while (streamReader.Peek() != -1) {
+                    string line = streamReader.ReadLine();
 
-                // if above doesn't work
-                if (line.Split("\t".ToCharArray()).Length == 4)
-                    return RawFileFormat.RFF_23ANDME;
-                if (line.Split("\t".ToCharArray()).Length == 5)
-                    return RawFileFormat.RFF_ANCESTRY;
-                if (line.Split(",".ToCharArray()).Length == 4)
-                    return RawFileFormat.RFF_FTDNA;
-                if (line.Split(",".ToCharArray()).Length == 6)
-                    return RawFileFormat.RFF_DECODEME;
+                    if (line == "RSID,CHROMOSOME,POSITION,RESULT")
+                        return RawFileFormat.RFF_FTDNA;
+                    if (line == "# rsid\tchromosome\tposition\tgenotype")
+                        return RawFileFormat.RFF_23ANDME;
+                    if (line == "rsid\tchromosome\tposition\tallele1\tallele2")
+                        return RawFileFormat.RFF_ANCESTRY;
+                    if (line == "Name,Variation,Chromosome,Position,Strand,YourCode")
+                        return RawFileFormat.RFF_DECODEME;
+                    if (line == "SNP,Chr,Allele1,Allele2")
+                        return RawFileFormat.RFF_GENO2;
 
-                if (count > 100) {
-                    // detection useless... 
-                    break;
-                }
-                count++;
-            }
-            return RawFileFormat.RFF_UNKNOWN;
-        }
+                    // if above doesn't work
+                    if (line.Split("\t".ToCharArray()).Length == 4)
+                        return RawFileFormat.RFF_23ANDME;
+                    if (line.Split("\t".ToCharArray()).Length == 5)
+                        return RawFileFormat.RFF_ANCESTRY;
+                    if (line.Split(",".ToCharArray()).Length == 4)
+                        return RawFileFormat.RFF_FTDNA;
+                    if (line.Split(",".ToCharArray()).Length == 6)
+                        return RawFileFormat.RFF_DECODEME;
 
-        /// <summary>
-        /// Reads the AncestryDNA or 23AndMe file. Comments begin line with #.
-        /// </summary>
-        /// <param name="filePath">The file path of DNA.</param>
-        public static DNAData ReadTabbedTextFile(StreamReader streamReader)
-        {
-            DNAData result = null;
-
-            try {
-                SNPFileReader snpReader = null;
-                string line = streamReader.ReadLine();
-                if (!string.IsNullOrEmpty(line) && line[0] == '#') {
-                    if (line.Contains("AncestryDNA")) {
-                        snpReader = new SNPAncestryDNAFileReader(streamReader);
-                    } else if (line.Contains("23andMe")) {
-                        snpReader = new SNP23andMeFileReader(streamReader);
-                    } else {
-                        throw new Exception("Unknown file format");
+                    if (count > 40) {
+                        // detection useless... 
+                        break;
                     }
+                    count++;
                 }
-
-                result = snpReader.ReadData();
-            } catch (Exception e) {
-                Console.WriteLine("The file could not be read: " + e.Message);
+                return RawFileFormat.RFF_UNKNOWN;
             }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Reads the deCODEme file.
-        /// </summary>
-        /// <param name="filePath">The file path of DNA.</param>
-        public static DNAData ReadCommaSeparatedTextFile(StreamReader streamReader)
-        {
-            DNAData result = null;
-
-            try {
-                SNPFileReader snpReader = null;
-                string line = streamReader.ReadLine();
-                if (!string.IsNullOrEmpty(line)) {
-                    if (line.StartsWith("Name")) {
-                        snpReader = new SNPdeCODEmeFileReader(streamReader);
-                    } else {
-                        throw new Exception("Unknown file format");
-                    }
-                }
-
-                result = snpReader.ReadData();
-            } catch (Exception e) {
-                Console.WriteLine("The file could not be read: " + e.Message);
-            }
-
-            return result;
         }
     }
 }

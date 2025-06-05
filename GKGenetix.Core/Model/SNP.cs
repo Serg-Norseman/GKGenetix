@@ -20,6 +20,7 @@
 
 using System.Collections.Generic;
 using System.Text;
+using GKGenetix.Core.Database;
 
 namespace GKGenetix.Core.Model
 {

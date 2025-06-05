@@ -108,56 +108,53 @@ namespace GKGenetix.UI.Forms
                 }
             }
 
-            if (bwCompare.CancellationPending) return;
-
             for (int i = 0; i < items.Count; i++) {
+                if (bwCompare.CancellationPending || !this.IsHandleCreated)
+                    break;
+
                 var itm = items[i];
 
                 bool reference = (itm.Ref1 == 1 || itm.Ref2 == 1);
                 if (reference) {
-                    WriteStatus($"Comparing Reference {itm.Kit1} ({itm.Name1}) and {itm.Kit2} ({itm.Name2})", true);
+                    WriteStatus($"Comparing Reference {itm.Kit1} ({itm.Name1}) and {itm.Kit2} ({itm.Name2})", -2, true);
                 } else {
-                    WriteStatus($"Comparing Kits {itm.Kit1} ({itm.Name1}) and {itm.Kit2} ({itm.Name2})", true);
+                    WriteStatus($"Comparing Kits {itm.Kit1} ({itm.Name1}) and {itm.Kit2} ({itm.Name2})", -2, true);
                 }
 
                 var cmpResults = GKGenFuncs.CompareOneToOne(itm.Kit1, itm.Kit2, bwCompare, reference, true);
+                int progress = i * 100 / items.Count;
+
                 if (cmpResults.Count > 0 || redoAgain) {
                     if (!this.IsHandleCreated)
                         break;
 
                     if (reference)
-                        WriteStatus($"{cmpResults.Count} compound segments found.", true);
+                        WriteStatus($"{cmpResults.Count} compound segments found.", progress, true);
                     else
-                        WriteStatus($"{cmpResults.Count} matching segments found.", true);
+                        WriteStatus($"{cmpResults.Count} matching segments found.", progress, true);
                 } else {
-                    WriteStatus("Earlier comparison exists. Skipping.", true);
+                    WriteStatus("Earlier comparison exists. Skipping.", progress, true);
                 }
-
-                int progress = i * 100 / items.Count;
-                bwCompare.ReportProgress(progress, progress.ToString() + "%");
-
-                if (bwCompare.CancellationPending || !this.IsHandleCreated)
-                    break;
             }
 
             if (!bwCompare.CancellationPending)
                 bwCompare.ReportProgress(100, "Done.");
         }
 
-        private void WriteStatus(string msg, bool onlyLocal = false)
+        private void WriteStatus(string msg, int progress, bool onlyLocal = false)
         {
             this.Invoke(new MethodInvoker(delegate {
-                WriteStatusMsg(msg, onlyLocal);
+                if (progress >= -1) {
+                    _host.SetProgress(progress);
+                    _host.SetStatus($"{progress}%");
+                }
+
+                if (!onlyLocal) _host.SetStatus(msg);
+
+                txtStatus.Text += $"{msg}\r\n";
+                txtStatus.Select(txtStatus.Text.Length - 1, 0);
+                txtStatus.ScrollToCaret();
             }));
-        }
-
-        private void WriteStatusMsg(string msg, bool onlyLocal = false)
-        {
-            if (!onlyLocal) _host.SetStatus(msg);
-
-            txtStatus.Text += $"{msg}\r\n";
-            txtStatus.Select(txtStatus.Text.Length - 1, 0);
-            txtStatus.ScrollToCaret();
         }
 
         private void bwCompare_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -165,16 +162,10 @@ namespace GKGenetix.UI.Forms
             if (!this.IsHandleCreated)
                 return;
 
-            WriteStatusMsg("Comparison Completed.", true);
+            WriteStatus("Comparison Completed.", -1, true);
 
             redoRoH = chkRedoRoH.Checked;
             bwROH.RunWorkerAsync();
-        }
-
-        private void bwCompare_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            _host.SetProgress(e.ProgressPercentage);
-            _host.SetStatus(e.UserState.ToString());
         }
 
         private void bwROH_DoWork(object sender, DoWorkEventArgs e)
@@ -200,17 +191,12 @@ namespace GKGenetix.UI.Forms
         private void bwROH_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             string rohStatus = e.UserState.ToString();
-
-            _host.SetProgress(e.ProgressPercentage);
-
-            WriteStatusMsg(rohStatus);
+            WriteStatus(rohStatus, e.ProgressPercentage);
         }
 
         private void bwROH_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            _host.SetProgress(-1);
-
-            WriteStatusMsg("Runs of Homozygosity Processing Completed.");
+            WriteStatus("Runs of Homozygosity Processing Completed.", -1);
 
             bwPhaseVisualizer.RunWorkerAsync();
         }
@@ -224,20 +210,14 @@ namespace GKGenetix.UI.Forms
         {
             btnStart.Text = "Start";
             btnStart.Enabled = true;
-            _host.SetProgress(-1);
-
-            WriteStatusMsg("Phased Segment Processing Completed.");
-
+            WriteStatus("Phased Segment Processing Completed.", -1);
             _host.EnableExplore();
         }
 
         private void bwPhaseVisualizer_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             string phStatus = e.UserState.ToString();
-
-            _host.SetProgress(e.ProgressPercentage);
-
-            WriteStatusMsg(phStatus);
+            WriteStatus(phStatus, e.ProgressPercentage);
         }
     }
 }

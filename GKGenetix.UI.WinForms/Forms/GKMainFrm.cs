@@ -44,7 +44,6 @@ namespace GKGenetix.UI.Forms
             this.Enabled = false;
             this.Text = Application.ProductName;
 
-            // bwIChkAndFix.RunWorkerAsync();
             Task.Factory.StartNew(() => {
                 GKSqlFuncs.CheckIntegrity();
 
@@ -109,42 +108,42 @@ namespace GKGenetix.UI.Forms
 
         private void miOneToOne_Click(object sender, EventArgs e)
         {
-            ShowOneToOneCmp(kitsExplorer.SelectedKits);
+            ShowWidget(new OneToOneCmpFrm(this, kitsExplorer.SelectedKits));
         }
 
         private void miOneToMany_Click(object sender, EventArgs e)
         {
-            ShowMatchingKits(kitsExplorer.SelectedKits);
+            ShowWidget(new MatchingKitsFrm(this, kitsExplorer.SelectedKits));
         }
 
         private void miProcessKits_Click(object sender, EventArgs e)
         {
-            ShowProcessKits();
+            ShowWidget(new ProcessKitsFrm(this));
         }
 
         private void miAdmixture_Click(object sender, EventArgs e)
         {
-            ShowAdmixture(kitsExplorer.SelectedKits);
+            ShowWidget(new AdmixtureFrm(this, kitsExplorer.SelectedKits));
         }
 
         private void miRunsOfHomozygosity_Click(object sender, EventArgs e)
         {
-            ShowROH(kitsExplorer.SelectedKits);
+            ShowWidget(new ROHFrm(this, kitsExplorer.SelectedKits));
         }
 
         private void miMtDnaPhylogeny_Click(object sender, EventArgs e)
         {
-            ShowMtPhylogeny(kitsExplorer.SelectedKits);
+            ShowWidget(new MtPhylogenyFrm(this, kitsExplorer.SelectedKits));
         }
 
         private void miMitoMap_Click(object sender, EventArgs e)
         {
-            ShowMitoMap(kitsExplorer.SelectedKits);
+            ShowWidget(new MitoMapFrm(this, kitsExplorer.SelectedKits));
         }
 
         private void miISOGGYTree_Click(object sender, EventArgs e)
         {
-            ShowIsoggYTree(kitsExplorer.SelectedKits);
+            ShowWidget(new IsoggYTreeFrm(this, kitsExplorer.SelectedKits));
         }
 
         private void miPhasing_Click(object sender, EventArgs e)
@@ -180,11 +179,6 @@ namespace GKGenetix.UI.Forms
             lblWidgetTitle.Text = frm.Text;
         }
 
-        public void DeleteKit()
-        {
-            kitsExplorer.Delete();
-        }
-
         public void SetStatus(string message)
         {
             statusLbl.Text = message;
@@ -212,6 +206,11 @@ namespace GKGenetix.UI.Forms
             if (newKitFrm == null || newKitFrm.IsDisposed)
                 newKitFrm = new NewEditKitFrm(this, kit, disabled);
             ShowWidget(newKitFrm);
+        }
+
+        public void DeleteKit()
+        {
+            kitsExplorer.Delete();
         }
 
         public void ImportTest()
@@ -262,16 +261,6 @@ namespace GKGenetix.UI.Forms
             btnWidgetClose.Enabled = false;
         }
 
-        public void ShowAdmixture(IList<TestRecord> selectedKits)
-        {
-            ShowWidget(new AdmixtureFrm(this, selectedKits));
-        }
-
-        public void ShowProcessKits()
-        {
-            ShowWidget(new ProcessKitsFrm(this));
-        }
-
         public void ShowPhasedSegmentVisualizer(string kit1, string kit2, byte chr, int startPos, int endPos)
         {
             using (var frm = new PhasedSegmentFrm(kit1, kit2, chr, startPos, endPos))
@@ -286,36 +275,6 @@ namespace GKGenetix.UI.Forms
             }
         }
 
-        public void ShowMatchingKits(IList<TestRecord> selectedKits)
-        {
-            ShowWidget(new MatchingKitsFrm(this, selectedKits));
-        }
-
-        public void ShowROH(IList<TestRecord> selectedKits)
-        {
-            ShowWidget(new ROHFrm(this, selectedKits));
-        }
-
-        public void ShowMtPhylogeny(IList<TestRecord> selectedKits)
-        {
-            ShowWidget(new MtPhylogenyFrm(this, selectedKits));
-        }
-
-        public void ShowMitoMap(IList<TestRecord> selectedKits)
-        {
-            ShowWidget(new MitoMapFrm(this, selectedKits));
-        }
-
-        public void ShowIsoggYTree(IList<TestRecord> selectedKits)
-        {
-            ShowWidget(new IsoggYTreeFrm(this, selectedKits));
-        }
-
-        public void ShowOneToOneCmp(IList<TestRecord> selectedKits)
-        {
-            ShowWidget(new OneToOneCmpFrm(this, selectedKits));
-        }
-
         public void SelectLocation(ref int lng, ref int lat)
         {
             using (var frm = new LocationSelectFrm(lng, lat)) {
@@ -325,14 +284,14 @@ namespace GKGenetix.UI.Forms
             }
         }
 
-        public void ShowMessage(string msg)
-        {
-            MessageBox.Show(msg);
-        }
-
         public void Exit()
         {
             Application.Exit();
+        }
+
+        public void ShowMessage(string msg)
+        {
+            MessageBox.Show(msg);
         }
 
         public bool ShowQuestion(string msg)

@@ -19,68 +19,25 @@
  */
 
 using System.Collections.Generic;
+using GKGenetix.Core.Database;
 
 namespace GKGenetix.Core.Model
 {
-    public class CmpSegment : ISNPSegment, IDataRecord
+    public class CmpSegment : SNPSegment, IDataRecord
     {
         public int SegmentId { get; private set; }
-        public byte Chromosome { get; private set; }
-        public int StartPosition { get; private set; }
-        public int EndPosition { get; private set; }
-        public double SegmentLength_cm { get; private set; }
-        public int SNPCount { get; private set; }
 
 
-        public string ChrStr { get { return Chromosome.ToString(); } set { Chromosome = (byte)value.ParseChromosome(); } }
-
-
-        public IList<CmpSegmentRow> Rows { get; set; }
+        public IList<SNPMatch> Rows { get; set; }
 
 
         public CmpSegment()
         {
         }
 
-        public CmpSegment(byte chromosome, int startPosition, int endPosition, double segmentLength_cm, IList<CmpSegmentRow> rows)
+        public CmpSegment(byte chromosome, int startPosition, int endPosition, double segmentLength_cm, IList<SNPMatch> rows) : base(chromosome, startPosition, endPosition, segmentLength_cm, rows.Count)
         {
-            Chromosome = chromosome;
-            StartPosition = startPosition;
-            EndPosition = endPosition;
-            SegmentLength_cm = segmentLength_cm;
-            SNPCount = rows.Count;
             Rows = rows;
-        }
-    }
-
-
-    public class CmpSegmentRow : ISNPHeader, IDataRecord
-    {
-        public string rsID { get; private set; }
-        public byte Chromosome { get; private set; }
-        public int Position { get; private set; }
-        public Genotype Genotype1 { get; private set; }
-        public Genotype Genotype2 { get; private set; }
-        public string Match { get; private set; }
-
-
-        public string ChrStr { get { return Chromosome.ToString(); } set { Chromosome = (byte)value.ParseChromosome(); } }
-        public string Gt1Str { get { return Genotype1.ToString(); } set { Genotype1 = new Genotype(value); } }
-        public string Gt2Str { get { return Genotype2.ToString(); } set { Genotype2 = new Genotype(value); } }
-
-
-        public CmpSegmentRow()
-        {
-        }
-
-        public CmpSegmentRow(string rsid, byte chromosome, int position, Genotype genotype1, Genotype genotype2, string match)
-        {
-            rsID = rsid;
-            Chromosome = chromosome;
-            Position = position;
-            Genotype1 = genotype1;
-            Genotype2 = genotype2;
-            Match = match;
         }
     }
 }

@@ -20,7 +20,7 @@
 
 namespace GKGenetix.Core.Database
 {
-    public class MtDNARecord
+    public class MtDNARecord : IDataRecord
     {
         public string Mutations { get; set; }
         public string Fasta { get; set; }

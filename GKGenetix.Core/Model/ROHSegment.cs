@@ -19,21 +19,12 @@
  */
 
 using System.Collections.Generic;
+using GKGenetix.Core.Database;
 
 namespace GKGenetix.Core.Model
 {
-    public class ROHSegment : ISNPSegment, IDataRecord
+    public class ROHSegment : SNPSegment, IDataRecord
     {
-        public byte Chromosome { get; private set; }
-        public int StartPosition { get; private set; }
-        public int EndPosition { get; private set; }
-        public double SegmentLength_cm { get; private set; }
-        public int SNPCount { get; private set; }
-
-
-        public string ChrStr { get { return Chromosome.ToString(); } set { Chromosome = (byte)value.ParseChromosome(); } }
-
-
         public IList<SNP> Rows { get; set; }
 
 
@@ -41,13 +32,8 @@ namespace GKGenetix.Core.Model
         {
         }
 
-        public ROHSegment(byte chromosome, int startPosition, int endPosition, double segmentLength_cm, IList<SNP> rows)
+        public ROHSegment(byte chromosome, int startPosition, int endPosition, double segmentLength_cm, IList<SNP> rows) : base(chromosome, startPosition, endPosition, segmentLength_cm, rows.Count)
         {
-            Chromosome = chromosome;
-            StartPosition = startPosition;
-            EndPosition = endPosition;
-            SegmentLength_cm = segmentLength_cm;
-            SNPCount = rows.Count;
             Rows = rows;
         }
     }

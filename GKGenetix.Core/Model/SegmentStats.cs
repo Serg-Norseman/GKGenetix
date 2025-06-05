@@ -44,7 +44,7 @@ namespace GKGenetix.Core.Model
             Mrca = mrca;
         }
 
-        public static SegmentStats CalculateSegmentStats(IEnumerable<ISNPSegment> segment_idx)
+        public static SegmentStats CalculateSegmentStats(IEnumerable<SNPSegment> segment_idx)
         {
             double total = 0;
             double longest = 0;

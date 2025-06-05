@@ -36,26 +36,20 @@ namespace GKGenetix.Core
         void EnableExplore();
         void DisableExplore();
 
-        void ShowAdmixture(IList<TestRecord> selectedKits);
-        void ShowPhasedSegmentVisualizer(string kit1, string kit2, byte chr, int startPos, int endPos);
-        void ShowProcessKits();
-        void ShowMatchingKits(IList<TestRecord> selectedKits);
-        void ShowROH(IList<TestRecord> selectedKits);
-        void ShowMtPhylogeny(IList<TestRecord> selectedKits);
-        void ShowMitoMap(IList<TestRecord> selectedKits);
-        void ShowIsoggYTree(IList<TestRecord> selectedKits);
-        void ShowOneToOneCmp(IList<TestRecord> selectedKits);
-        void SelectLocation(ref int lng, ref int lat);
-        void ShowMessage(string msg);
-        void Exit();
-        bool ShowQuestion(string msg);
-
         void NewKit();
         void OpenKit(string kit, bool disabled);
-        string SelectKit(char sex);
         void DeleteKit();
         void ImportTest();
 
         void ChangeKits(IList<TestRecord> selectedKits);
+
+        void ShowPhasedSegmentVisualizer(string kit1, string kit2, byte chr, int startPos, int endPos);
+
+        string SelectKit(char sex);
+        void SelectLocation(ref int lng, ref int lat);
+
+        void Exit();
+        void ShowMessage(string msg);
+        bool ShowQuestion(string msg);
     }
 }

@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analytics.cs" />
+    <Compile Include="Database\IDataRecord.cs" />
     <Compile Include="FileFormats\SNPFTDNAFileReader.cs" />
     <Compile Include="FileFormats\SNPGeno2FileReader.cs" />
     <Compile Include="AbstractImage.cs" />
@@ -62,15 +63,13 @@
     <Compile Include="JsonHelper.cs" />
     <Compile Include="Database\AdmixtureRecord.cs" />
     <Compile Include="Model\CmpSegment.cs" />
-    <Compile Include="Model\ISNPHeader.cs" />
-    <Compile Include="Model\ISNPSegment.cs" />
-    <Compile Include="Model\IDataRecord.cs" />
+    <Compile Include="Model\SNPSegment.cs" />
     <Compile Include="Database\TestRecord.cs" />
     <Compile Include="Model\MatchingKit.cs" />
     <Compile Include="Reference\MtDNAMapItem.cs" />
     <Compile Include="Model\MtDNANucleotide.cs" />
     <Compile Include="Database\MtDNARecord.cs" />
-    <Compile Include="Model\OTORow.cs" />
+    <Compile Include="Model\SNPMatch.cs" />
     <Compile Include="Model\PhaseSegment.cs" />
     <Compile Include="Reference\PhylogenyNode.cs" />
     <Compile Include="Model\ROHSegment.cs" />
@@ -79,7 +78,6 @@
     <Compile Include="Model\Nucleotide.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FileFormats\RawDataFormat.cs" />
     <Compile Include="Reference\Haplogroup.cs" />
     <Compile Include="Reference\HaplogroupMutation.cs" />
     <Compile Include="Model\Region.cs" />

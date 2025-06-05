@@ -336,7 +336,7 @@ namespace GKGenetix.Core
             return snpList;
         }
 
-        public static void DontMatchProc(int start_pos, int end_pos, byte prev_chr, byte chromosome, IList<CmpSegment> segments_idx, ref List<CmpSegmentRow> tmp, bool reference)
+        public static void DontMatchProc(int start_pos, int end_pos, byte prev_chr, byte chromosome, IList<CmpSegment> segments_idx, ref List<SNPMatch> tmp, bool reference)
         {
             double cm_len, cm_th;
             int snp_th;
@@ -370,7 +370,7 @@ namespace GKGenetix.Core
                 }
             }
 
-            tmp = new List<CmpSegmentRow>();
+            tmp = new List<SNPMatch>();
         }
 
         public static void DontMatchProcRoH(int start_pos, int end_pos, byte prev_chr, byte chromosome, IList<ROHSegment> segments_idx, ref List<SNP> tmp, bool reference)
@@ -612,7 +612,7 @@ namespace GKGenetix.Core
             } else {
                 var otoRows = GKSqlFuncs.GetOTORows(kit1, kit2);
 
-                var tmp = new List<CmpSegmentRow>();
+                var tmp = new List<SNPMatch>();
 
                 byte prev_chr = 0;
                 int start_pos = 0;
@@ -630,7 +630,7 @@ namespace GKGenetix.Core
                     int position = rd.Position;
                     var gt1 = rd.Genotype1;
                     var gt2 = rd.Genotype2;
-                    int cnt = rd.Count;
+                    string count = rd.Match;
 
                     if (prev_chr == 0) prev_chr = chromosome;
                     //gt1.CheckCompleteness();
@@ -639,26 +639,26 @@ namespace GKGenetix.Core
                     if (prev_chr == chromosome) {
                         float errorRadius = (chromosome == (byte)Chromosome.CHR_X) ? RefData.Compare_X_Threshold_SNPs / 2 : RefData.Compare_Autosomal_Threshold_SNPs / 2;
 
-                        if (cnt == 1) {
+                        if (count == "1") {
                             // match both alleles
-                            tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt1.ToString()));
+                            tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, gt1.ToString()));
                             if (start_pos == 0) start_pos = position;
-                        } else if (cnt == 2) {
+                        } else if (count == "2") {
                             // match 1 allele
                             if (gt1.Equals(gt2)) {
-                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt1.ToString()));
+                                tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, gt1.ToString()));
                                 if (start_pos == 0) start_pos = position;
                             } else if (gt1.A1 == gt2.A1) {
-                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt2.A1.ToString()));
+                                tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, gt2.A1.ToString()));
                                 if (start_pos == 0) start_pos = position;
                             } else if (gt1.A1 == gt2.A2) {
-                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt2.A2.ToString()));
+                                tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, gt2.A2.ToString()));
                                 if (start_pos == 0) start_pos = position;
                             } else if (gt1.A2 == gt2.A1) {
-                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt2.A1.ToString()));
+                                tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, gt2.A1.ToString()));
                                 if (start_pos == 0) start_pos = position;
                             } else if (gt1.A2 == gt2.A2) {
-                                tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, gt2.A2.ToString()));
+                                tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, gt2.A2.ToString()));
                                 if (start_pos == 0) start_pos = position;
                             } else {
                                 no_call_counter++;
@@ -669,12 +669,12 @@ namespace GKGenetix.Core
                                     DontMatchProc(start_pos, end_pos, prev_chr, chromosome, segments_idx, ref tmp, reference);
                                     start_pos = position;
                                 } else if (gt1.IsEmptyOrUnknown() || gt2.IsEmptyOrUnknown()) {
-                                    tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, "-"));
+                                    tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, "-"));
                                     if (start_pos == 0) start_pos = position;
                                 } else if (tmp.Count - prev_snp_count >= errorRadius && no_call_counter <= no_call_limit) {
                                     prev_snp_count = tmp.Count;
                                     no_call_counter = 0;
-                                    tmp.Add(new CmpSegmentRow(rsid, chromosome, position, gt1, gt2, ""));
+                                    tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, ""));
                                     if (start_pos == 0)
                                         start_pos = position;
                                 } else {
@@ -792,120 +792,114 @@ namespace GKGenetix.Core
             return segments_idx;
         }
 
-        public static void DoPhasing(string fatherKit, string motherKit, string childKit, ref IList<PhaseRow> dt, bool male)
+        public static void DoPhasing(IKitHost host, string fatherKit, string motherKit, string childKit, ref IList<PhaseRow> dt, bool chMale)
         {
-            const char ZeroChar = '\0';
+            const char ZeroChar = Genotype.UnknownAllele;
+
+            if (host != null) host.SetStatus("Phasing: data loading...");
 
             dt = GKSqlFuncs.GetPhaseRows(fatherKit, motherKit, childKit);
-            for (int ix = 0; ix < dt.Count; ix++) {
-                var o = dt[ix];
 
-                char phased_paternal = ZeroChar;
-                char phased_maternal = ZeroChar;
+            if (host != null) host.SetStatus("Phasing: data processing...");
 
-                string child = o.ChildGenotype;
-                string father = o.PaternalGenotype;
-                string mother = o.MaternalGenotype;
+            for (int i = 0; i < dt.Count; i++) {
+                var row = dt[i];
+                var child = row.ChildGenotype;
+                var father = row.PaternalGenotype;
+                var mother = row.MaternalGenotype;
 
-                if (child.Length == 1)
-                    child += child;
+                child.CheckCompleteness();
 
                 // check
-                if ((father.Replace(child[0].ToString(), "").Replace(child[1].ToString(), "") == father || mother.Replace(child[0].ToString(), "").Replace(child[1].ToString(), "") == mother)
-                    && o.Chromosome != (byte)Chromosome.CHR_X && father != "--" && mother != "--" && child != "--") {
-                    o.Mutated = true;
+                if ((!father.ContainsAny(child) || !mother.ContainsAny(child)) && row.Chromosome != (byte)Chromosome.CHR_X && !father.IsFullEmpty() && !mother.IsFullEmpty() && !child.IsFullEmpty()) {
+                    row.Mutated = true;
                 }
 
                 bool amb = false;
-                if (father == child && child[0] != child[1] && mother == "--")
-                    amb = true;
-                else if (mother == child && child[0] != child[1] && father == "--")
-                    amb = true;
-                else if (father == child && child[0] != child[1] && mother == child)
-                    amb = true;
+                if (child.A1 != child.A2) {
+                    if (father == child && mother.IsFullEmpty())
+                        amb = true;
+                    else if (mother == child && father.IsFullEmpty())
+                        amb = true;
+                    else if (father == child && mother == child)
+                        amb = true;
+                }
 
                 if (amb) {
-                    o.Ambiguous = true;
-                    char nc = GetNucleotideCode(child[0], child[1]);
-                    o.PhasedPaternal = nc;
-                    o.PhasedMaternal = nc;
+                    row.Ambiguous = true;
+                    char nc = GetNucleotideCode(child.A1, child.A2);
+                    row.PhasedPaternal = nc;
+                    row.PhasedMaternal = nc;
                     continue;
                 }
 
-                if ((child == "--" || child == "??") && father[0] == father[1] && father == mother && o.Chromosome != (byte)Chromosome.CHR_X) {
-                    o.PhasedPaternal = father[0];
-                    o.PhasedMaternal = father[0];
+                if (child.IsFullEmpty() && father.A1 == father.A2 && father == mother && row.Chromosome != (byte)Chromosome.CHR_X) {
+                    row.PhasedPaternal = father.A1;
+                    row.PhasedMaternal = father.A1;
                     continue;
                 }
 
-                if (male && o.Chromosome == (byte)Chromosome.CHR_X) {
-                    child = child[0].ToString();
-                    if (child == "-" && mother != "--") {
-                        o.PhasedPaternal = ZeroChar;
-                        o.PhasedMaternal = mother[0];
+                if (chMale && row.Chromosome == (byte)Chromosome.CHR_X) {
+                    if (child.A1 == '-' && !mother.IsFullEmpty()) {
+                        row.PhasedPaternal = ZeroChar;
+                        row.PhasedMaternal = mother.A1;
                         continue;
                     }
                 } else {
-                    if (child[0] == child[1] && child[0] != '-' && child[0] != '?') {
-                        o.PhasedPaternal = child[0];
-                        o.PhasedMaternal = child[0];
+                    if (child.A1 == child.A2 && !Genotype.IsEmptyOrUnknown(child.A1)) {
+                        row.PhasedPaternal = child.A1;
+                        row.PhasedMaternal = child.A1;
                         continue;
                     }
                 }
 
-                if (o.Chromosome != (byte)Chromosome.CHR_X) {
-                    AutosomalSingleSNPPhase(child, father, mother, o, ref phased_paternal, ref phased_maternal);
-                } else if (o.Chromosome == (byte)Chromosome.CHR_X) {
-                    if (male) {
-                        o.ChildGenotype = child[0].ToString();
-                        o.PaternalGenotype = "";
-                        o.PhasedPaternal = ZeroChar;
-                        o.PhasedMaternal = child[0];
-                        phased_paternal = ZeroChar;
-                        phased_maternal = child[0];
+                // Women have two X chromosomes; men have one X and one Y chromosome. One X chromosome is inherited
+                // from the mother, and the other (in women only) from the father. Although women have two X chromosomes,
+                // in somatic cells one of them is inactivated and forms a Barr body.
+
+                if (row.Chromosome == (byte)Chromosome.CHR_X) {
+                    if (chMale) {
+                        //row.ChildGenotype = child.A1.ToString(); // ?
+                        //row.PaternalGenotype.Clear(); // ?
+                        row.PhasedPaternal = ZeroChar;
+                        row.PhasedMaternal = child.A1;
                     } else {
-                        AutosomalSingleSNPPhase(child, father, mother, o, ref phased_paternal, ref phased_maternal);
+                        AutosomalSingleSNPPhase(child, father, mother, row);
                     }
+                } else {
+                    AutosomalSingleSNPPhase(child, father, mother, row);
                 }
 
-                if (phased_paternal == ZeroChar && phased_maternal != ZeroChar) {
-                    string ph_paternal = child.Replace("" + phased_maternal, "");
-                    if (ph_paternal.Length > 0)
-                        phased_paternal = ph_paternal[0];
-                    o.PhasedPaternal = phased_paternal;
+                if (row.PhasedPaternal == ZeroChar && row.PhasedMaternal != ZeroChar) {
+                    row.PhasedPaternal = child.GetOther(row.PhasedMaternal);
                 }
 
-                if (phased_maternal == ZeroChar && phased_paternal != ZeroChar) {
-                    string ph_maternal = child.Replace("" + phased_paternal, "");
-                    if (ph_maternal.Length > 0)
-                        phased_maternal = ph_maternal[0];
-                    o.PhasedMaternal = phased_maternal;
+                if (row.PhasedMaternal == ZeroChar && row.PhasedPaternal != ZeroChar) {
+                    row.PhasedMaternal = child.GetOther(row.PhasedPaternal);
                 }
             }
+
+            if (host != null) host.SetStatus("Phasing: data saving...");
 
             GKSqlFuncs.SavePhasedKit(fatherKit, motherKit, childKit, dt);
         }
 
-        public static void AutosomalSingleSNPPhase(string child, string father, string mother, PhaseRow row, ref char phased_paternal, ref char phased_maternal)
+        public static void AutosomalSingleSNPPhase(Genotype child, Genotype father, Genotype mother, PhaseRow row)
         {
-            if (father.Contains(child[0])) {
-                phased_paternal = child[0];
-                row.PhasedPaternal = phased_paternal;
+            if (father.Contains(child.A1)) {
+                row.PhasedPaternal = child.A1;
             }
 
-            if (mother.Contains(child[0])) {
-                phased_maternal = child[0];
-                row.PhasedMaternal = phased_maternal;
+            if (mother.Contains(child.A1)) {
+                row.PhasedMaternal = child.A1;
             }
 
-            if (father.Contains(child[1])) {
-                phased_paternal = child[1];
-                row.PhasedPaternal = phased_paternal;
+            if (father.Contains(child.A2)) {
+                row.PhasedPaternal = child.A2;
             }
 
-            if (mother.Contains(child[1])) {
-                phased_maternal = child[1];
-                row.PhasedMaternal = phased_maternal;
+            if (mother.Contains(child.A2)) {
+                row.PhasedMaternal = child.A2;
             }
         }
 

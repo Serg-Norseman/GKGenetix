@@ -38,7 +38,6 @@
             this.bwCompare.WorkerReportsProgress = true;
             this.bwCompare.WorkerSupportsCancellation = true;
             this.bwCompare.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwCompare_DoWork);
-            this.bwCompare.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bwCompare_ProgressChanged);
             this.bwCompare.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwCompare_RunWorkerCompleted);
             // 
             // txtStatus

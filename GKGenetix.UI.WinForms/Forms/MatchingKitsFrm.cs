@@ -22,7 +22,7 @@ namespace GKGenetix.UI.Forms
         private string unphasedKit = null;
         private bool phased = false;
         private IList<CmpSegment> tblSegments = null;
-        private IList<CmpSegmentRow> tblAlleles = null;
+        private IList<SNPMatch> tblAlleles = null;
 
 
         public static bool CanBeUsed(IList<TestRecord> selectedKits)

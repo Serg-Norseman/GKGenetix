@@ -49,6 +49,7 @@ namespace GKGenetix.Core.FileFormats
                 return null;
 
             // AncestryDNA: chromosome numbers from 1 to 25!
+            // Alleles: can be 0!
 
             string positionText = fields[2];
             int position = positionText.ParsePosition();

@@ -18,6 +18,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using GKGenetix.Core.Database;
+
 namespace GKGenetix.Core.Model
 {
     public class PhaseSegment : IDataRecord
@@ -34,15 +36,15 @@ namespace GKGenetix.Core.Model
     }
 
 
-    public class PhaseRow : ISNPHeader, IDataRecord
+    public class PhaseRow : IDataRecord
     {
         public string rsID { get; private set; } // 0
         public byte Chromosome { get; private set; } // 1
         public int Position { get; private set; } // 2
 
-        public string ChildGenotype { get; set; } // 3
-        public string PaternalGenotype { get; set; } // 4
-        public string MaternalGenotype { get; set; } // 5
+        public Genotype ChildGenotype { get; set; } // 3
+        public Genotype PaternalGenotype { get; set; } // 4
+        public Genotype MaternalGenotype { get; set; } // 5
 
         public char PhasedPaternal { get; set; } // 6
         public char PhasedMaternal { get; set; } // 7
@@ -52,6 +54,9 @@ namespace GKGenetix.Core.Model
 
 
         public string ChrStr { get { return Chromosome.ToString(); } set { Chromosome = (byte)value.ParseChromosome(); } }
+        public string Child { get { return ChildGenotype.ToString(); } set { ChildGenotype = new Genotype(value); } }
+        public string Father { get { return PaternalGenotype.ToString(); } set { PaternalGenotype = new Genotype(value); } }
+        public string Mother { get { return MaternalGenotype.ToString(); } set { MaternalGenotype = new Genotype(value); } }
 
 
         public PhaseRow()

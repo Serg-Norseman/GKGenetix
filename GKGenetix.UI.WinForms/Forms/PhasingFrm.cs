@@ -95,7 +95,7 @@ namespace GKGenetix.UI.Forms
             bool male = chSex[0] == 'M';
 
             Task.Factory.StartNew(() => {
-                GKGenFuncs.DoPhasing(fatherKit, motherKit, childKit, ref dt, male);
+                GKGenFuncs.DoPhasing(_host, fatherKit, motherKit, childKit, ref dt, male);
 
                 this.Invoke(new MethodInvoker(delegate {
                     _host.SetStatus("Saving Phased Kit " + childKit + " ...");

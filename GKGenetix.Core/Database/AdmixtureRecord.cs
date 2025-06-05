@@ -19,7 +19,6 @@
  */
 
 using System.Collections.Generic;
-using GKGenetix.Core.Model;
 
 namespace GKGenetix.Core.Database
 {

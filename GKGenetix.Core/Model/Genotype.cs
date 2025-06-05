@@ -37,6 +37,8 @@ namespace GKGenetix.Core.Model
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Genotype : IEquatable<Genotype>
     {
+        public static readonly Genotype Empty = new Genotype('-', '-');
+
         public const char UnknownAllele = '0';
 
         /// <summary>
@@ -89,6 +91,12 @@ namespace GKGenetix.Core.Model
             Orientation = orientation;
         }
 
+        public void Clear()
+        {
+            A1 = '0';
+            A2 = '0';
+        }
+
         public static bool IsEmptyOrUnknown(char a)
         {
             return /*a == UnknownAllele ||*/ a == '-' || a == '?';
@@ -99,10 +107,40 @@ namespace GKGenetix.Core.Model
             return (A1 == UnknownAllele || A1 == '-' || A1 == '?') || (A2 == UnknownAllele || A2 == '-' || A2 == '?');
         }
 
+        public bool IsFullEmpty()
+        {
+            return (A1 == UnknownAllele || A1 == '-' || A1 == '?') && (A2 == UnknownAllele || A2 == '-' || A2 == '?');
+        }
+
+        public bool Contains(char a)
+        {
+            return (A1 == a) || (A2 == a);
+        }
+
+        public bool ContainsAny(Genotype gt)
+        {
+            return (A1 == gt.A1 || A1 == gt.A2 || A2 == gt.A1 || A2 == gt.A2);
+        }
+
+        public char GetOther(char al)
+        {
+            if (A1 == al && A2 == al) {
+                return '0';
+            } else if (A1 == al) {
+                return A2;
+            } else if (A2 == al) {
+                return A1;
+            } else {
+                return '0';
+            }
+        }
+
         public void CheckCompleteness()
         {
             // questionable decision?
-            if (A2 == UnknownAllele || A2 == '-' || A2 == '?') {
+            if (A1 == UnknownAllele || A1 == '-' || A1 == '?') {
+                A1 = A2;
+            } else if (A2 == UnknownAllele || A2 == '-' || A2 == '?') {
                 A2 = A1;
             }
         }

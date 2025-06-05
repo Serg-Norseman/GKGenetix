@@ -97,17 +97,7 @@ namespace GKGenetix.Core.Database
 
             //using (var connection = new SQLiteConnection(@"Data Source=" + SQLITE_DB + @";Version=3; Compress=True; New=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;")) {
             using (var connection = new SQLiteConnection(SQLITE_DB)) {
-                /*Dictionary<string, string> pragma = new Dictionary<string, string> {
-                    { "foreign_keys", "ON" },
-                    { "auto_vacuum", "FULL" },
-                    { "journal_mode", "WAL" }
-                };
-
                 connection.BeginTransaction();
-                foreach (string key in pragma.Keys) {
-                    ExecCmd("PRAGMA " + key + " = " + pragma[key] + ";");
-                }*/
-
                 for (int idx = 0; idx < CreateTableSQL.Length; idx += 2) {
                     _connection.Execute(CreateTableSQL[idx + 1]);
                 }
@@ -124,15 +114,9 @@ namespace GKGenetix.Core.Database
 
                 _connection = new SQLiteConnection(SQLITE_DB);
 
-                /*Dictionary<string, string> pragma = new Dictionary<string, string> {
-                    { "foreign_keys", "ON" },
-                    { "auto_vacuum", "FULL" },
-                    { "journal_mode", "WAL" }
-                };
-
-                foreach (string key in pragma.Keys) {
-                    ExecCmd("PRAGMA " + key + " = " + pragma[key] + ";");
-                }*/
+                _connection.ExecuteScalar<string>("PRAGMA journal_mode = WAL;");
+                _connection.Execute("PRAGMA foreign_keys = ON;");
+                _connection.Execute("PRAGMA auto_vacuum = FULL;");
 
                 var dbVerStr = GetSettingValue("DB:Version");
                 int dbVer = string.IsNullOrEmpty(dbVerStr) ? 102 : int.Parse(dbVerStr);
@@ -195,7 +179,7 @@ namespace GKGenetix.Core.Database
             return (rows != null && rows.Count > 0) ? rows[0].Value : null;
         }
 
-        private static IList<T> GetRows<T>(string query) where T : new()
+        private static IList<T> GetRows<T>(string query) where T : IDataRecord, new()
         {
             CheckConnection();
 
@@ -304,10 +288,11 @@ namespace GKGenetix.Core.Database
             return !string.IsNullOrEmpty(val);
         }
 
-        public static IList<CmpSegmentRow> GetCmpSeg(int segmentId)
+        public static IList<SNPMatch> GetCmpSeg(int segmentId)
         {
-            return GetRows<CmpSegmentRow>(
-                $"select rsid'rsID', chromosome'ChrStr', position'Position', kit1_genotype'Gt1Str', kit2_genotype'Gt2Str', match'Match' from cmp_mrca where segment_id = '{segmentId}'");
+            return GetRows<SNPMatch>(
+                $"select rsid'rsID', chromosome'ChrStr', position'Position', kit1_genotype'Gt1Str', kit2_genotype'Gt2Str', match'Match' " +
+                $"from cmp_mrca where segment_id = '{segmentId}' order by position");
         }
 
         #endregion
@@ -368,19 +353,19 @@ namespace GKGenetix.Core.Database
         {
             return GetRows<CmpSegment>(
                 $"select segment_id'SegmentId', chromosome'ChrStr', start_position'StartPosition', end_position'EndPosition', segment_length_cm'SegmentLength_cm', snp_count'SNPCount' from cmp_autosomal " +
-                $"where (kit1 = '{kit1}' and kit2 = '{kit2}') or (kit1 = '{kit2}' and kit2 = '{kit1}')");
+                $"where (kit1 = '{kit1}' and kit2 = '{kit2}') or (kit1 = '{kit2}' and kit2 = '{kit1}') order by cast(chromosome as integer), start_position");
         }
 
         public static IList<CmpSegment> GetAutosomalCmp(int cmp_id)
         {
             return GetRows<CmpSegment>(
                 $"select segment_id'SegmentId', chromosome'ChrStr', start_position'StartPosition', end_position'EndPosition', segment_length_cm'SegmentLength_cm', snp_count'SNPCount' from cmp_autosomal " +
-                $"where cmp_id = '{cmp_id}'");
+                $"where cmp_id = '{cmp_id}' order by cast(chromosome as integer), start_position");
         }
 
         public static IList<SNP> GetAutosomal(string kit)
         {
-            return GetRows<SNP>($"select rsid'rsID', chromosome'ChrStr', position'Position', genotype'GtStr' from kit_autosomal where kit_no = '{kit}' order by chromosome, position");
+            return GetRows<SNP>($"select rsid'rsID', chromosome'ChrStr', position'Position', genotype'GtStr' from kit_autosomal where kit_no = '{kit}' order by cast(chromosome as integer), position");
         }
 
         public static IList<SNP> GetROHSeg(string kit, byte chromosome, int startPos, int endPos)
@@ -489,13 +474,13 @@ namespace GKGenetix.Core.Database
         {
             string query = "";
 
-            // [rsid], [chromosome], [position], "Child", "Father", "Mother", "Phased Paternal", "Phased Maternal"
+            // PhaseRow: rsID, ChrStr, Position, Child, Father, Mother
             if (fatherKit != "Unknown" && motherKit != "Unknown")
-                query = ("select c.[rsid], c.[chromosome], c.[position], c.[genotype]\"Child\", coalesce(f.[genotype],'--')\"Father\", coalesce(m.[genotype],'--')\"Mother\", ''\"Phased Paternal\",''\"Phased Maternal\"  from kit_autosomal c left outer join kit_autosomal f,kit_autosomal m on f.rsid=c.rsid and m.rsid=c.rsid where c.kit_no='" + childKit + "' and f.kit_no='" + fatherKit + "' and m.[kit_no]='" + motherKit + "' order by cast(c.chromosome as integer),c.position");
+                query = ("select c.[rsid]'rsID', c.[chromosome]'ChrStr', c.[position]'Position', c.[genotype]'Child', coalesce(f.[genotype],'--')'Father', coalesce(m.[genotype],'--')'Mother' from kit_autosomal c left outer join kit_autosomal f,kit_autosomal m on f.rsid=c.rsid and m.rsid=c.rsid where c.kit_no='" + childKit + "' and f.kit_no='" + fatherKit + "' and m.[kit_no]='" + motherKit + "' order by cast(c.chromosome as integer),c.position");
             else if (fatherKit != "Unknown" && motherKit == "Unknown")
-                query = ("select c.[rsid], c.[chromosome], c.[position], c.[genotype]\"Child\", coalesce(f.[genotype],'--')\"Father\", '--'\"Mother\", ''\"Phased Paternal\", ''\"Phased Maternal\"  from kit_autosomal c left outer join kit_autosomal f on f.rsid=c.rsid  where c.kit_no='" + childKit + "' and f.kit_no='" + fatherKit + "' order by cast(c.chromosome as integer), c.position");
+                query = ("select c.[rsid]'rsID', c.[chromosome]'ChrStr', c.[position]'Position', c.[genotype]'Child', coalesce(f.[genotype],'--')'Father', '--''Mother' from kit_autosomal c left outer join kit_autosomal f on f.rsid=c.rsid  where c.kit_no='" + childKit + "' and f.kit_no='" + fatherKit + "' order by cast(c.chromosome as integer), c.position");
             else if (fatherKit == "Unknown" && motherKit != "Unknown")
-                query = ("select c.[rsid], c.[chromosome], c.[position], c.[genotype]\"Child\", '--'\"Father\", coalesce(m.[genotype],'--')\"Mother\", ''\"Phased Paternal\", ''\"Phased Maternal\"  from kit_autosomal c left outer join kit_autosomal m on m.rsid=c.rsid where c.kit_no='" + childKit + "' and m.kit_no='" + motherKit + "' order by cast(c.chromosome as integer), c.position");
+                query = ("select c.[rsid]'rsID', c.[chromosome]'ChrStr', c.[position]'Position', c.[genotype]'Child', '--''Father', coalesce(m.[genotype],'--')'Mother' from kit_autosomal c left outer join kit_autosomal m on m.rsid=c.rsid where c.kit_no='" + childKit + "' and m.kit_no='" + motherKit + "' order by cast(c.chromosome as integer), c.position");
 
             return GetRows<PhaseRow>(query);
         }
@@ -506,11 +491,8 @@ namespace GKGenetix.Core.Database
 
             _connection.Execute($"delete from kit_phased where kit_no = '{childKit}'");
 
-            if (fatherKit == "Unknown")
-                fatherKit = "";
-
-            if (motherKit == "Unknown")
-                motherKit = "";
+            if (fatherKit == "Unknown") fatherKit = "";
+            if (motherKit == "Unknown") motherKit = "";
 
             _connection.BeginTransaction();
             foreach (var row in dt) {
@@ -521,7 +503,7 @@ namespace GKGenetix.Core.Database
                 if (string.IsNullOrEmpty(phasedMaternal)) phasedMaternal = string.Empty;
 
                 _connection.Execute(
-                    "insert or replace into kit_phased (kit_no, rsid, chromosome, position, paternal_genotype, maternal_genotype, paternal_kit_no, maternal_kit_no) " +
+                    "insert into kit_phased (kit_no, rsid, chromosome, position, paternal_genotype, maternal_genotype, paternal_kit_no, maternal_kit_no) " +
                     $"values ('{childKit}', '{row.rsID}', '{row.Chromosome}', {row.Position}, '{phasedPaternal}', '{phasedMaternal}', '{fatherKit}', '{motherKit}')");
             }
             _connection.Commit();
@@ -636,10 +618,10 @@ namespace GKGenetix.Core.Database
         /// <summary>
         /// Target: One2One (One2One and ProcessKits).
         /// </summary>
-        public static IList<OTORow> GetOTORows(string kit1, string kit2)
+        public static IList<SNPMatch> GetOTORows(string kit1, string kit2)
         {
-            return GetRows<OTORow>(
-                @"select rsid'rsID', chr'ChrStr', pos'Position', gt1'Gt1Str', gt2'Gt2Str', count(*)'Count' from (" +
+            return GetRows<SNPMatch>(
+                @"select rsid'rsID', chr'ChrStr', pos'Position', gt1'Gt1Str', gt2'Gt2Str', count(*)'Match' from (" +
                 "select kit1.rsid 'rsid', kit1.chromosome 'chr', kit1.position 'pos', kit1.genotype 'gt1', kit2.genotype 'gt2' from kit_autosomal kit1 " +
                 $"left join kit_autosomal kit2 on kit1.rsid=kit2.rsid where kit1.kit_no = '{kit1}' and kit2.kit_no = '{kit2}' " +
                 "union select kit1.rsid 'rsid', kit1.chromosome 'chr', kit1.position 'pos', kit1.genotype 'gt1', kit2.genotype 'gt2' from kit_autosomal kit1 " +

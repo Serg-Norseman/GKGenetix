@@ -18,12 +18,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace GKGenetix.Core.Model
+namespace GKGenetix.Core.Database
 {
-    public interface ISNPHeader
+    public interface IDataRecord
     {
-        string rsID { get; }
-        byte Chromosome { get; }
-        int Position { get; }
     }
 }
