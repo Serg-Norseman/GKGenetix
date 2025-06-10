@@ -4,7 +4,6 @@
  * License: MIT License (http://opensource.org/licenses/MIT)
  */
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -82,26 +81,28 @@ namespace GKGenetix.Core.Database
 
         private static SQLiteConnection _connection;
         private static IKitHost _host;
+        private static string _appDataPath = string.Empty;
 
         public static void SetHost(IKitHost host)
         {
             _host = host;
         }
 
+        public static void SetAppDataPath(string path)
+        {
+            _appDataPath = path;
+        }
+
         #region Common database
 
-        private static void ResetTables()
+        private static void ResetTables(string dbPath)
         {
-            if (File.Exists(SQLITE_DB))
-                File.Move(SQLITE_DB, SQLITE_DB + "-" + DateTime.Now.Ticks.ToString("X"));
-
-            //using (var connection = new SQLiteConnection(@"Data Source=" + SQLITE_DB + @";Version=3; Compress=True; New=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;")) {
-            using (var connection = new SQLiteConnection(SQLITE_DB)) {
-                connection.BeginTransaction();
+            using (var conn = new SQLiteConnection(dbPath)) {
+                conn.BeginTransaction();
                 for (int idx = 0; idx < CreateTableSQL.Length; idx += 2) {
-                    _connection.Execute(CreateTableSQL[idx + 1]);
+                    conn.Execute(CreateTableSQL[idx + 1]);
                 }
-                connection.Commit();
+                conn.Commit();
             }
         }
 
@@ -109,10 +110,12 @@ namespace GKGenetix.Core.Database
         {
             if (_connection != null) return;
 
-            if (File.Exists(SQLITE_DB)) {
+            string dbPath = Path.Combine(_appDataPath, SQLITE_DB);
+
+            if (File.Exists(dbPath)) {
                 //string connStr = @"Data Source=" + SQLITE_DB + @";Version=3; Compress=True; PRAGMA foreign_keys = ON; PRAGMA auto_vacuum = FULL;";
 
-                _connection = new SQLiteConnection(SQLITE_DB);
+                _connection = new SQLiteConnection(dbPath);
 
                 _connection.ExecuteScalar<string>("PRAGMA journal_mode = WAL;");
                 _connection.Execute("PRAGMA foreign_keys = ON;");
@@ -131,7 +134,7 @@ namespace GKGenetix.Core.Database
                 }
             } else {
                 if (_host.ShowQuestion("Data file ggk.db doesn't exist. If this is the first time you are opening the software, you can ignore this error. Do you wish to create one?")) {
-                    ResetTables();
+                    ResetTables(dbPath);
                     CheckConnection();
                 } else _host.Exit();
             }

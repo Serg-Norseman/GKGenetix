@@ -19,19 +19,29 @@
  */
 
 using System;
-using System.Windows.Forms;
 using GKGenetix.UI.Forms;
 
 namespace GKGenetix
 {
+#if !NETCORE
+    using System.Windows.Forms;
+#else
+    using Eto.Forms;
+#endif
+
     internal static class Program
     {
         [STAThread]
         static void Main()
         {
+#if !NETCORE
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new GKMainFrm());
+#else
+            var application = new Application();
+            application.Run(new GKMainFrm());
+#endif
         }
     }
 }

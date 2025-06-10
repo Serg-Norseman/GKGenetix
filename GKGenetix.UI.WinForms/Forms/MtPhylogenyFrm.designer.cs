@@ -19,11 +19,6 @@
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Label lblKit;
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-        }
-
         private void InitializeComponent()
         {
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();

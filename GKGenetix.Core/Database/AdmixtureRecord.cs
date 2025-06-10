@@ -24,13 +24,13 @@ namespace GKGenetix.Core.Database
 {
     public class AdmixtureRecord : IDataRecord
     {
-        public string Name { get; private set; }
-        public string Population { get; private set; }
-        public string Location { get; private set; }
-        public double AtTotal { get; private set; }
-        public double AtLongest { get; private set; }
-        public int Lng { get; private set; }
-        public int Lat { get; private set; }
+        public string Name { get; set; }
+        public string Population { get; set; }
+        public string Location { get; set; }
+        public double AtTotal { get; set; }
+        public double AtLongest { get; set; }
+        public int Lng { get; set; }
+        public int Lat { get; set; }
 
 
         public double Percentage { get; set; }
@@ -43,9 +43,11 @@ namespace GKGenetix.Core.Database
         public void PrepareValues()
         {
             string valPL = Name;
-            string[] data = valPL.Replace("_", " ").Split(new char[] { ',' });
-            Population = data[0];
-            Location = (data.Length > 1) ? data[1] : string.Empty;
+            if (!string.IsNullOrEmpty(valPL)) {
+                string[] data = valPL.Replace("_", " ").Split(new char[] { ',' });
+                Population = data[0];
+                Location = (data.Length > 1) ? data[1] : string.Empty;
+            }
         }
 
         public static void RecalcPercents(IList<AdmixtureRecord> items)

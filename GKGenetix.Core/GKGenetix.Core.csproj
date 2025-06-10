@@ -45,6 +45,7 @@
     <Compile Include="FileFormats\SNPFTDNAFileReader.cs" />
     <Compile Include="FileFormats\SNPGeno2FileReader.cs" />
     <Compile Include="AbstractImage.cs" />
+    <Compile Include="ITestProvider.cs" />
     <Compile Include="Reference\RefData.cs" />
     <Compile Include="GKGenFuncs.cs" />
     <Compile Include="Database\GKSqlFuncs.cs" />

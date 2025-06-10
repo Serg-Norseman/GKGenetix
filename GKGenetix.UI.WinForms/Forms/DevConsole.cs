@@ -30,15 +30,9 @@ using GKGenetix.Core.Model;
 
 namespace GKGenetix.UI.Forms
 {
-    internal class DNAFileInfo
-    {
-        public string FileName;
-        public DNAData DNA;
-    }
-
     public partial class DevConsole : GKWidget, IDisplay
     {
-        private readonly List<DNAFileInfo> fFiles;
+        private readonly List<DNAData> fFiles;
         private string fFileName;
         private DNAData fDNA;
 
@@ -46,7 +40,7 @@ namespace GKGenetix.UI.Forms
         {
             InitializeComponent();
 
-            fFiles = new List<DNAFileInfo>();
+            fFiles = new List<DNAData>();
         }
 
         private void btnSimpleAnalysis_Click(object sender, EventArgs e)
@@ -141,17 +135,12 @@ namespace GKGenetix.UI.Forms
 
                     fFiles.Clear();
                     foreach (var file in files) {
-                        var dfi = new DNAFileInfo();
-                        dfi.FileName = file;
+                        var dfi = FileFormatsHelper.ReadFile(file);
                         fFiles.Add(dfi);
                     }
 
                     foreach (var dfi in fFiles) {
-                        dfi.DNA = FileFormatsHelper.ReadFile(dfi.FileName);
-                    }
-
-                    foreach (var dfi in fFiles) {
-                        dfi.DNA.DetermineSex();
+                        dfi.DetermineSex();
                     }
 
                     for (int i = 0; i < fFiles.Count; i++) {
@@ -159,7 +148,7 @@ namespace GKGenetix.UI.Forms
 
                         for (int k = i + 1; k < fFiles.Count; k++) {
                             var dfi2 = fFiles[k];
-                            Analytics.Compare(dfi1.DNA, dfi2.DNA, this);
+                            Analytics.Compare(dfi1, dfi2, this);
                         }
                     }
                 }

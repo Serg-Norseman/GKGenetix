@@ -94,8 +94,9 @@ namespace GKGenetix.UI.Forms
 
             int radius_gap = 2;
             for (int i = 0; i < percent; i++) {
-                Pen pen1 = new Pen(UIHelper.HeatMapColor(i, percent), 2);
-                g.DrawEllipse(pen1, x - 1 - i * radius_gap, y - 1 - i * radius_gap, 2 + i * 2 * radius_gap, 2 + i * 2 * radius_gap);
+                using (var pen1 = new Pen(UIHelper.HeatMapColor(i, percent), 2)) {
+                    g.DrawEllipse(pen1, x - 1 - i * radius_gap, y - 1 - i * radius_gap, 2 + i * 2 * radius_gap, 2 + i * 2 * radius_gap);
+                }
             }
         }
     }

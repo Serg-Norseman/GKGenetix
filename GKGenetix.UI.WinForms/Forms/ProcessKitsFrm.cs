@@ -94,15 +94,19 @@ namespace GKGenetix.UI.Forms
 
             var items = new List<ProcessItem>();
             for (int i = 0; i < dt.Count; i++) {
+                var dtI = dt[i];
+
                 for (int j = i; j < dt.Count; j++) {
-                    if (dt[i].KitNo != dt[j].KitNo && (dt[i].Reference != 1 || dt[j].Reference != 1)) {
+                    var dtJ = dt[j];
+
+                    if (dtI.KitNo != dtJ.KitNo && (dtI.Reference != 1 || dtJ.Reference != 1)) {
                         items.Add(new ProcessItem() {
-                            Kit1 = dt[i].KitNo,
-                            Ref1 = dt[i].Reference,
-                            Name1 = dt[i].Name,
-                            Kit2 = dt[j].KitNo,
-                            Ref2 = dt[j].Reference,
-                            Name2 = dt[j].Name
+                            Kit1 = dtI.KitNo,
+                            Ref1 = dtI.Reference,
+                            Name1 = dtI.Name,
+                            Kit2 = dtJ.KitNo,
+                            Ref2 = dtJ.Reference,
+                            Name2 = dtJ.Name
                         });
                     }
                 }

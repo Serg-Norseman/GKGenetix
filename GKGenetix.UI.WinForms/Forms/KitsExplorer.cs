@@ -138,8 +138,8 @@ namespace GKGenetix.UI.Forms
             if (dgvEditKit.Columns[e.ColumnIndex] is DataGridViewButtonColumn && e.RowIndex >= 0) {
                 var kitRow = tblKits[e.RowIndex];
                 string location = kitRow.Location;
-                int lng = 0;
-                int lat = 0;
+                double lng = 0;
+                double lat = 0;
                 if (location != "Unknown") {
                     var parts = location.Split(new char[] { ':' });
                     lng = int.Parse(parts[0]);

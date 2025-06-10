@@ -25,11 +25,11 @@ namespace GKGenetix.Core.Model
 {
     public class SegmentStats
     {
-        public double Total { get; protected set; }
-        public double Longest { get; protected set; }
-        public double XTotal { get; protected set; }
-        public double XLongest { get; protected set; }
-        public int Mrca { get; protected set; }
+        public double Total { get; set; }
+        public double Longest { get; set; }
+        public double XTotal { get; set; }
+        public double XLongest { get; set; }
+        public int Mrca { get; set; }
 
         public SegmentStats()
         {

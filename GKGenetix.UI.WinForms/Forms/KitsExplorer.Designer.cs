@@ -27,14 +27,14 @@
             this.dgvEditKit.CellFormatting += new System.Windows.Forms.DataGridViewCellFormattingEventHandler(dgvEditKit_CellFormatting);
             this.dgvEditKit.DoubleClick += new System.EventHandler(this.dgvEditKit_DoubleClick);
             // 
-            // QuickEditKit
+            // KitsExplorer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(784, 562);
             this.Controls.Add(this.dgvEditKit);
-            this.Name = "QuickEditKit";
-            this.Text = "Quick Edit Kit";
+            this.Name = "KitsExplorer";
+            this.Text = "KitsExplorer";
             this.Closing += new System.EventHandler(this.QuickEditKit_FormClosing);
             this.Load += new System.EventHandler(this.QuickEditKit_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvEditKit)).EndInit();

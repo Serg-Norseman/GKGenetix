@@ -170,6 +170,29 @@ namespace GKGenetix.UI.Forms
             }
         }
 
+        public void ImportFile(DNATestInfo dnaTest)
+        {
+            txtName.Text = dnaTest.Name;
+            switch (dnaTest.Sex) {
+                case 'M':
+                    cbSex.SelectedIndex = 1;
+                    break;
+                case 'F':
+                    cbSex.SelectedIndex = 2;
+                    break;
+                default:
+                    cbSex.SelectedIndex = 0;
+                    break;
+            }
+
+            string[] filePaths = new string[] { dnaTest.FileReference };
+
+            _host.SetStatus("Parsing autosomal file(s) ...");
+            if (bwNewKitAutosomalJob.IsBusy)
+                bwNewKitAutosomalJob.CancelAsync();
+            bwNewKitAutosomalJob.RunWorkerAsync(filePaths);
+        }
+
         private void dgvAutosomal_DragDrop(object sender, DragEventArgs e)
         {
             // autosomal file dropped.

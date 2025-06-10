@@ -404,7 +404,7 @@
             this.Name = "GKMainFrm";
             this.Padding = new System.Windows.Forms.Padding(4);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "GenetixKit";
+            this.Text = "GKGenetix";
             this.Load += new System.EventHandler(this.GKMainFrm_Load);
             this.menuStripGGK.ResumeLayout(false);
             this.menuStripGGK.PerformLayout();

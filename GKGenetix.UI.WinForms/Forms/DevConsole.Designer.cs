@@ -2,20 +2,11 @@
 {
     partial class DevConsole
     {
-        private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton btnSimpleAnalysis;
         private System.Windows.Forms.ToolStripButton btnInheritanceTest;
         private System.Windows.Forms.ToolStripButton btnGenImage;
         private System.Windows.Forms.TextBox txtOutput;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null)) {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
 
         private void InitializeComponent()
         {

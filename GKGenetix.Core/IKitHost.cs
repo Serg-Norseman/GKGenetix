@@ -46,10 +46,13 @@ namespace GKGenetix.Core
         void ShowPhasedSegmentVisualizer(string kit1, string kit2, byte chr, int startPos, int endPos);
 
         string SelectKit(char sex);
-        void SelectLocation(ref int lng, ref int lat);
+        void SelectLocation(ref double lng, ref double lat);
 
         void Exit();
         void ShowMessage(string msg);
         bool ShowQuestion(string msg);
+
+        void SetAppDataPath(string path);
+        void SetTestProvider(ITestProvider testProvider);
     }
 }

@@ -25,7 +25,7 @@ namespace GKGenetix.Core.Model
 {
     public class CmpSegment : SNPSegment, IDataRecord
     {
-        public int SegmentId { get; private set; }
+        public int SegmentId { get; set; }
 
 
         public IList<SNPMatch> Rows { get; set; }

@@ -24,12 +24,12 @@ namespace GKGenetix.Core.Model
 {
     public class SNPMatch : IDataRecord
     {
-        public string rsID { get; private set; }
-        public byte Chromosome { get; private set; }
-        public int Position { get; private set; }
-        public Genotype Genotype1 { get; private set; }
-        public Genotype Genotype2 { get; private set; }
-        public string Match { get; private set; }
+        public string rsID { get; set; }
+        public byte Chromosome { get; set; }
+        public int Position { get; set; }
+        public Genotype Genotype1 { get; set; }
+        public Genotype Genotype2 { get; set; }
+        public string Match { get; set; }
 
 
         public string ChrStr { get { return Chromosome.ToString(); } set { Chromosome = (byte)value.ParseChromosome(); } }

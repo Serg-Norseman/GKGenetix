@@ -12,16 +12,16 @@ namespace GKGenetix.UI.Forms
 {
     public partial class LocationSelectFrm : Form
     {
-        public int Longitude { get; set; }
-        public int Latitude { get; set; }
+        public double Longitude { get; set; }
+        public double Latitude { get; set; }
 
         private bool preInit = false;
         private Pen pen1;
         private Pen pen2;
-        private int mX, mY;
+        private float mX, mY;
 
 
-        public LocationSelectFrm(int lng, int lat)
+        public LocationSelectFrm(double lng, double lat)
         {
             InitializeComponent();
 
@@ -32,8 +32,8 @@ namespace GKGenetix.UI.Forms
             Longitude = lng;
             Latitude = lat;
             if (Longitude != 0 && Latitude != 0) {
-                mX = Longitude / 2;
-                mY = Latitude / 2;
+                mX = (float)(Longitude / 2);
+                mY = (float)(Latitude / 2);
                 preInit = true;
             }
         }
@@ -51,11 +51,11 @@ namespace GKGenetix.UI.Forms
                     int green = i * 255 / 30;
                     int blue = green;
                     using (var pen1x = new Pen(Color.FromArgb(255, green, blue), 3))
-                        g.DrawEllipse(pen1x, new Rectangle(mX - i, mY - i, i * 2, i * 2));
+                        g.DrawEllipse(pen1x, new RectangleF(mX - i, mY - i, i * 2, i * 2));
                 }
             } else {
                 int size = 6;
-                g.DrawRectangle(pen1, new Rectangle(mX - size, mY - size, size * 2 - 1, size * 2 - 1));
+                g.DrawRectangle(pen1, new Rectangle((int)mX - size, (int)mY - size, size * 2 - 1, size * 2 - 1));
                 g.DrawLine(pen2, 0, mY, 1357, mY);
                 g.DrawLine(pen2, mX, 0, mX, 628);
             }

@@ -46,7 +46,7 @@ namespace GKGenetix.Core.FileFormats
         private static readonly char[] TabSeparator = new char[] { '\t' };
 
 
-        public static string FileFilter_All = "All files (*.*)|*.*";
+        public static string FileFilter_All = "All DNA files (*.*)|*.txt;*.txt.gz;*.csv;*.csv.gz;*.vcf;*.vcf.gz";
         public static string FileFilter_23AndMe = "23AndMe data files|*.txt";
         public static string FileFilter_AncestryDNA = "AncestryDNA data files|*.txt";
         public static string FileFilter_deCODEme = "deCODEme data files|*.csv";
@@ -116,25 +116,19 @@ namespace GKGenetix.Core.FileFormats
         {
             DNAData result = null;
 
-            Stream inputStream;
-            if (filePath.EndsWith(".gz")) {
-                inputStream = new GZipStream(new FileStream(filePath, FileMode.Open), CompressionMode.Decompress);
-                filePath = filePath.Substring(0, filePath.Length - 3);
-            } else {
-                inputStream = new FileStream(filePath, FileMode.Open);
-            }
+            var type = DetectFileType(filePath);
 
-            string ext = Path.GetExtension(filePath);
-
-            var type = DetectFileType(inputStream);
-            inputStream.Seek(0, SeekOrigin.Begin);
-
-            using (var streamReader = new StreamReader(inputStream, Encoding.ASCII)) {
-                if (ext == ".vcf") {
-                    using (var reader = new VCFFileReader(streamReader)) {
-                        result = reader.ReadData();
-                    }
+            using (var fileStream = new FileStream(filePath, FileMode.Open)) {
+                Stream inputStream;
+                if (filePath.EndsWith(".gz")) {
+                    inputStream = new GZipStream(fileStream, CompressionMode.Decompress);
+                    filePath = filePath.Substring(0, filePath.Length - 3);
                 } else {
+                    inputStream = fileStream;
+                }
+
+                using (inputStream)
+                using (var streamReader = new StreamReader(inputStream, Encoding.ASCII)) {
                     SNPFileReader snpReader = null;
                     switch (type) {
                         case RawFileFormat.RFF_UNKNOWN:
@@ -159,6 +153,10 @@ namespace GKGenetix.Core.FileFormats
                         case RawFileFormat.RFF_GENO2:
                             snpReader = new SNPGeno2FileReader(streamReader);
                             break;
+
+                        case RawFileFormat.RFF_VCF:
+                            snpReader = new VCFFileReader(streamReader);
+                            break;
                     }
 
                     if (snpReader != null) {
@@ -176,41 +174,62 @@ namespace GKGenetix.Core.FileFormats
             return result;
         }
 
-        private static RawFileFormat DetectFileType(Stream inputStream)
+        /// <summary>
+        /// Reopening the stream is necessary in cases where we read from a decompression stream,
+        /// since in this case it is not possible to return to the beginning if the type definition
+        /// has gone into the SNP data zone.
+        /// </summary>
+        private static RawFileFormat DetectFileType(string filePath)
         {
-            using (var streamReader = new StreamReader(inputStream, Encoding.ASCII, false, 16 * 1024, true)) {
-                int count = 0;
-                while (streamReader.Peek() != -1) {
-                    string line = streamReader.ReadLine();
-
-                    if (line == "RSID,CHROMOSOME,POSITION,RESULT")
-                        return RawFileFormat.RFF_FTDNA;
-                    if (line == "# rsid\tchromosome\tposition\tgenotype")
-                        return RawFileFormat.RFF_23ANDME;
-                    if (line == "rsid\tchromosome\tposition\tallele1\tallele2")
-                        return RawFileFormat.RFF_ANCESTRY;
-                    if (line == "Name,Variation,Chromosome,Position,Strand,YourCode")
-                        return RawFileFormat.RFF_DECODEME;
-                    if (line == "SNP,Chr,Allele1,Allele2")
-                        return RawFileFormat.RFF_GENO2;
-
-                    // if above doesn't work
-                    if (line.Split("\t".ToCharArray()).Length == 4)
-                        return RawFileFormat.RFF_23ANDME;
-                    if (line.Split("\t".ToCharArray()).Length == 5)
-                        return RawFileFormat.RFF_ANCESTRY;
-                    if (line.Split(",".ToCharArray()).Length == 4)
-                        return RawFileFormat.RFF_FTDNA;
-                    if (line.Split(",".ToCharArray()).Length == 6)
-                        return RawFileFormat.RFF_DECODEME;
-
-                    if (count > 40) {
-                        // detection useless... 
-                        break;
-                    }
-                    count++;
+            using (var fileStream = new FileStream(filePath, FileMode.Open)) {
+                Stream inputStream;
+                if (filePath.EndsWith(".gz")) {
+                    inputStream = new GZipStream(fileStream, CompressionMode.Decompress);
+                    filePath = filePath.Substring(0, filePath.Length - 3);
+                } else {
+                    inputStream = fileStream;
                 }
-                return RawFileFormat.RFF_UNKNOWN;
+
+                string ext = Path.GetExtension(filePath);
+                if (ext == ".vcf") {
+                    return RawFileFormat.RFF_VCF;
+                }
+
+                using (var streamReader = new StreamReader(inputStream, Encoding.ASCII, false, 16 * 1024, true)) {
+                    int count = 0;
+                    while (streamReader.Peek() != -1) {
+                        string line = streamReader.ReadLine();
+
+                        if (line == "RSID,CHROMOSOME,POSITION,RESULT")
+                            return RawFileFormat.RFF_FTDNA;
+                        if (line == "# rsid\tchromosome\tposition\tgenotype")
+                            return RawFileFormat.RFF_23ANDME;
+                        if (line == "rsid\tchromosome\tposition\tallele1\tallele2")
+                            return RawFileFormat.RFF_ANCESTRY;
+                        if (line == "Name,Variation,Chromosome,Position,Strand,YourCode")
+                            return RawFileFormat.RFF_DECODEME;
+                        if (line == "SNP,Chr,Allele1,Allele2")
+                            return RawFileFormat.RFF_GENO2;
+
+                        // if above doesn't work
+                        if (line.Split("\t".ToCharArray()).Length == 4)
+                            return RawFileFormat.RFF_23ANDME;
+                        if (line.Split("\t".ToCharArray()).Length == 5)
+                            return RawFileFormat.RFF_ANCESTRY;
+                        if (line.Split(",".ToCharArray()).Length == 4)
+                            return RawFileFormat.RFF_FTDNA;
+                        if (line.Split(",".ToCharArray()).Length == 6)
+                            return RawFileFormat.RFF_DECODEME;
+
+                        if (count > 40) {
+                            // detection useless... 
+                            break;
+                        }
+                        count++;
+                    }
+
+                    return RawFileFormat.RFF_UNKNOWN;
+                }
             }
         }
     }

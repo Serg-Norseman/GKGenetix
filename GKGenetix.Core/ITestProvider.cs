@@ -18,18 +18,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using GKGenetix.Core.Database;
+using System.Collections.Generic;
 
-namespace GKGenetix.Core.Model
+namespace GKGenetix.Core
 {
-    public class MatchingKit : SegmentStats, IDataRecord
+    public sealed class DNATestInfo
     {
-        public int CmpId { get; set; }
-        public string Kit {  get; set; }
         public string Name { get; set; }
+        public string Date { get; set; }
+        public char Sex { get; set; }
+        public string FileReference { get; set; }
+    }
 
-        public MatchingKit()
-        {
-        }
+
+    public interface ITestProvider
+    {
+        IList<DNATestInfo> RequestTests();
     }
 }

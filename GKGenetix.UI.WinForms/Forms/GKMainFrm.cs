@@ -16,6 +16,7 @@ namespace GKGenetix.UI.Forms
     public partial class GKMainFrm : Form, IKitHost
     {
         private NewEditKitFrm newKitFrm = null;
+        private ITestProvider testProvider;
 
         public GKMainFrm()
         {
@@ -42,7 +43,6 @@ namespace GKGenetix.UI.Forms
         {
             SetStatus("Checking Integrity of DB ...");
             this.Enabled = false;
-            this.Text = Application.ProductName;
 
             Task.Factory.StartNew(() => {
                 GKSqlFuncs.CheckIntegrity();
@@ -60,6 +60,7 @@ namespace GKGenetix.UI.Forms
 
             miOpen.Enabled = selKits != null && selKits.Count == 1;
             miDelete.Enabled = selKits != null && selKits.Count > 0;
+            miImport.Enabled = (testProvider != null);
 
             miAdmixture.Enabled = AdmixtureFrm.CanBeUsed(selKits);
             miISOGGYTree.Enabled = IsoggYTreeFrm.CanBeUsed(selKits);
@@ -215,6 +216,21 @@ namespace GKGenetix.UI.Forms
 
         public void ImportTest()
         {
+            if (testProvider == null) return;
+
+            var availableTests = testProvider.RequestTests();
+
+            using (var frm = new ImportTestFrm(availableTests)) {
+                frm.ShowDialog(this);
+
+                var test = frm.GetSelectedTest();
+
+                if (newKitFrm == null || newKitFrm.IsDisposed)
+                    newKitFrm = new NewEditKitFrm(this, null, false);
+                ShowWidget(newKitFrm);
+
+                newKitFrm.ImportFile(test);
+            }
         }
 
         public void EnableSave()
@@ -275,7 +291,7 @@ namespace GKGenetix.UI.Forms
             }
         }
 
-        public void SelectLocation(ref int lng, ref int lat)
+        public void SelectLocation(ref double lng, ref double lat)
         {
             using (var frm = new LocationSelectFrm(lng, lat)) {
                 frm.ShowDialog(this);
@@ -297,6 +313,16 @@ namespace GKGenetix.UI.Forms
         public bool ShowQuestion(string msg)
         {
             return (MessageBox.Show(msg, "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes);
+        }
+
+        public void SetTestProvider(ITestProvider testProvider)
+        {
+            this.testProvider = testProvider;
+        }
+
+        public void SetAppDataPath(string path)
+        {
+            GKSqlFuncs.SetAppDataPath(path);
         }
     }
 }
