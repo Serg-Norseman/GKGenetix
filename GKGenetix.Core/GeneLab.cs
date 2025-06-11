@@ -45,6 +45,10 @@ namespace GKGenetix.Core
 
     public static class GeneLab
     {
+        public const string APP_TITLE = "GKGenetix";
+        public const string APP_COPYRIGHT = "Copyright © 2022-2025 by Sergey V. Zhdanovskih";
+        public const string APP_VERSION = "1.1.0.0";
+
         public static char GetComplementaryNucleotide(char n)
         {
             if (n == 'A') {

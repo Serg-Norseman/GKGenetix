@@ -224,6 +224,7 @@ namespace GKGenetix.UI.Forms
                 frm.ShowDialog(this);
 
                 var test = frm.GetSelectedTest();
+                if (test == null) return;
 
                 if (newKitFrm == null || newKitFrm.IsDisposed)
                     newKitFrm = new NewEditKitFrm(this, null, false);
@@ -266,14 +267,14 @@ namespace GKGenetix.UI.Forms
         public void EnableExplore()
         {
             kitsExplorer.Enabled = true;
-            menuStripGGK.Enabled = true;
+            EnableToolbar();
             btnWidgetClose.Enabled = true;
         }
 
         public void DisableExplore()
         {
             kitsExplorer.Enabled = false;
-            menuStripGGK.Enabled = false;
+            DisableToolbar();
             btnWidgetClose.Enabled = false;
         }
 

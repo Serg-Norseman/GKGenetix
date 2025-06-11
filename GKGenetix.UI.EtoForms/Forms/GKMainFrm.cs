@@ -260,6 +260,7 @@ namespace GKGenetix.UI.Forms
                 frm.ShowModal(this);
 
                 var test = frm.GetSelectedTest();
+                if (test == null) return;
 
                 if (newKitFrm == null || newKitFrm.IsDisposed)
                     newKitFrm = new NewEditKitFrm(this, null, false);

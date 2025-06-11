@@ -19,18 +19,21 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using GDModel;
 using GKCore;
 using GKCore.Design.Graphics;
 using GKCore.Interfaces;
 using GKCore.Plugins;
-using GKGenetix.UI;
+using GKGenetix.Core;
+using GKGenetix.UI.Forms;
 
 [assembly: AssemblyTitle("GKGenetixPlugin")]
 [assembly: AssemblyDescription("GEDKeeper Genetix plugin")]
 [assembly: AssemblyProduct("GEDKeeper")]
-[assembly: AssemblyCopyright("Copyright © 2022-2025 by Sergey V. Zhdanovskih")]
-[assembly: AssemblyVersion("0.2.0.0")]
+[assembly: AssemblyCopyright(GeneLab.APP_COPYRIGHT)]
+[assembly: AssemblyVersion(GeneLab.APP_VERSION)]
 [assembly: AssemblyCulture("")]
 
 namespace GKGenetixPlugin
@@ -53,7 +56,7 @@ namespace GKGenetixPlugin
         public override string DisplayName { get { return fDisplayName; } }
         public override ILangMan LangMan { get { return fLangMan; } }
 
-        private DNAAnalysis fForm;
+        private GKMainFrm fForm;
 
         protected override void Dispose(bool disposing)
         {
@@ -74,7 +77,9 @@ namespace GKGenetixPlugin
         public override void Execute()
         {
             if (fForm == null) {
-                fForm = new DNAAnalysis();
+                fForm = new GKMainFrm();
+                fForm.SetAppDataPath(Host.GetAppDataPath());
+                fForm.SetTestProvider(new PTestProvider(Host));
                 fForm.Show();
             } else {
                 CloseForm();
@@ -115,6 +120,49 @@ namespace GKGenetixPlugin
                 result = false;
             }
             return result;
+        }
+
+
+        private class PTestProvider : ITestProvider
+        {
+            private IHost fHost;
+
+            public PTestProvider(IHost host)
+            {
+                fHost = host;
+            }
+
+            public IList<DNATestInfo> RequestTests()
+            {
+                var result = new List<DNATestInfo>();
+
+                var baseWindow = fHost.GetCurrentFile();
+                if (baseWindow != null) {
+                    var tree = baseWindow.Context.Tree;
+
+                    for (int i = 0; i < tree.RecordsCount; i++) {
+                        var indiRec = tree[i] as GDMIndividualRecord;
+                        if (indiRec != null && indiRec.HasDNATests) {
+                            for (int j = 0; j < indiRec.DNATests.Count; j++) {
+                                var dnaTest = indiRec.DNATests[j];
+
+                                string strDate = dnaTest.Date.GetDisplayString(GKCore.Types.DateFormat.dfDD_MM_YYYY);
+                                string strSex = indiRec.Sex.ToString();
+                                string fileRefPath = baseWindow.Context.MediaLoad(dnaTest.FileReference);
+
+                                result.Add(new DNATestInfo() {
+                                    Name = dnaTest.TestName,
+                                    Date = strDate,
+                                    Sex = strSex[2],
+                                    FileReference = fileRefPath
+                                });
+                            }
+                        }
+                    }
+                }
+
+                return result;
+            }
         }
     }
 }
