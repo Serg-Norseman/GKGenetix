@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Panel xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="GKGenetix.UI.Forms.ProcessKitsFrm">
+
+  <TableLayout>
+    <TableRow>
+      <StackLayout Orientation="Horizontal" Spacing="8">
+        <CheckBox x:Name="chkDontSkip" Text="Delete Existing Comparisons." />
+        <CheckBox x:Name="chkRedoRoH" Text="Delete Existing Runs of Homozygosity" />
+        <Button x:Name="btnStart" Text="Start" Click="btnStart_Click"/>
+      </StackLayout>
+    </TableRow>
+
+    <TableRow>
+      <Label x:Name="label1" Text="Status:" />
+    </TableRow>
+
+    <TableRow ScaleHeight="True">
+      <TextArea x:Name="txtStatus" ReadOnly="True" />
+    </TableRow>
+  </TableLayout>
+
+</Panel>

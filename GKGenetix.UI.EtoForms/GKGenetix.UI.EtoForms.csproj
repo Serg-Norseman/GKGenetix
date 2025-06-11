@@ -9,7 +9,9 @@
         <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 
         <Configurations>Debug;Release</Configurations>
-        <Platforms>MSWin64;Linux;MacOS;FreeBSD</Platforms>
+        <Platforms>MSWin64;Linux;MacOS</Platforms>
+
+        <NoWarn>$(NoWarn);NU1902;NU1903;NU1904;IDE0017</NoWarn>
     </PropertyGroup>
 
     <Import Project="..\GKConfigurations3.targets" />
@@ -17,7 +19,7 @@
 
     <ItemGroup>
         <Reference Include="BSLib">
-            <HintPath>..\..\libs\netstd\BSLib.dll</HintPath>
+            <HintPath>..\libs\netstd\BSLib.dll</HintPath>
         </Reference>
     </ItemGroup>
 
@@ -28,14 +30,65 @@
 
 
     <ItemGroup>
-        <ProjectReference Include="..\..\GKv3\GKComponents\GKComponents.csproj" />
         <ProjectReference Include="..\GKGenetix.Core\GKGenetix.Core.nstd.csproj" />
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Include="GKWidget.cs" />
+        <Compile Include="UIHelper.cs" />
+        <Compile Include="EFImage.cs" />
+
+        <Compile Include="Forms\AdmixtureFrm.cs" />
+        <EmbeddedResource Include="Forms\AdmixtureFrm.xeto" />
+
+        <Compile Include="Forms\GKMainFrm.cs" />
+        <EmbeddedResource Include="Forms\GKMainFrm.xeto" />
+
+        <Compile Include="Forms\ImportTestFrm.cs" />
+        <EmbeddedResource Include="Forms\ImportTestFrm.xeto" />
+
+        <Compile Include="Forms\IsoggYTreeFrm.cs" />
+        <EmbeddedResource Include="Forms\IsoggYTreeFrm.xeto" />
+
+        <Compile Include="Forms\KitsExplorer.cs" />
+
+        <Compile Include="Forms\LocationSelectFrm.cs" />
+        <EmbeddedResource Include="Forms\LocationSelectFrm.xeto" />
+
+        <Compile Include="Forms\MatchingKitsFrm.cs" />
+        <EmbeddedResource Include="Forms\MatchingKitsFrm.xeto" />
+
+        <Compile Include="Forms\MitoMapFrm.cs" />
+        <EmbeddedResource Include="Forms\MitoMapFrm.xeto" />
+
+        <Compile Include="Forms\MtPhylogenyFrm.cs" />
+        <EmbeddedResource Include="Forms\MtPhylogenyFrm.xeto" />
+
+        <Compile Include="Forms\NewEditKitFrm.cs" />
+        <EmbeddedResource Include="Forms\NewEditKitFrm.xeto" />
+
+        <Compile Include="Forms\OneToOneCmpFrm.cs" />
+        <EmbeddedResource Include="Forms\OneToOneCmpFrm.xeto" />
+
+        <Compile Include="Forms\PhasedSegmentFrm.cs" />
+        <EmbeddedResource Include="Forms\PhasedSegmentFrm.xeto" />
+
+        <Compile Include="Forms\PhasingFrm.cs" />
+        <EmbeddedResource Include="Forms\PhasingFrm.xeto" />
+
+        <Compile Include="Forms\ProcessKitsFrm.cs" />
+        <EmbeddedResource Include="Forms\ProcessKitsFrm.xeto" />
+
+        <Compile Include="Forms\ROHFrm.cs" />
+        <EmbeddedResource Include="Forms\ROHFrm.xeto" />
+
+        <Compile Include="Forms\SelectKitFrm.cs" />
+        <EmbeddedResource Include="Forms\SelectKitFrm.xeto" />
+
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="DNAAnalysis.cs" />
-        <EmbeddedResource Include="DNAAnalysis.xeto" />
+
+        <Compile Include="Forms\DevConsole.cs" />
+        <EmbeddedResource Include="Forms\DevConsole.xeto" />
     </ItemGroup>
 
 </Project>

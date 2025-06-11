@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Panel xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="GKGenetix.UI.Forms.NewEditKitFrm"
+  Load="NewKitFrm_Load">
+
+  <TableLayout Spacing="4, 4">
+
+    <TableRow>
+      <StackLayout Orientation="Horizontal" Spacing="4">
+        <StackLayoutItem Expand="True">
+          <TableLayout Spacing="4, 4">
+            <TableRow>
+              <Label x:Name="lblName" Text="Name:"/>
+              <TextBox x:Name="txtName" />
+            </TableRow>
+
+            <TableRow>
+              <Label x:Name="lblKitNo" Text="Kit #:"/>
+              <TextBox x:Name="txtKit" />
+            </TableRow>
+
+            <TableRow>
+              <Label x:Name="lblSex" Text="Sex:"/>
+              <ComboBox x:Name="cbSex" ReadOnly="True" />
+            </TableRow>
+          </TableLayout>
+        </StackLayoutItem>
+
+        <TextArea x:Name="tipLbl" Enabled="False" Width="400" Text="Tip: Drag and drop any autosomal raw file into the grid below. You can select multiple files. e.g, Autosomal and X." />
+      </StackLayout>
+    </TableRow>
+
+    <TableRow>
+
+      <TabControl x:Name="tabsNewKit" SelectedIndexChanged="tabsNewKit_SelectedIndexChanged">
+        <TabPage Text="Autosomal">
+          <GridView x:Name="dgvAutosomal" AllowDrop="True">
+            <GridView.ContextMenu>
+              <ContextMenu>
+                <ButtonMenuItem Text="Delete Row" Click="miDeleteRowAutosomal_Click" />
+                <ButtonMenuItem Text="Clear All" Click="miClearAllAutosomal_Click" />
+              </ContextMenu>
+            </GridView.ContextMenu>
+          </GridView>
+        </TabPage>
+
+        <TabPage Text="Y DNA">
+          <TabControl x:Name="tabsY" TabPosition="Left" SelectedIndexChanged="tabsY_SelectedIndexChanged">
+            <TabPage Text="Y-SNPs">
+              <TextArea x:Name="txtYDNA" AllowDrop="True" AcceptsReturn="True" AcceptsTab="True" />
+            </TabPage>
+
+            <TabPage Text="Y-STR">
+              <TableLayout Spacing="4, 4">
+                <TableRow>
+                  <StackLayout Orientation="Horizontal" Spacing="4">
+                    <Button x:Name="btnPasteY" Size="24, 24"/>
+                    <Button x:Name="btnClearY" Size="24, 24"/>
+                  </StackLayout>
+                </TableRow>
+
+                <TableRow>
+                  <Label Font="Bold" Text="Y-DNA 12" />
+                  <Label Font="Bold" Text="Y-DNA 25" />
+                  <Label Font="Bold" Text="Y-DNA 37" />
+                </TableRow>
+
+                <TableRow ScaleHeight="True">
+                  <TableCell ScaleWidth="True">
+                    <GridView x:Name="dgvY12" />
+                  </TableCell>
+                  <TableCell ScaleWidth="True">
+                    <GridView x:Name="dgvY25" />
+                  </TableCell>
+                  <TableCell ScaleWidth="True">
+                    <GridView x:Name="dgvY37" />
+                  </TableCell>
+                </TableRow>
+
+                <TableRow>
+                  <Label Font="Bold" Text="Y-DNA 67" />
+                  <Label Font="Bold" Text="Y-DNA 111" />
+                  <Label Font="Bold" Text="Y-DNA Misc" />
+                </TableRow>
+
+                <TableRow ScaleHeight="True">
+                  <GridView x:Name="dgvY67" />
+                  <GridView x:Name="dgvY111" />
+                  <GridView x:Name="dgvYMisc" >
+                    <GridView.ContextMenu>
+                      <ContextMenu>
+                        <ButtonMenuItem Text="Delete Row" Click="miDeleteRowYDNAMisc_Click"/>
+                        <ButtonMenuItem Text="Clear All" Click="miClearAllYMisc_Click"/>
+                      </ContextMenu>
+                    </GridView.ContextMenu>
+                  </GridView>
+                </TableRow>
+              </TableLayout>
+
+            </TabPage>
+          </TabControl>
+        </TabPage>
+
+        <TabPage Text="MT DNA">
+          <TabControl x:Name="tabsMt" TabPosition="Left">
+            <TabPage Text="Mutations">
+              <TextArea x:Name="txtMtDNA" AllowDrop="True" AcceptsReturn="True" AcceptsTab="True" />
+            </TabPage>
+            <TabPage Text="FASTA">
+              <TextArea x:Name="txtFASTA" AllowDrop="True" AcceptsReturn="True" AcceptsTab="True" />
+            </TabPage>
+          </TabControl>
+        </TabPage>
+      </TabControl>
+
+    </TableRow>
+
+  </TableLayout>
+
+</Panel>

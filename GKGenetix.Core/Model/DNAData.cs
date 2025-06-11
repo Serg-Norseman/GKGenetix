@@ -32,6 +32,8 @@ namespace GKGenetix.Core.Model
 
     public sealed class DNAData
     {
+        public string FileName { get; set; }
+
         public string PersonalName { get; set; }
 
         /// <summary>

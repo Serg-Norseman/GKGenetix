@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Panel xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="GKGenetix.UI.Forms.OneToOneCmpFrm">
+
+  <TableLayout Spacing="4, 4">
+    <TableRow>
+      <Scrollable Border="Bezel">
+        <TableLayout Spacing="8, 8" Padding="4">
+          <TableRow>
+            <Label Text="Total Autosomal Segments:" />
+            <Label x:Name="lblTotalSegments" Text=".." />
+
+            <Label Text="Total X Segments:" />
+            <Label x:Name="lblTotalXSegments" Text=".." />
+          </TableRow>
+
+          <TableRow>
+            <Label Text="Longest Autosomal Segment:" />
+            <Label x:Name="lblLongestSegment" Text=".." />
+
+            <Label Text="Longest X Segment:" />
+            <Label x:Name="lblLongestXSegment" Text=".." />
+          </TableRow>
+
+          <TableRow>
+            <Label Text="Estimated MRCA of Parents:" />
+            <Label x:Name="lblMRCA" Text=".." />
+          </TableRow>
+        </TableLayout>
+      </Scrollable>
+    </TableRow>
+
+    <TableRow ScaleHeight="True">
+      <GridView x:Name="dgvSegmentIdx" CellDoubleClick="dgvSegmentIdx_CellDoubleClick"/>
+    </TableRow>
+  </TableLayout>
+
+</Panel>

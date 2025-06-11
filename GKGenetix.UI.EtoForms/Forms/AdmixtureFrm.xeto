@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="GKGenetix.UI.Forms.AdmixtureFrm"
+  Load="AdmixtureFrm_Load">
+
+  <TabControl x:Name="tabControl1">
+    <TabPage x:Name="tabOrigins" Text="Ethnic Origins">
+      <ImageView x:Name="pbWorldMap" />
+    </TabPage>
+
+    <TabPage x:Name="tabChart" Text="Chart View">
+    </TabPage>
+
+    <TabPage x:Name="tabAdmixTable" Text="Admixture Table">
+      <GridView x:Name="dgvAdmixture" />
+    </TabPage>
+  </TabControl>
+
+</Panel>

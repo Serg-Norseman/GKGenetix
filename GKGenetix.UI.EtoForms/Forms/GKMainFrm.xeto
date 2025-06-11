@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Form xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:gf="clr-namespace:GKGenetix.UI.Forms"
+  x:Class="GKGenetix.UI.Forms.GKMainFrm"
+  Title="GenetixKit" Load="GKMainFrm_Load" Size="1210, 562">
+
+  <Form.Menu>
+    <MenuBar IncludeSystemItems="None">
+      <ButtonMenuItem x:Name="miFile" Text="File">
+        <ButtonMenuItem x:Name="miDevConsole" Text="Dev Console" Click="miDevConsole_Click"/>
+        <SeparatorMenuItem/>
+        <ButtonMenuItem x:Name="miExit" Text="Exit" Click="miExit_Click"/>
+      </ButtonMenuItem>
+
+      <ButtonMenuItem x:Name="miTest" Text="Test">
+        <ButtonMenuItem x:Name="miNew" Text="New" Click="miNew_Click"/>
+        <ButtonMenuItem x:Name="miOpen" Text="Open" Click="miOpen_Click"/>
+        <ButtonMenuItem x:Name="miSave" Text="Save" Click="miSave_Click"/>
+        <SeparatorMenuItem/>
+        <ButtonMenuItem x:Name="miImport" Text="Import" Click="miImport_Click"/>
+        <SeparatorMenuItem/>
+        <ButtonMenuItem x:Name="miDelete" Text="Delete" Click="miDelete_Click"/>
+      </ButtonMenuItem>
+
+      <ButtonMenuItem x:Name="miDNA" Text="DNA">
+        <ButtonMenuItem x:Name="miProcessKits" Text="Process Kits" Click="miProcessKits_Click"/>
+        <ButtonMenuItem x:Name="miPhasing" Text="Phasing Utility" Click="miPhasing_Click"/>
+        <SeparatorMenuItem/>
+        <ButtonMenuItem x:Name="miOneToOne" Text="One-to-One" Click="miOneToOne_Click"/>
+        <ButtonMenuItem x:Name="miOneToMany" Text="One-to-Many" Click="miOneToMany_Click"/>
+        <ButtonMenuItem x:Name="miAdmixture" Text="Admixture" Click="miAdmixture_Click"/>
+        <ButtonMenuItem x:Name="miRunsOfHomozygosity" Text="Runs of Homozygosity" Click="miRunsOfHomozygosity_Click"/>
+        <SeparatorMenuItem/>
+        <ButtonMenuItem x:Name="miMtDnaPhylogeny" Text="Mt-Dna Phylogeny" Click="miMtDnaPhylogeny_Click"/>
+        <ButtonMenuItem x:Name="miMitoMap" Text="Mito Map" Click="miMitoMap_Click"/>
+        <ButtonMenuItem x:Name="miISOGGYTree" Text="ISOGG Y-Tree" Click="miISOGGYTree_Click"/>
+      </ButtonMenuItem>
+    </MenuBar>
+  </Form.Menu>
+
+  <TableLayout Padding="4">
+    <TableRow ScaleHeight="True">
+      <Splitter Orientation="Horizontal" FixedPanel="Panel1" RelativePosition="480">
+        <Splitter.Panel1>
+          <gf:KitsExplorer x:Name="kitsExplorer" />
+        </Splitter.Panel1>
+
+        <Splitter.Panel2>
+          <TableLayout Spacing="4, 4">
+            <TableRow>
+              <StackLayout Orientation="Horizontal" Spacing="4" BackgroundColor="LightSlateGray">
+                <StackLayoutItem Expand="True">
+                  <Label x:Name="lblWidgetTitle" Font="Bold+10pt" Text="..." />
+                </StackLayoutItem>
+                <Button x:Name="btnWidgetClose" Text="X" Click="btnWidgetClose_Click" Size="22, 22" />
+              </StackLayout>
+            </TableRow>
+            <TableRow ScaleHeight="True">
+              <Panel x:Name="panWidget" />
+            </TableRow>
+          </TableLayout>
+        </Splitter.Panel2>
+      </Splitter>
+    </TableRow>
+
+    <TableRow>
+      <StackLayout Orientation="Horizontal">
+        <ProgressBar x:Name="progressBar" Visible="false" Size="100, 16"/>
+
+        <StackLayoutItem Expand="True">
+          <Label x:Name="statusLbl" />
+        </StackLayoutItem>
+      </StackLayout>
+    </TableRow>
+  </TableLayout>
+
+</Form>

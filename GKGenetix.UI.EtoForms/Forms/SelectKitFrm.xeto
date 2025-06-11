@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Dialog xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="GKGenetix.UI.Forms.SelectKitFrm"
+  Title="Select Kit" Size="464,326" Load="OpenKitFrm_Load">
+
+  <TableLayout Style="paddedTable8">
+    <TableRow ScaleHeight="True">
+      <GridView x:Name="dgvKits" CellDoubleClick="dgvKits_CellContentDoubleClick" SelectionChanged="dgvKits_SelectionChanged" CellFormatting="dgvKits_CellFormatting" />
+    </TableRow>
+
+    <TableRow>
+      <StackLayout Style="dlgFooter">
+        <Label Text="Selected Kit:"></Label>
+        <Label x:Name="kitLbl" Text="." />
+        <StackLayoutItem Expand="True" />
+        <Button x:Name="btnOpen" Style="dlgBtn" Text="Open" Click="btnOpen_Click"/>
+      </StackLayout>
+    </TableRow>
+  </TableLayout>
+
+</Dialog>

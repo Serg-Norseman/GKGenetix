@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:complat="clr-namespace:GKUI.Platform;assembly=GKComponents"
+  xmlns:comcom="clr-namespace:GKUI.Components;assembly=GKComponents"
+  x:Class="GKGenetix.UI.Forms.DevConsole">
+
+  <TableLayout Spacing="4, 4">
+
+    <TableRow>
+      <StackLayout Orientation="Horizontal" Spacing="4">
+        <Button x:Name="btnInheritanceTest" Click="btnInheritanceTest_Click" Text="Inheritance Test" />
+        <Button x:Name="btnDetermineHaplogroupsY" Click="btnDetermineHaplogroupsY_Click" Text="Determine Haplogroups Y" />
+      </StackLayout>
+    </TableRow>
+
+    <TableRow ScaleHeight="True">
+      <TextArea x:Name="txtOutput" />
+    </TableRow>
+
+  </TableLayout>
+
+</Panel>

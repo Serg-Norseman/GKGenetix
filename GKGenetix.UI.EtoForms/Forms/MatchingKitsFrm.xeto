@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Panel xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="GKGenetix.UI.Forms.MatchingKitsFrm"
+  Load="MatchingKitsFrm_Load">
+
+  <TableLayout Spacing="4, 4">
+    <Label Text="List of matching kits:"/>
+
+    <TableRow ScaleHeight="True">
+      <GridView x:Name="dgvMatches" SelectionChanged="dgvMatches_SelectionChanged" />
+    </TableRow>
+
+    <TableRow ScaleHeight="True">
+      <TableLayout Spacing="4, 4">
+        <TableRow>
+          <Label x:Name="lblSegLabel" Text="List of segments matching with ..."/>
+          <Label Text="Segment Matching Details:"/>
+        </TableRow>
+
+        <TableRow>
+          <GridView x:Name="dgvSegments" SelectionChanged="dgvSegments_SelectionChanged" CellDoubleClick="dgvSegments_CellDoubleClick" />
+          <GridView x:Name="dgvAlleles" CellFormatting="dgvAlleles_CellFormatting" />
+        </TableRow>
+      </TableLayout>
+    </TableRow>
+  </TableLayout>
+
+</Panel>

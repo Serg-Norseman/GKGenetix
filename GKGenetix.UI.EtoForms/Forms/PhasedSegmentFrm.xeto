@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Dialog xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="GKGenetix.UI.Forms.PhasedSegmentFrm"
+  Title="Phased Segment Visualizer" Size="624,442" Load="PhasedSegmentFrm_Load">
+
+  <TableLayout Style="paddedTable8">
+    <TableRow ScaleHeight="True">
+      <ImageView x:Name="pbSegment" MouseDown="pbSegment_MouseClick" MouseMove="pbSegment_MouseMove" />
+    </TableRow>
+
+    <TableRow ScaleHeight="True">
+      <GridView x:Name="dgvSegment" SelectionChanged="dgvSegment_SelectionChanged"/>
+    </TableRow>
+
+    <TableRow>
+      <StackLayout Style="dlgFooter">
+        <Label x:Name="statusLbl" Text="Phased."/>
+        <StackLayoutItem Expand="True" />
+      </StackLayout>
+    </TableRow>
+  </TableLayout>
+
+</Dialog>

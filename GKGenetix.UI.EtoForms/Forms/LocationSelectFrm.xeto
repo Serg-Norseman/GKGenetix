@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Dialog xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="GKGenetix.UI.Forms.LocationSelectFrm"
+  Title="World Map" Size="678, 314" Load="LocationSelectFrm_Load">
+
+  <ImageView x:Name="pbWorldMap" MouseDown="pbWorldMap_MouseClick" MouseMove="pbWorldMap_MouseMove" />
+
+</Dialog>

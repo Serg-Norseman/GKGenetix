@@ -168,6 +168,7 @@ namespace GKGenetix.Core.FileFormats
             }
 
             if (result != null) {
+                result.FileName = filePath;
                 result.PersonalName = Path.GetFileNameWithoutExtension(filePath);
             }
 

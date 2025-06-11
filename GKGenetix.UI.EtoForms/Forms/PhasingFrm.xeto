@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Panel xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="GKGenetix.UI.Forms.PhasingFrm">
+
+  <TableLayout Spacing="4, 4">
+    <TableRow>
+      <StackLayout Orientation="Horizontal" Spacing="4">
+        <Button x:Name="btnFather" Text="Select Father" Click="btnFather_Click"/>
+        <Button x:Name="btnMother" Text="Select Mother" Click="btnMother_Click"/>
+        <Button x:Name="btnChild" Text="Select Child" Click="btnChild_Click"/>
+        <Button x:Name="btnPhasing" Text="Begin Phasing" Enabled="False" Click="btnPhasing_Click"/>
+      </StackLayout>
+    </TableRow>
+
+    <TableRow ScaleHeight="True">
+      <GridView x:Name="dgvPhasing" CellFormatting="dgvPhasing_CellFormatting"/>
+    </TableRow>
+  </TableLayout>
+</Panel>

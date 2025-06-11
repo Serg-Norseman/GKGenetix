@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Dialog xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="GKGenetix.UI.Forms.ImportTestFrm"
+  Title="Import Test" Size="464, 326">
+
+  <TableLayout Style="paddedTable8">
+    <TableRow ScaleHeight="True">
+      <GridView x:Name="dgvTests" CellDoubleClick="dgvTests_CellContentDoubleClick" />
+    </TableRow>
+
+    <TableRow>
+      <StackLayout Style="dlgFooter">
+        <StackLayoutItem Expand="True" />
+        <Button Style="dlgBtn" Text="Open" Click="btnOpen_Click"/>
+      </StackLayout>
+    </TableRow>
+  </TableLayout>
+
+</Dialog>

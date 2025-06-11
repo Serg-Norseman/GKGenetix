@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Panel xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="GKGenetix.UI.Forms.IsoggYTreeFrm"
+  Size="784, 562" Load="MainFrm_Load">
+
+  <Splitter Orientation="Horizontal" FixedPanel="Panel1" RelativePosition="260">
+
+    <Splitter.Panel1>
+      <TableLayout>
+        <Label x:Name="lblKitName" Text="..."/>
+        <TableRow ScaleHeight="True">
+          <TreeView x:Name="treeView1" SelectionChanged="treeView1_AfterSelect" />
+        </TableRow>
+
+        <Label x:Name="label1" Text="SNP Data"/>
+        <TableRow ScaleHeight="True">
+          <RichTextArea x:Name="snpTextBox" ReadOnly="True"/>
+        </TableRow>
+      </TableLayout>
+    </Splitter.Panel1>
+
+    <Splitter.Panel2>
+      <TableLayout>
+        <Label Text="SNPs:"/>
+        <TableRow ScaleHeight="True">
+          <TextArea x:Name="txtSNPs" Text="M170-, M201-, M304-, M69-, M89+, M9-" ReadOnly="True" />
+        </TableRow>
+
+        <Label Text="Identified Y Haplogroup:"/>
+        <Label x:Name="lblyhg" Font="Bold" Text="..." />
+      </TableLayout>
+    </Splitter.Panel2>
+
+  </Splitter>
+</Panel>

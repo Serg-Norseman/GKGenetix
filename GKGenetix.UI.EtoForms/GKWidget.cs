@@ -19,31 +19,45 @@
  */
 
 using System;
-using GKGenetix.UI.Forms;
+using System.Collections.Generic;
+using Eto.Forms;
+using GKGenetix.Core;
+using GKGenetix.Core.Database;
 
-namespace GKGenetix
+namespace GKGenetix.UI
 {
-#if !NETCORE
-    using System.Windows.Forms;
-#else
-    using Eto.Forms;
-    using GKGenetix.UI;
-#endif
-
-    internal static class Program
+    public class TreeNode : TreeItem
     {
-        [STAThread]
-        static void Main()
+        public TreeNode(string text)
         {
-#if !NETCORE
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new GKMainFrm());
-#else
-            UIHelper.InitCommonStyles();
-            var application = new Application();
-            application.Run(new GKMainFrm());
-#endif
+            Text = text;
+        }
+    }
+
+
+    public class GKWidget : Panel
+    {
+        protected IKitHost _host;
+
+        public string Text { get; set; }
+
+        public event EventHandler Closing;
+
+        protected GKWidget(IKitHost host)
+        {
+            _host = host;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) {
+                Closing?.Invoke(this, EventArgs.Empty);
+            }
+            base.Dispose(disposing);
+        }
+
+        public virtual void SetKit(IList<TestRecord> selectedKits)
+        {
         }
     }
 }
