@@ -28,14 +28,21 @@ namespace GKGenetix.Core.Database
         public string Name { get; set; }
         public string Sex { get; set; }
         public bool Disabled { get; set; }
-        public int Lng { get; set; }
-        public int Lat { get; set; }
+        public double Lng { get; set; }
+        public double Lat { get; set; }
         public DateTime LastModified { get; set; }
         public int Reference { get; set; }
         public int RoH_Status { get; set; }
 
 
-        public string Location { get; set; }
+        public string Location
+        {
+            get {
+                string xy = (int)Lng + ":" + (int)Lat;
+                if (xy == "0:0") xy = "Unknown";
+                return xy;
+            }
+        }
 
 
         public TestRecord()
@@ -50,11 +57,6 @@ namespace GKGenetix.Core.Database
                 Sex = "Male";
             else if (Sex == "F")
                 Sex = "Female";
-
-            string xy = Lng + ":" + Lat;
-            if (xy == "0:0")
-                xy = "Unknown";
-            Location = xy;
         }
     }
 }

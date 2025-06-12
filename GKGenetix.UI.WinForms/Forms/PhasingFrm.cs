@@ -98,22 +98,18 @@ namespace GKGenetix.UI.Forms
                 GKGenFuncs.DoPhasing(_host, fatherKit, motherKit, childKit, ref dt, male);
 
                 this.Invoke(new MethodInvoker(delegate {
-                    _host.SetStatus("Saving Phased Kit " + childKit + " ...");
-                    UpdateView();
+                    _host.SetStatus($"Saving Phased Kit {childKit} ...");
+
+                    dgvPhasing.DataSource = dt;
+
+                    btnPhasing.Enabled = true;
+                    btnChild.Enabled = true;
+                    btnFather.Enabled = true;
+                    btnMother.Enabled = true;
+
+                    _host.SetStatus("Done.");
                 }));
             });
-        }
-
-        private void UpdateView()
-        {
-            dgvPhasing.DataSource = dt;
-
-            btnPhasing.Enabled = true;
-            btnChild.Enabled = true;
-            btnFather.Enabled = true;
-            btnMother.Enabled = true;
-
-            _host.SetStatus("Done.");
         }
     }
 }

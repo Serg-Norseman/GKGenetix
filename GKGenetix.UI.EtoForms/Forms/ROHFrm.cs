@@ -112,8 +112,8 @@ namespace GKGenetix.UI.Forms
         private void dgvSegmentIdx_SelectionChanged(object sender, EventArgs e)
         {
             var selRow = dgvSegmentIdx.GetSelectedObj<ROHSegment>();
-            if (selRow == null) return;
-            dgvMatching.DataStore = selRow.Rows;
+            if (selRow != null)
+                dgvMatching.DataStore = selRow.Rows;
         }
 
         private void dgvMatching_CellFormatting(object sender, GridCellFormatEventArgs e)

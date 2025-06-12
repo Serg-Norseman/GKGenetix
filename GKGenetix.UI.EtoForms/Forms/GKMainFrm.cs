@@ -332,12 +332,12 @@ namespace GKGenetix.UI.Forms
             }
         }
 
-        public void SelectLocation(ref double lng, ref double lat)
+        public void SelectLocation(TestRecord testRecord)
         {
-            using (var frm = new LocationSelectFrm(lng, lat)) {
+            using (var frm = new LocationSelectFrm(testRecord.Lng, testRecord.Lat)) {
                 frm.ShowModal(this);
-                lng = frm.Longitude;
-                lat = frm.Latitude;
+                testRecord.Lng = frm.Longitude;
+                testRecord.Lat = frm.Latitude;
             }
         }
 

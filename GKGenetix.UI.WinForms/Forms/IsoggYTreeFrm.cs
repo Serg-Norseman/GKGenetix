@@ -47,6 +47,7 @@ namespace GKGenetix.UI.Forms
 
         private void ReloadData()
         {
+            this.Text = "ISOGG Y-Tree : " + GKSqlFuncs.GetKitName(kit);
             lblKitName.Text = GKSqlFuncs.GetKitName(kit);
             _host.SetStatus("Plotting on ISOGG Y-Tree ...");
 
@@ -115,33 +116,24 @@ namespace GKGenetix.UI.Forms
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            TreeNode node = treeView1.SelectedNode;
-            label1.Text = "Defining SNPs for " + node.Text;
+            var phNode = (ISOGGYTreeNode)treeView1.SelectedNode.Tag;
+            string phMarkers = " " + phNode.Markers.Replace(",", ", ") + " ";
+            var pnHgl = GKGenFuncs.GetYHighlights(phMarkers, snpArray);
 
-            snpTextBox.Text = " " + ((ISOGGYTreeNode)node.Tag).Markers.Replace(",", ", ") + " ";
+            label1.Text = "Defining SNPs for " + phNode.Name;
+            snpTextBox.Text = phMarkers;
             snpTextBox.SelectAll();
             snpTextBox.SelectionColor = Color.Gray;
 
-            string[] begin = new string[] { " ", "/" };
-            string[] end = new string[] { " ", "/", "," };
-            foreach (string snp in snpArray) {
-                if (snp.Equals("")) continue;
-
-                foreach (string b1 in begin)
-                    foreach (string e1 in end) {
-                        string search_term = b1 + snp.Substring(0, snp.Length - 1) + e1;
-                        int start = snpTextBox.Find(search_term);
-                        if (start != -1) {
-                            snpTextBox.Select(start + 1, snp.Length - 1);
-                            if (snp.EndsWith("-")) {
-                                snpTextBox.SelectionBackColor = Color.Red;
-                                snpTextBox.SelectionColor = Color.Yellow;
-                            } else if (snp.EndsWith("+")) {
-                                snpTextBox.SelectionBackColor = Color.DarkGreen;
-                                snpTextBox.SelectionColor = Color.White;
-                            }
-                        }
-                    }
+            foreach (var hgl in pnHgl) {
+                snpTextBox.Select(hgl.Start, hgl.Length);
+                if (hgl.State == GKGenFuncs.HGS_R) {
+                    snpTextBox.SelectionBackColor = Color.Red;
+                    snpTextBox.SelectionColor = Color.Yellow;
+                } else if (hgl.State == GKGenFuncs.HGS_DG) {
+                    snpTextBox.SelectionBackColor = Color.DarkGreen;
+                    snpTextBox.SelectionColor = Color.White;
+                }
             }
         }
     }

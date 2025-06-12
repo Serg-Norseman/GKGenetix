@@ -153,23 +153,6 @@ namespace GKGenetix.UI.Forms
 
         #region Autosomal
 
-        private void dgvAutosomal_DataError(object sender, DataGridViewDataErrorEventArgs e)
-        {
-            MessageBox.Show("Data Error. Technical Details: " + e.Exception.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            _host.SetStatus("Data Error. Technical Details: " + e.Exception.Message);
-        }
-
-        private void dgvAutosomal_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right) {
-                try {
-                    var hti = dgvAutosomal.HitTest(e.X, e.Y);
-                    dgvAutosomal.ClearSelection();
-                    dgvAutosomal.Rows[hti.RowIndex].Selected = true;
-                } catch (Exception) { }
-            }
-        }
-
         public void ImportFile(DNATestInfo dnaTest)
         {
             txtName.Text = dnaTest.Name;
@@ -316,23 +299,6 @@ namespace GKGenetix.UI.Forms
                 dgvYMisc.Rows.RemoveAt(rowToDelete);
                 dgvYMisc.ClearSelection();
             } catch (Exception) { }
-        }
-
-        private void dgvY_DataError(object sender, DataGridViewDataErrorEventArgs e)
-        {
-            MessageBox.Show("Data Error. Technical Details: " + e.Exception.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            _host.SetStatus("Data Error. Technical Details: " + e.Exception.Message);
-        }
-
-        private void dgvYMisc_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right) {
-                try {
-                    var hti = dgvYMisc.HitTest(e.X, e.Y);
-                    dgvYMisc.ClearSelection();
-                    dgvYMisc.Rows[hti.RowIndex].Selected = true;
-                } catch (Exception) { }
-            }
         }
 
         private void miClearAllYMisc_Click(object sender, EventArgs e)

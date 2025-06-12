@@ -84,9 +84,10 @@ namespace GKGenetix.UI.Forms
         private void miSave_Click(object sender, EventArgs e)
         {
             var widget = (panWidget.Controls.Count > 0) ? panWidget.Controls[0] : null;
+            if (widget == null) return;
 
-            if (widget.Name == "NewEditKitFrm")
-                ((NewEditKitFrm)widget).Save();
+            if (widget is NewEditKitFrm editFrm)
+                editFrm.Save();
             else
                 kitsExplorer.Save();
         }
@@ -292,12 +293,12 @@ namespace GKGenetix.UI.Forms
             }
         }
 
-        public void SelectLocation(ref double lng, ref double lat)
+        public void SelectLocation(TestRecord testRecord)
         {
-            using (var frm = new LocationSelectFrm(lng, lat)) {
+            using (var frm = new LocationSelectFrm(testRecord.Lng, testRecord.Lat)) {
                 frm.ShowDialog(this);
-                lng = frm.Longitude;
-                lat = frm.Latitude;
+                testRecord.Lng = frm.Longitude;
+                testRecord.Lat = frm.Latitude;
             }
         }
 

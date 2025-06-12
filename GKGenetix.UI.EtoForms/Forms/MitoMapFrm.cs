@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Eto.Drawing;
 using Eto.Forms;
@@ -226,36 +225,14 @@ namespace GKGenetix.UI.Forms
 
         private void PopulateFASTA(string locus, int start, int end)
         {
-            StringBuilder sb = new StringBuilder();
-            int width = 0;
-            Dictionary<int, Color> list = new Dictionary<int, Color>();
-            sb.Append(">" + kit + "|" + locus + "|" + start + "-" + end + "\r");
-            // with \r\n sb.Length has wrong value for format
-
             var nucleotides = (List<MtDNANucleotide>)dgvNucleotides.DataStore;
-            foreach (var row in nucleotides) {
-                string val = row.Kit;
 
-                if (width % 30 == 0 && width != 0)
-                    sb.Append("\r");
+            var fastaHgl = GKGenFuncs.GetFastaHighlights(kit, locus, start, end, nucleotides, out string fasta);
 
-                if (row.Mut) {
-                    sb.Append(val);
-                    list.Add(sb.Length - 1, Colors.Blue);
-                } else if (row.Ins) {
-                    sb.Append(val);
-                    list.Add(sb.Length - 1, Colors.Green);
-                } else {
-                    sb.Append(val);
-                }
-
-                width++;
-            }
-
-            rtbFASTA.Text = sb.ToString();
-            foreach (KeyValuePair<int, Color> a in list) {
-                rtbFASTA.Selection = new Range<int>(a.Key, a.Key + 1);
-                rtbFASTA.SelectionForeground = a.Value;
+            rtbFASTA.Text = fasta;
+            foreach (var a in fastaHgl) {
+                rtbFASTA.Selection = new Range<int>(a.Start, a.Start);
+                rtbFASTA.SelectionForeground = (a.State == GKGenFuncs.HGS_MB) ? Colors.Blue : ((a.State == GKGenFuncs.HGS_MG) ? Colors.Green : Colors.Black);
             }
             rtbFASTA.Selection = new Range<int>(0, 0);
             rtbFASTA.SelectedText = "";

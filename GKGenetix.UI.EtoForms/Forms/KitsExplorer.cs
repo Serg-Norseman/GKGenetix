@@ -93,16 +93,7 @@ namespace GKGenetix.UI.Forms
             _host.SetStatus("Saving ...");
 
             foreach (var row in tblKits) {
-                string location = row.Location;
-                string lng, lat;
-                if (location == "Unknown") {
-                    lng = "0";
-                    lat = "0";
-                } else {
-                    lng = location.Split(new char[] { ':' })[0];
-                    lat = location.Split(new char[] { ':' })[1];
-                }
-                GKSqlFuncs.SaveKit(row.KitNo, row.Name, row.Sex, row.Disabled, lng, lat);
+                GKSqlFuncs.SaveKit(row);
             }
 
             _host.SetStatus("Saved.");
@@ -146,16 +137,7 @@ namespace GKGenetix.UI.Forms
         {
             if (e.Column == 4 && e.Row >= 0) {
                 var kitRow = tblKits[e.Row];
-                string location = kitRow.Location;
-                double lng = 0;
-                double lat = 0;
-                if (location != "Unknown") {
-                    var parts = location.Split(new char[] { ':' });
-                    lng = int.Parse(parts[0]);
-                    lat = int.Parse(parts[1]);
-                }
-                _host.SelectLocation(ref lng, ref lat);
-                kitRow.Location = lng.ToString() + ":" + lat.ToString();
+                _host.SelectLocation(kitRow);
 
                 dgvEditKit.Invalidate();
             }

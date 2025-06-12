@@ -133,33 +133,26 @@ namespace GKGenetix.UI.Forms
 
         private void treeView1_AfterSelect(object sender, EventArgs e)
         {
-            TreeItem node = treeView1.SelectedItem as TreeNode;
-            label1.Text = "Defining SNPs for " + node.Text;
+            var phNode = (ISOGGYTreeNode)((TreeNode)treeView1.SelectedItem).Tag;
+            string phMarkers = " " + phNode.Markers.Replace(",", ", ") + " ";
 
-            snpTextBox.Text = " " + ((ISOGGYTreeNode)node.Tag).Markers.Replace(",", ", ") + " ";
+            label1.Text = "Defining SNPs for " + phNode.Name;
+
+            snpTextBox.Text = phMarkers;
             snpTextBox.SelectAll();
             snpTextBox.SelectionForeground = Colors.Gray;
 
-            string[] begin = new string[] { " ", "/" };
-            string[] end = new string[] { " ", "/", "," };
-            foreach (string snp in snpArray) {
-                if (snp.Equals("")) continue;
+            var pnHgl = GKGenFuncs.GetYHighlights(phMarkers, snpArray);
 
-                foreach (string b1 in begin)
-                    foreach (string e1 in end) {
-                        string search_term = b1 + snp.Substring(0, snp.Length - 1) + e1;
-                        int start = snpTextBox.Text.IndexOf(search_term);
-                        if (start != -1) {
-                            snpTextBox.Selection = new Range<int>(start + 1, snp.Length - 1);
-                            if (snp.EndsWith("-")) {
-                                snpTextBox.SelectionBackground = Colors.Red;
-                                snpTextBox.SelectionForeground = Colors.Yellow;
-                            } else if (snp.EndsWith("+")) {
-                                snpTextBox.SelectionBackground = Colors.DarkGreen;
-                                snpTextBox.SelectionForeground = Colors.White;
-                            }
-                        }
-                    }
+            foreach (var hgl in pnHgl) {
+                snpTextBox.Selection = new Range<int>(hgl.Start, hgl.Start + hgl.Length - 1);
+                if (hgl.State == GKGenFuncs.HGS_R) {
+                    snpTextBox.SelectionBackground = Colors.Red;
+                    snpTextBox.SelectionForeground = Colors.Yellow;
+                } else if (hgl.State == GKGenFuncs.HGS_DG) {
+                    snpTextBox.SelectionBackground = Colors.DarkGreen;
+                    snpTextBox.SelectionForeground = Colors.White;
+                }
             }
         }
     }

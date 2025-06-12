@@ -226,7 +226,7 @@ namespace GKGenetix.Core.Database
                 else where += $" and sex = '{requestedSex}'";
             }
 
-            string sql = $"select kit_no'KitNo', name'Name', sex'Sex', disabled'Disabled', coalesce(x, 0)'Lng', coalesce(y, 0)'Lat', last_modified'LastModified', reference'Reference', roh_status'RoH_Status' from kit_master {where} order by last_modified desc";
+            string sql = $"select kit_no'KitNo', name'Name', sex'Sex', disabled'Disabled', [x]'Lng', [y]'Lat', last_modified'LastModified', reference'Reference', roh_status'RoH_Status' from kit_master {where} order by last_modified desc";
             return GetRows<TestRecord>(sql);
         }
 
@@ -259,13 +259,13 @@ namespace GKGenetix.Core.Database
             _connection.Execute($"insert or replace into kit_master (kit_no, name, sex) values ('{kit_no}', '{name}', '{sex[0]}')");
         }
 
-        public static void SaveKit(string kit_no, string name, string sex, bool disabled, string x, string y)
+        public static void SaveKit(TestRecord testRec)
         {
             CheckConnection();
 
-            sex = sex[0].ToString();
-            string dis = (disabled) ? "1" : "0";
-            _connection.Execute($"update kit_master set name = '{name}', sex = '{sex}', disabled = {dis}, x = {x}, y = {y} where kit_no = '{kit_no}'");
+            var sex = testRec.Sex[0].ToString();
+            string dis = (testRec.Disabled) ? "1" : "0";
+            _connection.Execute($"update kit_master set name = '{testRec.Name}', sex = '{sex}', disabled = {dis}, x = {(int)testRec.Lng}, y = {(int)testRec.Lat} where kit_no = '{testRec.KitNo}'");
         }
 
         #endregion

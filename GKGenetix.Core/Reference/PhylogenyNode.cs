@@ -72,4 +72,19 @@ namespace GKGenetix.Core.Reference
         {
         }
     }
+
+
+    public sealed class PMHighlight
+    {
+        public int Start { get; set; }
+        public int Length { get; set; }
+        public int State { get; set; }
+
+        public PMHighlight(int start, int length, int state)
+        {
+            Start = start;
+            Length = length;
+            State = state;
+        }
+    }
 }

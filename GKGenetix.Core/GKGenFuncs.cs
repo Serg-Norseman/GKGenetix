@@ -980,6 +980,9 @@ namespace GKGenetix.Core
         public const int HGS_LG = 2;
         public const int HGS_R = 3;
 
+        public const int HGS_MB = 4;
+        public const int HGS_MG = 5;
+
         #region Determine Y-DNA Haplogroup
 
         public static ISOGGYTreeNode FindYHaplogroup(ISOGGYTreeNode isoggYTree, IList<string> snpArray)
@@ -1023,6 +1026,32 @@ namespace GKGenetix.Core
             }
 
             return hg_maxpath;
+        }
+
+        public static IList<PMHighlight> GetYHighlights(string phMarkers, IList<string> snpArray)
+        {
+            var result = new List<PMHighlight>();
+
+            string[] begin = new string[] { " ", "/" };
+            string[] end = new string[] { " ", "/", "," };
+
+            foreach (string snp in snpArray) {
+                if (string.IsNullOrEmpty(snp)) continue;
+                var search_snp = snp.Substring(0, snp.Length - 1);
+                var snpSign = snp[snp.Length - 1];
+                int state = (snpSign == '-') ? HGS_R : ((snpSign == '+') ? HGS_DG : 0);
+
+                foreach (string b1 in begin)
+                    foreach (string e1 in end) {
+                        string search_term = b1 + search_snp + e1;
+                        int start = phMarkers.IndexOf(search_term);
+                        if (start != -1) {
+                            result.Add(new PMHighlight(start + 1, search_snp.Length, state));
+                        }
+                    }
+            }
+
+            return result;
         }
 
         #endregion
@@ -1212,6 +1241,21 @@ namespace GKGenetix.Core
                 return match;
         }
 
+        public static IList<PMHighlight> GetMtHighlights(string phMarkers, string[] snpArray)
+        {
+            var result = new List<PMHighlight>();
+
+            foreach (string mutation in snpArray) {
+                var mut = mutation.Trim();
+                int start = phMarkers.IndexOf(mut);
+                if (start != -1) {
+                    result.Add(new PMHighlight(start, mut.Length, HGS_DG));
+                }
+            }
+
+            return result;
+        }
+
         #endregion
 
         public static void GetMtDNA(string kit, out string mutations, out string fasta,
@@ -1319,6 +1363,40 @@ namespace GKGenetix.Core
             }
 
             return nucRes;
+        }
+
+
+        public static IList<PMHighlight> GetFastaHighlights(string kit, string locus, int start, int end, List<MtDNANucleotide> nucleotides, out string fasta)
+        {
+            var result = new List<PMHighlight>();
+
+            StringBuilder sb = new StringBuilder();
+            int width = 0;
+            sb.Append(">" + kit + "|" + locus + "|" + start + "-" + end + "\r");
+            // with \r\n sb.Length has wrong value for format
+
+            foreach (var row in nucleotides) {
+                string val = row.Kit;
+
+                if (width % 30 == 0 && width != 0)
+                    sb.Append("\r");
+
+                if (row.Mut) {
+                    sb.Append(val);
+                    result.Add(new PMHighlight(sb.Length - 1, 1, HGS_MB));
+                } else if (row.Ins) {
+                    sb.Append(val);
+                    result.Add(new PMHighlight(sb.Length - 1, 1, HGS_MG));
+                } else {
+                    sb.Append(val);
+                }
+
+                width++;
+            }
+
+            fasta = sb.ToString();
+
+            return result;
         }
     }
 }

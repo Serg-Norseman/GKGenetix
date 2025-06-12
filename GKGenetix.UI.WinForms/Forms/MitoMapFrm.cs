@@ -7,7 +7,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
@@ -206,41 +205,15 @@ namespace GKGenetix.UI.Forms
 
         private void PopulateFASTA(string locus, int start, int end)
         {
-            StringBuilder sb = new StringBuilder();
-            int width = 0;
-            Dictionary<int, Color> list = new Dictionary<int, Color>();
-            sb.Append(">" + kit + "|" + locus + "|" + start + "-" + end + "\r");
-            // with \r\n sb.Length has wrong value for format
-
             var nucleotides = (List<MtDNANucleotide>)dgvNucleotides.DataSource;
-            foreach (var row in nucleotides) {
-                string val = row.Kit;
+            var fastaHgl = GKGenFuncs.GetFastaHighlights(kit, locus, start, end, nucleotides, out string fasta);
 
-                if (width % 30 == 0 && width != 0)
-                    sb.Append("\r");
-
-                if (row.Mut) {
-                    sb.Append(val);
-                    list.Add(sb.Length - 1, Color.Blue);
-                } else if (row.Ins) {
-                    sb.Append(val);
-                    list.Add(sb.Length - 1, Color.Green);
-                } else {
-                    sb.Append(val);
-                }
-
-                width++;
-            }
-
-            rtbFASTA.Text = sb.ToString();
-            foreach (KeyValuePair<int, Color> a in list) {
-                rtbFASTA.SelectionStart = a.Key;
+            rtbFASTA.Text = fasta;
+            foreach (var a in fastaHgl) {
+                rtbFASTA.SelectionStart = a.Start;
                 rtbFASTA.SelectionLength = 1;
-                rtbFASTA.SelectionColor = a.Value;
+                rtbFASTA.SelectionColor = (a.State == GKGenFuncs.HGS_MB) ? Color.Blue : ((a.State == GKGenFuncs.HGS_MG) ? Color.Green : Color.Black);
             }
-            rtbFASTA.SelectionStart = 0;
-            rtbFASTA.SelectionLength = 0;
-            rtbFASTA.SelectedText = "";
         }
     }
 }

@@ -102,17 +102,16 @@ namespace GKGenetix.UI.Forms
         {
             TreeNode node = treeView1.SelectedNode;
             var markers = ((MtDNAPhylogenyNode)node.Tag).Markers;
+            string[] snps = txtSNPs.Text.Split(new char[] { ',' });
+
+            var mtHgl = GKGenFuncs.GetMtHighlights(markers, snps);
 
             snpTextBox.Text = markers;
-            string[] snps = txtSNPs.Text.Split(new char[] { ',' });
-            foreach (string mutation in snps) {
-                int loc = snpTextBox.Find(mutation.Trim());
-                if (loc != -1) {
-                    snpTextBox.SelectionStart = loc;
-                    snpTextBox.SelectionLength = mutation.Trim().Length;
-                    snpTextBox.SelectionBackColor = Color.DarkGreen;
-                    snpTextBox.SelectionColor = Color.White;
-                }
+            foreach (var hgl in mtHgl) {
+                snpTextBox.SelectionStart = hgl.Start;
+                snpTextBox.SelectionLength = hgl.Length;
+                snpTextBox.SelectionBackColor = Color.DarkGreen;
+                snpTextBox.SelectionColor = Color.White;
             }
         }
     }

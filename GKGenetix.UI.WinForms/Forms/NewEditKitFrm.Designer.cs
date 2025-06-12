@@ -188,10 +188,8 @@
             this.dgvAutosomal.Name = "dataGridViewAutosomal";
             this.dgvAutosomal.Size = new System.Drawing.Size(742, 437);
             this.dgvAutosomal.TabIndex = 0;
-            this.dgvAutosomal.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgvAutosomal_DataError);
             this.dgvAutosomal.DragDrop += new System.Windows.Forms.DragEventHandler(this.dgvAutosomal_DragDrop);
             this.dgvAutosomal.DragEnter += new System.Windows.Forms.DragEventHandler(this.nekf_DragEnter);
-            this.dgvAutosomal.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dgvAutosomal_MouseDown);
             // 
             // mnuAutosomal
             // 
@@ -313,8 +311,6 @@
             this.dgvYMisc.Name = "dgvYMisc";
             this.dgvYMisc.Size = new System.Drawing.Size(237, 176);
             this.dgvYMisc.TabIndex = 11;
-            this.dgvYMisc.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgvY_DataError);
-            this.dgvYMisc.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dgvYMisc_MouseDown);
             // 
             // mnuYDNAMisc
             // 
@@ -345,7 +341,6 @@
             this.dgvY111.Name = "dgvY111";
             this.dgvY111.Size = new System.Drawing.Size(227, 176);
             this.dgvY111.TabIndex = 10;
-            this.dgvY111.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgvY_DataError);
             // 
             // dgvY67
             // 
@@ -354,7 +349,6 @@
             this.dgvY67.Name = "dgvY67";
             this.dgvY67.Size = new System.Drawing.Size(227, 176);
             this.dgvY67.TabIndex = 9;
-            this.dgvY67.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgvY_DataError);
             // 
             // dgvY37
             // 
@@ -363,7 +357,6 @@
             this.dgvY37.Name = "dgvY37";
             this.dgvY37.Size = new System.Drawing.Size(237, 175);
             this.dgvY37.TabIndex = 8;
-            this.dgvY37.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgvY_DataError);
             // 
             // dgvY25
             // 
@@ -372,7 +365,6 @@
             this.dgvY25.Name = "dgvY25";
             this.dgvY25.Size = new System.Drawing.Size(227, 175);
             this.dgvY25.TabIndex = 7;
-            this.dgvY25.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgvY_DataError);
             // 
             // lblY37
             // 
@@ -436,7 +428,6 @@
             this.dgvY12.Name = "dgvY12";
             this.dgvY12.Size = new System.Drawing.Size(227, 175);
             this.dgvY12.TabIndex = 6;
-            this.dgvY12.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.dgvY_DataError);
             // 
             // tableLayoutPanel2
             // 
