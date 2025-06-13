@@ -218,17 +218,21 @@ namespace GKGenetix.UI.Forms
 
         public void SetStatus(string message)
         {
-            statusLbl.Text = message;
+            Application.Instance.Invoke(new Action(delegate {
+                statusLbl.Text = message;
+            }));
         }
 
         public void SetProgress(int percent)
         {
-            if (percent == -1 || percent == 100)
-                progressBar.Visible = false;
-            else {
-                progressBar.Visible = true;
-                progressBar.Value = percent;
-            }
+            Application.Instance.Invoke(new Action(delegate {
+                if (percent == -1 || percent == 100)
+                    progressBar.Visible = false;
+                else {
+                    progressBar.Visible = true;
+                    progressBar.Value = percent;
+                }
+            }));
         }
 
         public void NewKit()

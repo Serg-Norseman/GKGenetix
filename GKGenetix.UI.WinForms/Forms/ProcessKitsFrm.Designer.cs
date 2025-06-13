@@ -8,7 +8,6 @@
         private System.Windows.Forms.CheckBox chkDontSkip;
         private System.Windows.Forms.Label label1;
         private System.ComponentModel.BackgroundWorker bwROH;
-        private System.ComponentModel.BackgroundWorker bwPhaseVisualizer;
         private System.Windows.Forms.CheckBox chkRedoRoH;
 
         private void InitializeComponent()
@@ -19,7 +18,6 @@
             this.chkDontSkip = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.bwROH = new System.ComponentModel.BackgroundWorker();
-            this.bwPhaseVisualizer = new System.ComponentModel.BackgroundWorker();
             this.chkRedoRoH = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
@@ -81,14 +79,6 @@
             this.bwROH.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwROH_DoWork);
             this.bwROH.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bwROH_ProgressChanged);
             this.bwROH.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwROH_RunWorkerCompleted);
-            // 
-            // bwPhaseVisualizer
-            // 
-            this.bwPhaseVisualizer.WorkerReportsProgress = true;
-            this.bwPhaseVisualizer.WorkerSupportsCancellation = true;
-            this.bwPhaseVisualizer.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwPhaseVisualizer_DoWork);
-            this.bwPhaseVisualizer.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.bwPhaseVisualizer_ProgressChanged);
-            this.bwPhaseVisualizer.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.bwPhaseVisualizer_RunWorkerCompleted);
             // 
             // chkRedoRoH
             // 

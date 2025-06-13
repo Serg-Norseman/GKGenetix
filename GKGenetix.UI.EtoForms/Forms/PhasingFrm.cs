@@ -44,12 +44,12 @@ namespace GKGenetix.UI.Forms
 
             UIHelper.FixGridView(dgvPhasing);
 
-            dgvPhasing.AddColumn("RSID", "RSID");
-            dgvPhasing.AddColumn("Chromosome", "Chromosome");
+            dgvPhasing.AddColumn("rsID", "RSID");
+            dgvPhasing.AddColumn("ChrStr", "Chromosome");
             dgvPhasing.AddColumn("Position", "Position");
-            dgvPhasing.AddColumn("ChildGenotype", "Child");
-            dgvPhasing.AddColumn("PaternalGenotype", "Father");
-            dgvPhasing.AddColumn("MaternalGenotype", "Mother");
+            dgvPhasing.AddColumn("Child", "Child");
+            dgvPhasing.AddColumn("Father", "Father");
+            dgvPhasing.AddColumn("Mother", "Mother");
             dgvPhasing.AddColumn("PhasedPaternal", "Phased Paternal");
             dgvPhasing.AddColumn("PhasedMaternal", "Phased Maternal");
 

@@ -22,7 +22,6 @@ namespace GKGenetix.UI.Forms
         private string kit = null;
         private readonly SortedDictionary<int, List<string>> kitMutations = new SortedDictionary<int, List<string>>();
         private readonly SortedDictionary<int, List<string>> kitInsertions = new SortedDictionary<int, List<string>>();
-        private int initialValue = -1;
 
 
         public static bool CanBeUsed(IList<TestRecord> selectedKits)
@@ -124,58 +123,6 @@ namespace GKGenetix.UI.Forms
                 e.CellStyle.BackColor = Color.Green;
                 e.CellStyle.ForeColor = Color.White;
             }
-        }
-
-        private void mtdna_chart_MouseDown(object sender, MouseEventArgs e)
-        {
-            initialValue = e.Y;
-        }
-
-        private void mtdna_chart_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (initialValue != -1) {
-                if (e.Button == MouseButtons.Left) {
-                    int new_y = e.Y - initialValue;
-                    int new_degree = new_y * (90) / 1200;
-                    new_degree += mtdna_chart.ChartAreas[0].Area3DStyle.Inclination;
-
-                    if (new_degree < -90)
-                        new_degree = 90 + (new_degree + 90);
-
-                    if (new_degree > 90)
-                        new_degree = -90 + (new_degree - 90);
-
-                    mtdna_chart.ChartAreas[0].Area3DStyle.Inclination = new_degree;
-                }
-
-                if (e.Button == MouseButtons.Right) {
-                    int new_y = e.Y - initialValue;
-                    int new_degree = new_y * 180 / 1200;
-
-                    string tmp = mtdna_chart.Series[0].CustomProperties;
-                    int start_pos = tmp.IndexOf("PieStartAngle=") + "PieStartAngle=".Length;
-                    tmp = tmp.Substring(start_pos);
-                    start_pos = tmp.IndexOf(",");
-                    if (start_pos != -1)
-                        tmp = tmp.Substring(0, start_pos);
-
-                    int angle = int.Parse(tmp.Trim());
-                    new_degree += angle;
-
-                    if (new_degree < -180)
-                        new_degree = 180 + (new_degree + 180);
-
-                    if (new_degree > 180)
-                        new_degree = -180 + (new_degree - 180);
-
-                    mtdna_chart.Series[0].CustomProperties = "PieLineColor=Black, CollectedSliceExploded=True, DoughnutRadius=5, PieDrawingStyle=SoftEdge, PieLabelStyle=Outside, PieStartAngle=" + new_degree;
-                }
-            }
-        }
-
-        private void mtdna_chart_MouseUp(object sender, MouseEventArgs e)
-        {
-            initialValue = -1;
         }
 
         private void mtdna_chart_MouseClick(object sender, MouseEventArgs e)

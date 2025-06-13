@@ -16,6 +16,7 @@ namespace GKGenetix.UI.Forms
     public partial class ProcessKitsFrm : GKWidget
     {
         private IList<TestRecord> dt;
+        private bool redoAgain;
         private bool redoRoH;
 
 
@@ -26,7 +27,7 @@ namespace GKGenetix.UI.Forms
 
         private void ProcessKitsFrm_FormClosing(object sender, EventArgs e)
         {
-            if (bwCompare.IsBusy || bwROH.IsBusy || bwPhaseVisualizer.IsBusy) {
+            if (bwCompare.IsBusy || bwROH.IsBusy) {
                 _host.SetStatus("Cancelling...");
                 _host.SetProgress(-1);
                 btnStart.Text = "Cancelling";
@@ -35,8 +36,6 @@ namespace GKGenetix.UI.Forms
                     bwCompare.CancelAsync();
                 if (bwROH.IsBusy)
                     bwROH.CancelAsync();
-                if (bwPhaseVisualizer.IsBusy)
-                    bwPhaseVisualizer.CancelAsync();
                 //e.Cancel = true;
                 //this.Close();
             } else {
@@ -48,6 +47,9 @@ namespace GKGenetix.UI.Forms
 
         private void btnStart_Click(object sender, EventArgs e)
         {
+            redoAgain = chkDontSkip.Checked;
+            redoRoH = chkRedoRoH.Checked;
+
             if (btnStart.Text == "Start") {
                 _host.SetStatus("Processing Kits ...");
                 if (bwCompare.IsBusy) {
@@ -63,7 +65,6 @@ namespace GKGenetix.UI.Forms
                     _host.SetProgress(-1);
                     bwCompare.CancelAsync();
                     bwROH.CancelAsync();
-                    bwPhaseVisualizer.CancelAsync();
                     btnStart.Text = "Cancelling";
                     btnStart.Enabled = false;
                     _host.EnableExplore();
@@ -85,8 +86,6 @@ namespace GKGenetix.UI.Forms
 
         private void bwCompare_DoWork(object sender, DoWorkEventArgs e)
         {
-            var redoAgain = chkDontSkip.Checked;
-
             if (redoAgain)
                 GKSqlFuncs.ClearAllComparisons(false);
 
@@ -125,7 +124,7 @@ namespace GKGenetix.UI.Forms
                     WriteStatus($"Comparing Kits {itm.Kit1} ({itm.Name1}) and {itm.Kit2} ({itm.Name2})", -2, true);
                 }
 
-                var cmpResults = GKGenFuncs.CompareOneToOne(itm.Kit1, itm.Kit2, bwCompare, reference, true);
+                var cmpResults = GKGenFuncs.CompareOneToOne(itm.Kit1, itm.Kit2, bwCompare, reference, redoAgain);
                 int progress = i * 100 / items.Count;
 
                 if (cmpResults.Count > 0 || redoAgain) {
@@ -168,7 +167,6 @@ namespace GKGenetix.UI.Forms
 
             WriteStatus("Comparison Completed.", -1, true);
 
-            redoRoH = chkRedoRoH.Checked;
             bwROH.RunWorkerAsync();
         }
 
@@ -201,27 +199,6 @@ namespace GKGenetix.UI.Forms
         private void bwROH_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             WriteStatus("Runs of Homozygosity Processing Completed.", -1);
-
-            bwPhaseVisualizer.RunWorkerAsync();
-        }
-
-        private void bwPhaseVisualizer_DoWork(object sender, DoWorkEventArgs e)
-        {
-            GKGenFuncs.DoPhaseVisualizer(false, bwPhaseVisualizer);
-        }
-
-        private void bwPhaseVisualizer_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            btnStart.Text = "Start";
-            btnStart.Enabled = true;
-            WriteStatus("Phased Segment Processing Completed.", -1);
-            _host.EnableExplore();
-        }
-
-        private void bwPhaseVisualizer_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            string phStatus = e.UserState.ToString();
-            WriteStatus(phStatus, e.ProgressPercentage);
         }
     }
 }

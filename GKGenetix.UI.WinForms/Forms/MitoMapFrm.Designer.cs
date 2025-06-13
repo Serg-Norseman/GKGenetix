@@ -102,9 +102,6 @@
             this.mtdna_chart.Size = new System.Drawing.Size(528, 494);
             this.mtdna_chart.TabIndex = 0;
             this.mtdna_chart.MouseClick += new System.Windows.Forms.MouseEventHandler(this.mtdna_chart_MouseClick);
-            this.mtdna_chart.MouseDown += new System.Windows.Forms.MouseEventHandler(this.mtdna_chart_MouseDown);
-            this.mtdna_chart.MouseMove += new System.Windows.Forms.MouseEventHandler(this.mtdna_chart_MouseMove);
-            this.mtdna_chart.MouseUp += new System.Windows.Forms.MouseEventHandler(this.mtdna_chart_MouseUp);
             // 
             // details
             // 

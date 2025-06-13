@@ -38,16 +38,16 @@ namespace GKGenetix.Core.Model
 
     public class PhaseRow : IDataRecord
     {
-        public string rsID { get; private set; } // 0
-        public byte Chromosome { get; private set; } // 1
-        public int Position { get; private set; } // 2
+        public string rsID { get; set; }
+        public byte Chromosome { get; set; }
+        public int Position { get; set; }
 
-        public Genotype ChildGenotype { get; set; } // 3
-        public Genotype PaternalGenotype { get; set; } // 4
-        public Genotype MaternalGenotype { get; set; } // 5
+        public Genotype ChildGenotype { get; set; }
+        public Genotype PaternalGenotype { get; set; }
+        public Genotype MaternalGenotype { get; set; }
 
-        public char PhasedPaternal { get; set; } // 6
-        public char PhasedMaternal { get; set; } // 7
+        public char PhasedPaternal { get; set; }
+        public char PhasedMaternal { get; set; }
 
         public bool Mutated { get; set; }
         public bool Ambiguous { get; set; }

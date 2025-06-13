@@ -14,6 +14,9 @@ using GKGenetix.Core;
 using GKGenetix.Core.Database;
 using GKGenetix.Core.Model;
 using GKGenetix.Core.Reference;
+using OxyPlot;
+using OxyPlot.Eto;
+using OxyPlot.Series;
 
 namespace GKGenetix.UI.Forms
 {
@@ -22,7 +25,7 @@ namespace GKGenetix.UI.Forms
         #region Design components
 #pragma warning disable CS0169, CS0649, IDE0044, IDE0051
 
-        //private DataVisualization.Charting.Chart mtdna_chart;
+        private PlotView mtdna_chart;
         private TabPage mtMapTab;
         private TabPage details;
         private GridView dgvMtDna;
@@ -35,10 +38,11 @@ namespace GKGenetix.UI.Forms
         #endregion
 
 
+        private PlotModel plotModel;
         private string kit = null;
         private readonly SortedDictionary<int, List<string>> kitMutations = new SortedDictionary<int, List<string>>();
         private readonly SortedDictionary<int, List<string>> kitInsertions = new SortedDictionary<int, List<string>>();
-        private float initialValue = -1;
+        private List<MtDNAMapItem> mtdna_map;
 
 
         public static bool CanBeUsed(IList<TestRecord> selectedKits)
@@ -54,6 +58,10 @@ namespace GKGenetix.UI.Forms
         public MitoMapFrm(IKitHost host, string kit) : base(host)
         {
             XamlReader.Load(this);
+
+            plotModel = new PlotModel();
+            mtdna_chart.Model = plotModel;
+            mtdna_chart.MouseDown += mtdna_chart_MouseClick;
 
             UIHelper.FixGridView(dgvMtDna);
             dgvMtDna.AddColumn("MapLocus", "Map Locus");
@@ -83,18 +91,21 @@ namespace GKGenetix.UI.Forms
         {
             this.Text = $"Mito Map : {kit} ({GKSqlFuncs.GetKitName(kit)})";
 
-            var mtdna_map = RefData.MtDnaMap;
+            mtdna_map = RefData.MtDnaMap;
 
-            /*Series series = mtdna_chart.Series[0];
-            series.Points.Clear();
+            plotModel.Title = "Mito Map";
+            var series = new PieSeries {
+                InsideLabelPosition = 0.9,
+                InnerDiameter = 0.95,
+            };
+            plotModel.Series.Add(series);
+
+            series.Slices.Clear();
             foreach (var mdm in mtdna_map) {
-                DataPoint dp = new DataPoint();
-                dp.IsVisibleInLegend = false;
-                dp.Label = mdm.MapLocus;
-                dp.YValues = new double[] { int.Parse(mdm.bpLength) };
-                dp.CustomProperties = "PieLineColor=Black, PieLabelStyle=Outside, Exploded=True";
-                series.Points.Add(dp);
-            }*/
+                var slice = new PieSlice(mdm.MapLocus, int.Parse(mdm.bpLength));
+                series.Slices.Add(slice);
+            }
+            mtdna_chart.Invalidate();
 
             dgvMtDna.DataStore = mtdna_map;
 
@@ -118,9 +129,6 @@ namespace GKGenetix.UI.Forms
             if (selRow == null) return;
 
             string title = selRow.MapLocus;
-            /*foreach (DataPoint dp in mtdna_chart.Series[0].Points) {
-                dp.LabelBackColor = (dp.Label == title) ? Colors.LightBlue : Colors.White;
-            }*/
             rsrs.Text = "Nucleotides - " + title;
 
             int start = int.Parse(selRow.Starting);
@@ -143,84 +151,17 @@ namespace GKGenetix.UI.Forms
             }
         }
 
-        private void mtdna_chart_MouseDown(object sender, MouseEventArgs e)
-        {
-            var mPt = e.Location;
-            initialValue = mPt.Y;
-        }
-
-        private void mtdna_chart_MouseMove(object sender, MouseEventArgs e)
-        {
-            /*var mPt = e.Location;
-            if (initialValue != -1) {
-                if (e.Buttons == MouseButtons.Primary) {
-                    int new_y = mPt.Y - initialValue;
-                    int new_degree = new_y * (90) / 1200;
-                    new_degree += mtdna_chart.ChartAreas[0].Area3DStyle.Inclination;
-
-                    if (new_degree < -90)
-                        new_degree = 90 + (new_degree + 90);
-
-                    if (new_degree > 90)
-                        new_degree = -90 + (new_degree - 90);
-
-                    mtdna_chart.ChartAreas[0].Area3DStyle.Inclination = new_degree;
-                }
-
-                if (e.Buttons == MouseButtons.Alternate) {
-                    int new_y = mPt.Y - initialValue;
-                    int new_degree = new_y * 180 / 1200;
-
-                    string tmp = mtdna_chart.Series[0].CustomProperties;
-                    int start_pos = tmp.IndexOf("PieStartAngle=") + "PieStartAngle=".Length;
-                    tmp = tmp.Substring(start_pos);
-                    start_pos = tmp.IndexOf(",");
-                    if (start_pos != -1)
-                        tmp = tmp.Substring(0, start_pos);
-
-                    int angle = int.Parse(tmp.Trim());
-                    new_degree += angle;
-
-                    if (new_degree < -180)
-                        new_degree = 180 + (new_degree + 180);
-
-                    if (new_degree > 180)
-                        new_degree = -180 + (new_degree - 180);
-
-                    mtdna_chart.Series[0].CustomProperties = "PieLineColor=Black, CollectedSliceExploded=True, DoughnutRadius=5, PieDrawingStyle=SoftEdge, PieLabelStyle=Outside, PieStartAngle=" + new_degree;
-                }
-            }*/
-        }
-
-        private void mtdna_chart_MouseUp(object sender, MouseEventArgs e)
-        {
-            initialValue = -1;
-        }
-
         private void mtdna_chart_MouseClick(object sender, MouseEventArgs e)
         {
-            // Call Hit Test Method
-            /*var mPt = e.Location;
-            HitTestResult result = mtdna_chart.HitTest(mPt.X, mPt.Y);
-
-            if (result.ChartElementType == ChartElementType.DataPoint || result.ChartElementType == ChartElementType.DataPointLabel) {
-                foreach (DataPoint dp2 in mtdna_chart.Series[0].Points) {
-                    dp2.LabelBackColor = Colors.White;
-                    dp2.LabelForeColor = Colors.Black;
+            var series = plotModel.Series[0] as PieSeries;
+            if (series != null) {
+                var point = new ScreenPoint(e.Location.X, e.Location.Y);
+                var nearestSlice = series.GetNearestPoint(point, true);
+                if (nearestSlice != null) {
+                    _host.SetStatus("Selected " + nearestSlice.Text);
+                    dgvMtDna.SelectedRow = (int)nearestSlice.Index;
                 }
-
-                DataPoint dp = (DataPoint)result.Object;
-                dp.LabelBackColor = Colors.LightBlue;
-                _host.SetStatus("Selected " + dp.Label);
-
-                foreach (DataGridViewRow dgvRow in dgvMtDna.Rows) {
-                    var row = (MtDNAMapItem)dgvRow.DataBoundItem;
-                    if (row.MapLocus == dp.Label) {
-                        dgvRow.Selected = true;
-                        break;
-                    }
-                }
-            }*/
+            }
         }
 
         private void PopulateFASTA(string locus, int start, int end)

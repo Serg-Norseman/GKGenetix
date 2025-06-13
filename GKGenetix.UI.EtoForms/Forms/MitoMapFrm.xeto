@@ -1,20 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Panel xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:oxy="clr-namespace:OxyPlot;assembly=OxyPlot"
+  xmlns:oxeto="clr-namespace:OxyPlot.Eto;assembly=OxyPlot.Eto"
   x:Class="GKGenetix.UI.Forms.MitoMapFrm"
-  Load="MitoMapFrm_Load">
+  Load="MitoMapFrm_Load" Padding="4">
 
-  <TableLayout Spacing="4, 4">
-    <TableRow>
-
+  <Splitter Orientation="Horizontal" FixedPanel="Panel2" RelativePosition="360">
+    <Splitter.Panel1>
       <TabControl>
         <TabPage x:Name="mtMapTab" Text="Mitocondria Map">
+          <oxeto:PlotView x:Name="mtdna_chart">
+          </oxeto:PlotView>
         </TabPage>
 
         <TabPage x:Name="details" Text="Details">
           <GridView x:Name="dgvMtDna" SelectionChanged="dgvMtDna_SelectionChanged" />
         </TabPage>
       </TabControl>
+    </Splitter.Panel1>
 
+    <Splitter.Panel2>
       <TabControl>
         <TabPage x:Name="rsrs" Text="Nucleotides">
           <GridView x:Name="dgvNucleotides" CellFormatting="dgvNucleotides_CellFormatting" />
@@ -24,8 +29,7 @@
           <RichTextArea x:Name="rtbFASTA" TextColor="LightGrey" />
         </TabPage>
       </TabControl>
-
-    </TableRow>
-  </TableLayout>
+    </Splitter.Panel2>
+  </Splitter>
 
 </Panel>

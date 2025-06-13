@@ -41,7 +41,6 @@ namespace GKGenetix.Core.Database
         private const string TABLE_cmp_status_CREATE_SQL = "CREATE TABLE [cmp_status] ([cmp_id] INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, [kit1] TEXT NOT NULL REFERENCES [kit_master]([kit_no]) ON DELETE CASCADE ON UPDATE CASCADE, [kit2] TEXT NOT NULL REFERENCES [kit_master]([kit_no]) ON DELETE CASCADE ON UPDATE CASCADE, [status_autosomal] INTEGER NOT NULL DEFAULT 0, [status_ysnp] INTEGER NOT NULL DEFAULT 0, [status_ystr] INTEGER NOT NULL DEFAULT 0, [status_mtdna] INTEGER NOT NULL DEFAULT 0, [at_longest] DOUBLE NOT NULL DEFAULT (0.0), [at_total] DOUBLE NOT NULL DEFAULT (0.0), [x_longest] DOUBLE NOT NULL DEFAULT (0.0), [x_total] DOUBLE NOT NULL DEFAULT (0.0), [mrca] INTEGER NOT NULL DEFAULT 0, [mt_haplogroup] TEXT, [y_haplogroup] TEXT, [last_processed] DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)";
         private const string TABLE_kit_roh_CREATE_SQL = "CREATE TABLE [kit_roh] ([kit_no] TEXT NOT NULL REFERENCES [kit_master]([kit_no]) ON DELETE CASCADE ON UPDATE CASCADE, [chromosome] TEXT NOT NULL, [start_position] INTEGER NOT NULL, [end_position] INTEGER NOT NULL, [segment_length_cm] DOUBLE NOT NULL DEFAULT (0.0), [snp_count] INTEGER NOT NULL)";
         private const string TABLE_kit_phased_CREATE_SQL = "CREATE TABLE [kit_phased] ([kit_no] TEXT REFERENCES [kit_master]([kit_no]) ON DELETE CASCADE ON UPDATE CASCADE, [rsid] TEXT NOT NULL, [chromosome] TEXT NOT NULL, [position] INTEGER NOT NULL, [paternal_genotype] TEXT NOT NULL, [maternal_genotype] TEXT NOT NULL, [paternal_kit_no] TEXT, [maternal_kit_no] TEXT, CONSTRAINT [sqlite_autoindex_kit_phased_1] PRIMARY KEY ([kit_no], [rsid]))";
-        private const string TABLE_cmp_phased_CREATE_SQL = "CREATE TABLE [cmp_phased] ([phased_kit] TEXT NOT NULL REFERENCES [kit_master]([kit_no]) ON DELETE CASCADE ON UPDATE CASCADE, [match_kit] TEXT NOT NULL, [chromosome] TEXT NOT NULL, [start_position] INTEGER NOT NULL, [end_position] INTEGER NOT NULL, [segment_image] BLOB, [segment_xml] TEXT)";
 
         private static readonly string[] CreateTableSQL = new string[]{
             "kit_master", TABLE_kit_master_CREATE_SQL,
@@ -55,7 +54,6 @@ namespace GKGenetix.Core.Database
             "cmp_status", TABLE_cmp_status_CREATE_SQL,
             "kit_roh", TABLE_kit_roh_CREATE_SQL,
             "kit_phased", TABLE_kit_phased_CREATE_SQL,
-            "cmp_phased", TABLE_cmp_phased_CREATE_SQL
         };
 
         private static readonly DBPatch[] Patches = new DBPatch[] {
@@ -65,10 +63,10 @@ namespace GKGenetix.Core.Database
             new DBPatch(102, "update [cmp_mrca] set [chromosome] = '23' where [chromosome] = 'X'"),
             new DBPatch(102, "update [kit_roh] set [chromosome] = '23' where [chromosome] = 'X'"),
             new DBPatch(102, "update [kit_phased] set [chromosome] = '23' where [chromosome] = 'X'"),
-            new DBPatch(102, "update [cmp_phased] set [chromosome] = '23' where [chromosome] = 'X'"),
+            new DBPatch(103, "drop table if exists cmp_phased"),
         };
 
-        private const int DB_VER = 103;
+        private const int DB_VER = 104;
 
         #endregion
 
@@ -448,21 +446,14 @@ namespace GKGenetix.Core.Database
             return !string.IsNullOrEmpty(val);
         }
 
-        public static IList<UnphasedSegment> GetUnphasedSegments(string phasedKit)
+        /*public static IList<UnphasedSegment> GetUnphasedSegments(string phasedKit)
         {
             return GetRows<UnphasedSegment>(
                 "select unphased_kit'UnphasedKit', chromosome'ChrStr', start_position'StartPosition', end_position'EndPosition' from (" +
                 $"select kit1'unphased_kit', chromosome, start_position, end_position from cmp_autosomal where kit2='{phasedKit}' " +
                 $"union select kit2'unphased_kit', chromosome, start_position, end_position from cmp_autosomal where kit1='{phasedKit}'" +
                 ") order by cast(chromosome as integer), start_position");
-        }
-
-        public static bool HasUnphasedSegment(string phasedKit, string unphasedKit, byte chromosome, int startPosition, int endPosition)
-        {
-            var val = QueryValue(
-                $"select phased_kit'Value' from cmp_phased where phased_kit='{phasedKit}' and match_kit='{unphasedKit}' and chromosome='{chromosome}' and start_position={startPosition} and end_position={endPosition}");
-            return !string.IsNullOrEmpty(val);
-        }
+        }*/
 
         public static IList<PhaseSegment> GetPhaseSegments(string phasedKit, string unphasedKit, byte chromosome, int startPosition, int endPosition)
         {
@@ -506,26 +497,19 @@ namespace GKGenetix.Core.Database
                 if (string.IsNullOrEmpty(phasedMaternal)) phasedMaternal = string.Empty;
 
                 _connection.Execute(
-                    "insert into kit_phased (kit_no, rsid, chromosome, position, paternal_genotype, maternal_genotype, paternal_kit_no, maternal_kit_no) " +
+                    "insert or replace into kit_phased (kit_no, rsid, chromosome, position, paternal_genotype, maternal_genotype, paternal_kit_no, maternal_kit_no) " +
                     $"values ('{childKit}', '{row.rsID}', '{row.Chromosome}', {row.Position}, '{phasedPaternal}', '{phasedMaternal}', '{fatherKit}', '{motherKit}')");
             }
             _connection.Commit();
         }
 
-        public static void DeletePhasedKit(string kit)
-        {
-            CheckConnection();
-
-            _connection.Execute($"delete from cmp_phased where phased_kit = '{kit}'");
-        }
-
-        public static IList<string> GetPhasedKits()
+        /*public static IList<string> GetPhasedKits()
         {
             CheckConnection();
 
             var rows = _connection.Query<QString>("select distinct kit_no'Value' from kit_phased");
             return rows.Select(x => x.Value).ToList();
-        }
+        }*/
 
         #endregion
 
