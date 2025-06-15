@@ -29,8 +29,8 @@ namespace GKGenetix.Core.Database
         public string Location { get; set; }
         public double AtTotal { get; set; }
         public double AtLongest { get; set; }
-        public int Lng { get; set; }
-        public int Lat { get; set; }
+        public double Lng { get; set; }
+        public double Lat { get; set; }
 
 
         public double Percentage { get; set; }

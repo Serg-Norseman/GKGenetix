@@ -6,7 +6,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Windows.Forms.DataVisualization.Charting;
 using GKGenetix.Core;
 using GKGenetix.Core.Database;
@@ -54,50 +53,46 @@ namespace GKGenetix.UI.Forms
         {
             this.Text = $"Admixture : {kit} ({GKSqlFuncs.GetKitName(kit)})";
 
+            pbWorldMap.Clear();
+            var testRec = GKSqlFuncs.GetKit(kit);
+            var hasPt = (testRec.Lng != 0 || testRec.Lat != 0);
+            if (hasPt) {
+                pbWorldMap.AddMarker(new GKMap.PointLatLng(testRec.Lat, testRec.Lng), GKMap.MapObjects.GMarkerIconType.red_small, "");
+            }
+
             var dt = GKSqlFuncs.GetAdmixture(kit, "> 3");
             foreach (var row in dt) row.PrepareValues();
             AdmixtureRecord.RecalcPercents(dt);
             dgvAdmixture.DataSource = dt;
 
+            var seriesPoints = chart1.Series[0].Points;
+            seriesPoints.Clear();
             foreach (var row in dt) {
-                chart1.Series[0].Points.AddXY($"{row.Population}, {row.Location} ({row.Percentage:#0.00} %)", row.Percentage);
+                seriesPoints.AddXY($"{row.Population}, {row.Location} ({row.Percentage:#0.00} %)", row.Percentage);
             }
 
-            foreach (DataPoint p in chart1.Series[0].Points) {
+            foreach (DataPoint p in seriesPoints) {
                 p.IsVisibleInLegend = false;
             }
 
-            var plotted = new List<string>();
-            Image img = (Image)GKGenetix.UI.Properties.Resources.world_map.Clone();
-            using (Graphics g = Graphics.FromImage(img)) {
-                foreach (var row in dt) {
-                    if (row.Lng == 0 && row.Lat == 0) continue;
+            foreach (var row in dt) {
+                if (row.Lng == 0 && row.Lat == 0) continue;
 
-                    string item = row.Lng + ":" + row.Lat;
-                    if (!plotted.Contains(item)) {
-                        SetHeatMap(g, (int)row.Percentage, row.Lng, row.Lat);
-                        plotted.Add(item);
-                    }
+                var perc = $"{row.Percentage:#0.00} %";
+
+                pbWorldMap.AddMarker(new GKMap.PointLatLng(row.Lat, row.Lng), GKMap.MapObjects.GMarkerIconType.green_small, $"{row.Name} {perc}");
+
+                if (hasPt) {
+                    pbWorldMap.AddRoute(perc, new List<GKMap.PointLatLng>() { new GKMap.PointLatLng(testRec.Lat, testRec.Lng), new GKMap.PointLatLng(row.Lat, row.Lng) });
                 }
             }
-            pbWorldMap.Image = img;
+
+            pbWorldMap.Invalidate();
         }
 
         private void AdmixtureFrm_Load(object sender, EventArgs e)
         {
             ReloadData();
-        }
-
-        private static void SetHeatMap(Graphics g, int percent, int x, int y)
-        {
-            percent = Math.Min(50, percent);
-
-            int radius_gap = 2;
-            for (int i = 0; i < percent; i++) {
-                using (var pen1 = new Pen(UIHelper.HeatMapColor(i, percent), 2)) {
-                    g.DrawEllipse(pen1, x - 1 - i * radius_gap, y - 1 - i * radius_gap, 2 + i * 2 * radius_gap, 2 + i * 2 * radius_gap);
-                }
-            }
         }
     }
 }

@@ -21,6 +21,12 @@
     <Reference Include="BSLib">
       <HintPath>..\libs\BSLib.dll</HintPath>
     </Reference>
+    <Reference Include="GKMap.Core">
+      <HintPath>..\libs\GKMap.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="GKMap.WinForms">
+      <HintPath>..\libs\GKMap.WinForms.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -50,6 +56,9 @@
     </Compile>
     <Compile Include="Forms\ImportTestFrm.Designer.cs">
       <DependentUpon>ImportTestFrm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GKMapBrowser.cs">
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="GKWidget.cs">
       <SubType>UserControl</SubType>

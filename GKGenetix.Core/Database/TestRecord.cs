@@ -38,8 +38,7 @@ namespace GKGenetix.Core.Database
         public string Location
         {
             get {
-                string xy = (int)Lng + ":" + (int)Lat;
-                if (xy == "0:0") xy = "Unknown";
+                string xy = Lng.ToString("#0.000000") + ":" + Lat.ToString("#0.000000");
                 return xy;
             }
         }

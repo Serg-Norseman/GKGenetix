@@ -523,14 +523,15 @@ namespace GKGenetix.UI.Forms
             string kit = (string)e.Argument;
 
             // kit master
-            GKSqlFuncs.GetKit(kit, out string name, out string sex);
+            var testRec = GKSqlFuncs.GetKit(kit);
             this.Invoke(new MethodInvoker(delegate {
-                txtName.Text = name;
-                if (sex == "U")
+                if (testRec == null) return;
+                txtName.Text = testRec.Name;
+                if (testRec.Sex == "U")
                     cbSex.SelectedIndex = 0;
-                else if (sex == "M")
+                else if (testRec.Sex == "M")
                     cbSex.SelectedIndex = 1;
-                else if (sex == "F")
+                else if (testRec.Sex == "F")
                     cbSex.SelectedIndex = 2;
             }));
 

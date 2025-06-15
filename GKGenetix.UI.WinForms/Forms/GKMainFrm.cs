@@ -84,8 +84,6 @@ namespace GKGenetix.UI.Forms
         private void miSave_Click(object sender, EventArgs e)
         {
             var widget = (panWidget.Controls.Count > 0) ? panWidget.Controls[0] : null;
-            if (widget == null) return;
-
             if (widget is NewEditKitFrm editFrm)
                 editFrm.Save();
             else

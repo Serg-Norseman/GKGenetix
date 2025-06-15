@@ -9,7 +9,7 @@
         private System.Windows.Forms.DataGridView dgvAdmixture;
         private System.Windows.Forms.TabPage tabChart;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
-        private System.Windows.Forms.PictureBox pbWorldMap;
+        private GKGenetix.UI.GKMapBrowser pbWorldMap;
 
         private void InitializeComponent()
         {
@@ -19,7 +19,7 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabOrigins = new System.Windows.Forms.TabPage();
-            this.pbWorldMap = new System.Windows.Forms.PictureBox();
+            this.pbWorldMap = new GKGenetix.UI.GKMapBrowser();
             this.tabAdmixTable = new System.Windows.Forms.TabPage();
             this.dgvAdmixture = new System.Windows.Forms.DataGridView();
             this.tabChart = new System.Windows.Forms.TabPage();
@@ -27,7 +27,6 @@
             this.tableLayoutPanel1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabOrigins.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbWorldMap)).BeginInit();
             this.tabAdmixTable.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvAdmixture)).BeginInit();
             this.tabChart.SuspendLayout();
@@ -76,7 +75,6 @@
             this.pbWorldMap.Location = new System.Drawing.Point(3, 3);
             this.pbWorldMap.Name = "pbWorldMap";
             this.pbWorldMap.Size = new System.Drawing.Size(764, 464);
-            this.pbWorldMap.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbWorldMap.TabIndex = 0;
             this.pbWorldMap.TabStop = false;
             // 
@@ -143,7 +141,6 @@
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabOrigins.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pbWorldMap)).EndInit();
             this.tabAdmixTable.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvAdmixture)).EndInit();
             this.tabChart.ResumeLayout(false);

@@ -5,6 +5,7 @@
  */
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using GKGenetix.Core.Model;
@@ -72,6 +73,9 @@ namespace GKGenetix.Core.Database
 
         static GKSqlFuncs()
         {
+            numberFormat = new NumberFormatInfo();
+            numberFormat.NumberDecimalSeparator = ".";
+
 #if !NETSTANDARD && !NET461 && !MONO
             SQLiteLoader.Load();
 #endif
@@ -80,6 +84,7 @@ namespace GKGenetix.Core.Database
         private static SQLiteConnection _connection;
         private static IKitHost _host;
         private static string _appDataPath = string.Empty;
+        private static NumberFormatInfo numberFormat;
 
         public static void SetHost(IKitHost host)
         {
@@ -228,19 +233,16 @@ namespace GKGenetix.Core.Database
             return GetRows<TestRecord>(sql);
         }
 
-        public static void GetKit(string kitNo, out string name, out string sex)
+        public static TestRecord GetKit(string kitNo)
         {
             CheckConnection();
 
-            var rows = _connection.Query<TestRecord>($"select name'Name', sex'Sex' from kit_master where kit_no = '{kitNo}'");
+            var rows = _connection.Query<TestRecord>($"select kit_no'KitNo', name'Name', sex'Sex', disabled'Disabled', [x]'Lng', [y]'Lat', last_modified'LastModified', reference'Reference', roh_status'RoH_Status' from kit_master where kit_no = '{kitNo}'");
             if (rows != null && rows.Count > 0) {
-                name = rows[0].Name;
-                sex = rows[0].Sex;
-                return;
+                return rows[0];
             }
 
-            name = string.Empty;
-            sex = string.Empty;
+            return null;
         }
 
         public static void UpdateKit(string kit_no, string name, string sex)
@@ -263,7 +265,10 @@ namespace GKGenetix.Core.Database
 
             var sex = testRec.Sex[0].ToString();
             string dis = (testRec.Disabled) ? "1" : "0";
-            _connection.Execute($"update kit_master set name = '{testRec.Name}', sex = '{sex}', disabled = {dis}, x = {(int)testRec.Lng}, y = {(int)testRec.Lat} where kit_no = '{testRec.KitNo}'");
+            string lng = testRec.Lng.ToString("#0.000000", numberFormat);
+            string lat = testRec.Lat.ToString("#0.000000", numberFormat);
+
+            _connection.Execute($"update kit_master set name = '{testRec.Name}', sex = '{sex}', disabled = {dis}, x = {lng}, y = {lat} where kit_no = '{testRec.KitNo}'");
         }
 
         #endregion

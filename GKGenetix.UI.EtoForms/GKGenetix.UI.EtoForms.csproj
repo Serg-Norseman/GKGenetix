@@ -21,6 +21,12 @@
         <Reference Include="BSLib">
             <HintPath>..\libs\netstd\BSLib.dll</HintPath>
         </Reference>
+        <Reference Include="GKMap.Core">
+            <HintPath>..\libs\netstd\GKMap.Core.dll</HintPath>
+        </Reference>
+        <Reference Include="GKMap.EtoForms">
+            <HintPath>..\libs\netstd\GKMap.EtoForms.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
     <ItemGroup>
@@ -35,6 +41,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Include="GKMapBrowser.cs" />
         <Compile Include="GKWidget.cs" />
         <Compile Include="UIHelper.cs" />
         <Compile Include="EFImage.cs" />

@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Panel xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:gcomp="clr-namespace:GKGenetix.UI"
+  xmlns:oxy="clr-namespace:OxyPlot;assembly=OxyPlot"
+  xmlns:oxeto="clr-namespace:OxyPlot.Eto;assembly=OxyPlot.Eto"
   x:Class="GKGenetix.UI.Forms.AdmixtureFrm"
   Load="AdmixtureFrm_Load">
 
   <TabControl x:Name="tabControl1">
     <TabPage x:Name="tabOrigins" Text="Ethnic Origins">
-      <ImageView x:Name="pbWorldMap" />
+      <gcomp:GKMapBrowser x:Name="pbWorldMap" />
     </TabPage>
 
     <TabPage x:Name="tabChart" Text="Chart View">
+      <oxeto:PlotView x:Name="chart1">
+      </oxeto:PlotView>
     </TabPage>
 
     <TabPage x:Name="tabAdmixTable" Text="Admixture Table">

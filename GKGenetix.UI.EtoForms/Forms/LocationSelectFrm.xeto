@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Dialog xmlns="http://schema.picoe.ca/eto.forms" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:gcomp="clr-namespace:GKGenetix.UI"
   x:Class="GKGenetix.UI.Forms.LocationSelectFrm"
-  Title="World Map" Size="678, 314" Load="LocationSelectFrm_Load">
+  Title="World Map" Size="678, 314">
 
-  <ImageView x:Name="pbWorldMap" MouseDown="pbWorldMap_MouseClick" MouseMove="pbWorldMap_MouseMove" />
+  <gcomp:GKMapBrowser x:Name="pbWorldMap" />
 
 </Dialog>

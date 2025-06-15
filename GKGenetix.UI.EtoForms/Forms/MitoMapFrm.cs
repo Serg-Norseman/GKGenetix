@@ -93,6 +93,7 @@ namespace GKGenetix.UI.Forms
 
             mtdna_map = RefData.MtDnaMap;
 
+            plotModel.Series.Clear();
             plotModel.Title = "Mito Map";
             var series = new PieSeries {
                 InsideLabelPosition = 0.9,

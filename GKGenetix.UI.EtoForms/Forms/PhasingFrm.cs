@@ -93,8 +93,8 @@ namespace GKGenetix.UI.Forms
             btnFather.Text = GKSqlFuncs.GetKitName(fatherKit);
             btnMother.Text = GKSqlFuncs.GetKitName(motherKit);
 
-            GKSqlFuncs.GetKit(childKit, out string chName, out chSex);
-            btnChild.Text = chName;
+            var testRec = GKSqlFuncs.GetKit(childKit);
+            btnChild.Text = testRec?.Name;
 
             btnPhasing.Enabled = ((fatherKit != "Unknown" || motherKit != "Unknown") && childKit != "Unknown");
         }
