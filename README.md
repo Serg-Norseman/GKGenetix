@@ -22,7 +22,6 @@ Management, analysis and matching tool for Autosomal, X, Y and Mitochondrial DNA
 
 Planned:
 - Downloading up-to-date SNP reference databases;
-- Simple charts;
 
 ## GGKit (Genetic Genealogy Kit)
 

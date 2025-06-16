@@ -84,7 +84,7 @@ namespace GKGenetix.Core.Model
             // chromosome 24 is male Y
             var chrY = Chromosomes[23];
             for (int i = chrY.StartPosition; i <= chrY.EndPosition; i++) {
-                if (SNP[i].Genotype.A1 == '0') {
+                if (SNP[i].Genotype.A1 == Genotype.UnknownAllele) {
                     count++;
                 }
                 total++;

@@ -37,19 +37,19 @@ namespace GKGenetix.Core.Model
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct Genotype : IEquatable<Genotype>
     {
-        public static readonly Genotype Empty = new Genotype('-', '-');
+        public static readonly Genotype Empty = new Genotype(UnknownAllele, UnknownAllele);
 
         public const char UnknownAllele = '0';
 
         /// <summary>
-        /// Allele1.
+        /// Allele 1.
         /// </summary>
-        public char A1;
+        public char A1 { get; private set; }
 
         /// <summary>
-        /// Allele2.
+        /// Allele 2.
         /// </summary>
-        public char A2;
+        public char A2 { get; private set; }
 
         public char this[int index]
         {
@@ -73,43 +73,53 @@ namespace GKGenetix.Core.Model
 
         public Genotype(char a1, char a2, Orientation orientation = Orientation.Unknown)
         {
-            A1 = a1;
-            A2 = a2;
+            A1 = CheckAllele(a1);
+            A2 = CheckAllele(a2);
             Orientation = orientation;
         }
 
         public Genotype(string field, Orientation orientation = Orientation.Unknown)
         {
-            A1 = '0';
-            A2 = '0';
+            A1 = UnknownAllele;
+            A2 = UnknownAllele;
             if (!string.IsNullOrEmpty(field)) {
-                A1 = field[0];
+                A1 = CheckAllele(field[0]);
                 if (field.Length > 1) {
-                    A2 = field[1];
+                    A2 = CheckAllele(field[1]);
                 }
             }
             Orientation = orientation;
         }
 
+        private static char CheckAllele(char value)
+        {
+            return (value == '-' || value == '?') ? UnknownAllele : value;
+        }
+
         public void Clear()
         {
-            A1 = '0';
-            A2 = '0';
+            A1 = UnknownAllele;
+            A2 = UnknownAllele;
+        }
+
+        public bool IsHomozygous()
+        {
+            return (A1 == A2 && A1 != UnknownAllele);
         }
 
         public static bool IsEmptyOrUnknown(char a)
         {
-            return /*a == UnknownAllele ||*/ a == '-' || a == '?';
+            return a == UnknownAllele;
         }
 
         public bool IsEmptyOrUnknown()
         {
-            return (A1 == UnknownAllele || A1 == '-' || A1 == '?') || (A2 == UnknownAllele || A2 == '-' || A2 == '?');
+            return (A1 == UnknownAllele || A2 == UnknownAllele);
         }
 
         public bool IsFullEmpty()
         {
-            return (A1 == UnknownAllele || A1 == '-' || A1 == '?') && (A2 == UnknownAllele || A2 == '-' || A2 == '?');
+            return (A1 == UnknownAllele && A2 == UnknownAllele);
         }
 
         public bool Contains(char a)
@@ -125,22 +135,22 @@ namespace GKGenetix.Core.Model
         public char GetOther(char al)
         {
             if (A1 == al && A2 == al) {
-                return '0';
+                return UnknownAllele;
             } else if (A1 == al) {
                 return A2;
             } else if (A2 == al) {
                 return A1;
             } else {
-                return '0';
+                return UnknownAllele;
             }
         }
 
         public void CheckCompleteness()
         {
             // questionable decision?
-            if (A1 == UnknownAllele || A1 == '-' || A1 == '?') {
+            if (A1 == UnknownAllele) {
                 A1 = A2;
-            } else if (A2 == UnknownAllele || A2 == '-' || A2 == '?') {
+            } else if (A2 == UnknownAllele) {
                 A2 = A1;
             }
         }
@@ -182,11 +192,6 @@ namespace GKGenetix.Core.Model
             return string.Format("{0}{1}", A1, A2);
         }
 
-        public Genotype GetComplement()
-        {
-            return new Genotype(GeneLab.GetComplementaryNucleotide(A1), GeneLab.GetComplementaryNucleotide(A2));
-        }
-
         public static Nucleotide ParseNucleotide(char a)
         {
             Nucleotide result;
@@ -211,15 +216,24 @@ namespace GKGenetix.Core.Model
                     result = Nucleotide.U;
                     break;
 
-                case 'N':
-                case '0':
-                case '-':
-                case '?':
+                case '.': // only [VCF] gap?, ??
+                case 'N': // only [VCF] any one base?, ??
+                case '0': // only [AncestryDNA] "not determined", always "00" (checked!)
+                case '-': // only [23andMe] "not determined", always "--" (checked!)
+                case '?': // ? [?] "missing or unknown genotypes", "??"
+                    result = Nucleotide.NoCall;
+                    break;
+
                 default:
                     result = Nucleotide.None;
                     break;
             }
             return result;
+        }
+
+        public Genotype GetComplement()
+        {
+            return new Genotype(GeneLab.GetComplementaryNucleotide(A1), GeneLab.GetComplementaryNucleotide(A2));
         }
 
         public Genotype GetComplement(Orientation orientation)
@@ -239,6 +253,41 @@ namespace GKGenetix.Core.Model
             } else {
                 return GetComplement(targetOrientation);
             }
+        }
+
+        /// <summary>
+        /// IUPAC symbols. See: https://en.wikipedia.org/wiki/Nucleic_acid_notation
+        /// </summary>
+        public char GetNucleotideCode()
+        {
+            /*
+                R = A/G (Purine)
+                Y = C/T (Pyrimidine)
+                S = G/C (Strong)
+                W = A/T (Weak)
+                K = G/T (Ketone)
+                M = A/C (Amino)
+                N = (Any one base)
+                - = (Gap)
+             */
+
+            char bp1 = A1;
+            char bp2 = A2;
+
+            if ((bp1 == 'A' && bp2 == 'G') || (bp1 == 'G' && bp2 == 'A'))
+                return 'R';
+            else if ((bp1 == 'C' && bp2 == 'T') || (bp1 == 'T' && bp2 == 'C'))
+                return 'Y';
+            else if ((bp1 == 'C' && bp2 == 'G') || (bp1 == 'G' && bp2 == 'C'))
+                return 'S';
+            else if ((bp1 == 'A' && bp2 == 'T') || (bp1 == 'T' && bp2 == 'A'))
+                return 'W';
+            else if ((bp1 == 'T' && bp2 == 'G') || (bp1 == 'G' && bp2 == 'T'))
+                return 'K';
+            else if ((bp1 == 'A' && bp2 == 'C') || (bp1 == 'C' && bp2 == 'A'))
+                return 'M';
+            else
+                return 'N';
         }
     }
 }

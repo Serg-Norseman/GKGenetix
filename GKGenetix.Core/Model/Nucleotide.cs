@@ -18,61 +18,53 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
-
 namespace GKGenetix.Core.Model
 {
-    [Flags]
     public enum Nucleotide : byte
     {
         /// <summary>
-        /// ("0")
+        /// 
         /// </summary>
         None = 0,
 
         /// <summary>
+        /// Not determined ("0" [AncestryDNA], "-" [23andMe])
+        /// </summary>
+        NoCall = 1,
+
+        /// <summary>
         /// Adenine (complementary pair - T/U)
         /// </summary>
-        A = 1,
+        A = 2,
 
         /// <summary>
         /// Cytosine (complementary pair - G)
         /// </summary>
-        C = 2,
+        C = 3,
 
         /// <summary>
         /// Guanine (complementary pair - C)
         /// </summary>
-        G = 3,
+        G = 4,
 
         /// <summary>
         /// Thymine (DNA only; complementary pair - A)
         /// </summary>
-        T = 4,
+        T = 5,
 
         /// <summary>
         /// Uracil (RNA only; complementary pair - A)
         /// </summary>
-        U = 5,
+        U = 6,
 
         /// <summary>
         /// Insertion ("I")
         /// </summary>
-        I = 6,
+        I = 7,
 
         /// <summary>
         /// Deletion ("D")
         /// </summary>
-        D = 7,
-
-        /// <summary>
-        /// 
-        /// </summary>
-        Homozygous = 8,
-
-        /// <summary>
-        /// ("-")
-        /// </summary>
-        NoCall = 9,
+        D = 8,
     }
 }

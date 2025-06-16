@@ -30,11 +30,6 @@ namespace GKGenetix.Core
             return GetPosition_in_cM(chr_s, end_pos) - GetPosition_in_cM(chr_s, start_pos);
         }
 
-        public static double GetLength_in_cM(string chr, int start_pos, int end_pos)
-        {
-            return GetPosition_in_cM(chr, end_pos) - GetPosition_in_cM(chr, start_pos);
-        }
-
         private static double GetPosition_in_cM(string chr, int pos)
         {
             double cm = 0.0;
@@ -440,7 +435,7 @@ namespace GKGenetix.Core
                 snp_th = RefData.Compare_Autosomal_Threshold_SNPs;
                 errorRadius = snp_th / 2;
             }
-            int no_call_limit = RefData.Compare_NoCalls_Limit;
+            int no_call_limit = RefData.Compare_NoCalls_LimitDef;
 
             int paternal_no_call_count = 0;
             int maternal_no_call_count = 0;
@@ -564,40 +559,12 @@ namespace GKGenetix.Core
             return false;
         }
 
-        public static char GetNucleotideCode(char bp1, char bp2)
-        {
-            /*
-                 R = A/G
-                 Y = C/T
-                 S = G/C
-                 W = A/T
-                 K = G/T
-                 M = A/C
-             */
-
-            if ((bp1 == 'A' && bp2 == 'G') || (bp1 == 'G' && bp2 == 'A'))
-                return 'R';
-            else if ((bp1 == 'C' && bp2 == 'T') || (bp1 == 'T' && bp2 == 'C'))
-                return 'Y';
-            else if ((bp1 == 'C' && bp2 == 'G') || (bp1 == 'G' && bp2 == 'C'))
-                return 'S';
-            else if ((bp1 == 'A' && bp2 == 'T') || (bp1 == 'T' && bp2 == 'A'))
-                return 'W';
-            else if ((bp1 == 'T' && bp2 == 'G') || (bp1 == 'G' && bp2 == 'T'))
-                return 'K';
-            else if ((bp1 == 'A' && bp2 == 'C') || (bp1 == 'C' && bp2 == 'A'))
-                return 'M';
-            else
-                return 'N';
-        }
-
         public static IList<CmpSegment> CompareOneToOne(string kit1, string kit2, BackgroundWorker bwCompare, bool reference, bool justUpdate)
         {
             // just_update - if parameter true, will update if record not found but will not return the existing record if found.
-            IList<CmpSegment> segments_idx = new List<CmpSegment>();
+            IList<CmpSegment> segments_idx;
 
             bool exists = GKSqlFuncs.CheckAlreadyCompared(kit1, kit2);
-
             if (exists && !justUpdate) {
                 segments_idx = GKSqlFuncs.GetAutosomalCmp(kit1, kit2);
 
@@ -610,6 +577,8 @@ namespace GKGenetix.Core
                     }
                 }
             } else {
+                segments_idx = new List<CmpSegment>();
+
                 var otoRows = GKSqlFuncs.GetOTORows(kit1, kit2);
 
                 var tmp = new List<SNPMatch>();
@@ -619,7 +588,7 @@ namespace GKGenetix.Core
                 int end_pos = 0;
                 int prev_snp_count = 0;
                 int no_call_counter = 0;
-                int no_call_limit = RefData.Compare_NoCalls_Limit;
+                int no_call_limit = RefData.Compare_NoCalls_LimitDef;
 
                 foreach (var rd in otoRows) {
                     if (bwCompare != null && bwCompare.CancellationPending)
@@ -633,31 +602,20 @@ namespace GKGenetix.Core
                     string count = rd.Match;
 
                     if (prev_chr == 0) prev_chr = chromosome;
-                    //gt1.CheckCompleteness();
-                    //gt2.CheckCompleteness();
 
                     if (prev_chr == chromosome) {
                         float errorRadius = (chromosome == (byte)Chromosome.CHR_X) ? RefData.Compare_X_Threshold_SNPs / 2 : RefData.Compare_Autosomal_Threshold_SNPs / 2;
 
-                        if (count == "1") {
+                        if (count == "1" || gt1.Equals(gt2)) {
                             // match both alleles
                             tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, gt1.ToString()));
                             if (start_pos == 0) start_pos = position;
                         } else if (count == "2") {
                             // match 1 allele
-                            if (gt1.Equals(gt2)) {
-                                tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, gt1.ToString()));
-                                if (start_pos == 0) start_pos = position;
-                            } else if (gt1.A1 == gt2.A1) {
+                            if (gt1.Contains(gt2.A1)) {
                                 tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, gt2.A1.ToString()));
                                 if (start_pos == 0) start_pos = position;
-                            } else if (gt1.A1 == gt2.A2) {
-                                tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, gt2.A2.ToString()));
-                                if (start_pos == 0) start_pos = position;
-                            } else if (gt1.A2 == gt2.A1) {
-                                tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, gt2.A1.ToString()));
-                                if (start_pos == 0) start_pos = position;
-                            } else if (gt1.A2 == gt2.A2) {
+                            } else if (gt1.Contains(gt2.A2)) {
                                 tmp.Add(new SNPMatch(rsid, chromosome, position, gt1, gt2, gt2.A2.ToString()));
                                 if (start_pos == 0) start_pos = position;
                             } else {
@@ -707,18 +665,20 @@ namespace GKGenetix.Core
 
         public static IList<ROHSegment> ROH(string kit, bool justUpdate)
         {
-            IList<ROHSegment> segments_idx = new List<ROHSegment>();
+            IList<ROHSegment> segments_idx;
 
             bool exists = GKSqlFuncs.ExistsROH(kit);
-
             if (exists && !justUpdate) {
                 segments_idx = GKSqlFuncs.GetROHCmp(kit);
 
+                // Parallel.ForEach() slight increase within the margin of error
                 foreach (var row in segments_idx) {
                     var rohSeg = GKSqlFuncs.GetROHSeg(kit, row.Chromosome, row.StartPosition, row.EndPosition);
                     row.Rows = rohSeg;
                 }
             } else {
+                segments_idx = new List<ROHSegment>();
+
                 var rows = GKSqlFuncs.GetAutosomal(kit);
 
                 var tmp = new List<SNP>();
@@ -728,7 +688,7 @@ namespace GKGenetix.Core
                 int end_pos = 0;
                 int prev_snp_count = 0;
                 int no_call_counter = 0;
-                int no_call_limit = RefData.Compare_NoCalls_Limit;
+                int no_call_limit = RefData.Compare_NoCalls_LimitROH;
                 foreach (var snp in rows) {
                     byte chromosome = snp.Chromosome;
                     int position = snp.Position;
@@ -740,18 +700,12 @@ namespace GKGenetix.Core
                         float errorRadius = (chromosome == (byte)Chromosome.CHR_X) ? RefData.Compare_X_Threshold_SNPs / 2 : RefData.Compare_Autosomal_Threshold_SNPs / 2;
 
                         var genotype = snp.Genotype;
-                        char gt0 = genotype.A1;
-                        char gt1 = genotype.A2;
 
-                        bool gt0_unk = Genotype.IsEmptyOrUnknown(gt0);
-                        bool gt1_unk = Genotype.IsEmptyOrUnknown(gt1);
-                        if (gt1_unk) gt1 = gt0;
-
-                        if (gt0 == gt1 && !gt0_unk) {
+                        if (genotype.IsHomozygous()) {
                             // match 
                             tmp.Add(snp);
                             if (start_pos == 0) start_pos = position;
-                        } else if ((!gt0_unk && gt1_unk) || (!gt1_unk && gt0_unk)) {
+                        } else if (genotype.IsEmptyOrUnknown()) {
                             no_call_counter++;
                             if (no_call_counter <= no_call_limit) {
                                 tmp.Add(snp);
@@ -817,17 +771,12 @@ namespace GKGenetix.Core
 
                 bool amb = false;
                 if (child.A1 != child.A2) {
-                    if (father == child && mother.IsFullEmpty())
-                        amb = true;
-                    else if (mother == child && father.IsFullEmpty())
-                        amb = true;
-                    else if (father == child && mother == child)
-                        amb = true;
+                    amb = (father == child && mother.IsFullEmpty()) || (mother == child && father.IsFullEmpty()) || (father == child && mother == child);
                 }
 
                 if (amb) {
                     row.Ambiguous = true;
-                    char nc = GetNucleotideCode(child.A1, child.A2);
+                    char nc = child.GetNucleotideCode();
                     row.PhasedPaternal = nc;
                     row.PhasedMaternal = nc;
                     continue;
@@ -840,13 +789,13 @@ namespace GKGenetix.Core
                 }
 
                 if (chMale && row.Chromosome == (byte)Chromosome.CHR_X) {
-                    if (child.A1 == '-' && !mother.IsFullEmpty()) {
+                    if (child.A1 == Genotype.UnknownAllele && !mother.IsFullEmpty()) {
                         row.PhasedPaternal = ZeroChar;
                         row.PhasedMaternal = mother.A1;
                         continue;
                     }
                 } else {
-                    if (child.A1 == child.A2 && !Genotype.IsEmptyOrUnknown(child.A1)) {
+                    if (child.IsHomozygous()) {
                         row.PhasedPaternal = child.A1;
                         row.PhasedMaternal = child.A1;
                         continue;

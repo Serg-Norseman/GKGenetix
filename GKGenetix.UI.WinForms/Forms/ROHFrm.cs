@@ -66,7 +66,7 @@ namespace GKGenetix.UI.Forms
             dgvMatching.DataSource = null;
 
             Task.Factory.StartNew(() => {
-                roh_results = GKGenFuncs.ROH(kit, false);
+                roh_results = GKGenFuncs.ROH(kit, true);
 
                 this.Invoke(new MethodInvoker(delegate {
                     UpdateView();
@@ -106,6 +106,7 @@ namespace GKGenetix.UI.Forms
             var segRow = roh_results[index].Rows;
             SNP row = segRow[e.RowIndex];
 
+            // later replace with None/Null and NoCall
             if (row.Genotype.A1 == '-')
                 e.CellStyle.BackColor = Color.LightGray;
             else if (row.Genotype.A1 == '0')

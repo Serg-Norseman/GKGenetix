@@ -82,7 +82,7 @@ namespace GKGenetix.UI.Forms
             dgvMatching.DataStore = null;
 
             Task.Factory.StartNew(() => {
-                roh_results = GKGenFuncs.ROH(kit, false);
+                roh_results = GKGenFuncs.ROH(kit, true);
 
                 Application.Instance.Invoke(new Action(delegate {
                     UpdateView();

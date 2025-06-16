@@ -34,7 +34,8 @@ namespace GKGenetix.Core.Reference
         public static int Admixture_Threshold_SNPs = 100;
 
         // This parameter defines how many no-calls must be allowed in a matching segment. If the no-calls exceeds this limit in a segment, then the segment will not be matched.
-        public static int Compare_NoCalls_Limit = 5;
+        public static int Compare_NoCalls_LimitDef = 5;
+        public static int Compare_NoCalls_LimitROH = 200;
 
         public const double MB_THRESHOLD = 0.5;
 
