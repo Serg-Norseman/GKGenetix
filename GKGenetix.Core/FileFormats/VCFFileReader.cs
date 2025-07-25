@@ -47,8 +47,7 @@ namespace GKGenetix.Core.FileFormats
             // optional columns: FORMAT [8] and other
 
             string positionText = fields[1];
-            int position;
-            if (!int.TryParse(positionText, out position)) {
+            if (!int.TryParse(positionText, out int position)) {
                 throw new ParseException("Error in VCF raw file. Invalid position '{0}'.", positionText);
             }
 

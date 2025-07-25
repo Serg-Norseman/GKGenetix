@@ -462,8 +462,7 @@ namespace GKGenetix.Core
 
             // if result is not null, then there are significant child nodes
 
-            HGMatch match;
-            if (!haplogroupMatches.TryGetValue(hg.Name, out match)) {
+            if (!haplogroupMatches.TryGetValue(hg.Name, out HGMatch match)) {
                 if (result != null) {
                     result.Value = hg.Name;
                     return result;
@@ -500,8 +499,7 @@ namespace GKGenetix.Core
                     for (int j = 0; j < dbHaplogroupMutationsY.Count; j++) {
                         var hGroup = dbHaplogroupMutationsY[j];
                         if (snp.Position == hGroup.Position) {
-                            HGMatch tuple;
-                            if (!mutationMatches.TryGetValue(hGroup.Haplogroup, out tuple)) {
+                            if (!mutationMatches.TryGetValue(hGroup.Haplogroup, out HGMatch tuple)) {
                                 tuple = new HGMatch();
                                 mutationMatches.Add(hGroup.Haplogroup, tuple);
                             }
