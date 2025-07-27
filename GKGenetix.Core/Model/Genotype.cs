@@ -289,5 +289,22 @@ namespace GKGenetix.Core.Model
             else
                 return 'N';
         }
+
+        public override bool Equals(object o)
+        {
+            if (o is Genotype other) {
+                return (A1 == other.A1 && A2 == other.A2) ||
+                       (A1 == other.A2 && A2 == other.A1);
+            } else return false;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = -1506897950;
+            hashCode = hashCode * -1521134295 + A1.GetHashCode();
+            hashCode = hashCode * -1521134295 + A2.GetHashCode();
+            hashCode = hashCode * -1521134295 + Orientation.GetHashCode();
+            return hashCode;
+        }
     }
 }
