@@ -11,10 +11,9 @@
         <DefineConstants>NETCORE</DefineConstants>
 
         <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
 
         <NoWarn>$(NoWarn);NU1902;NU1903;NU1904;IDE0017</NoWarn>
-
-        <Platforms>MSWin64;Linux;MacOS</Platforms>
 
         <TargetFramework>net6.0-windows</TargetFramework>
         <OutputType>WinExe</OutputType>
@@ -36,8 +35,8 @@
 
     <ItemGroup>
         <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
-        <PackageReference Include="Eto.Serialization.Xaml" Version="2.8.3" />
-        <PackageReference Include="Eto.Platform.Wpf" Version="2.8.3" />
+        <PackageReference Include="Eto.Serialization.Xaml" Version="2.10.0" />
+        <PackageReference Include="Eto.Platform.Wpf" Version="2.10.0" />
     </ItemGroup>
 
 </Project>
