@@ -66,7 +66,6 @@ namespace GKGenetix.UI.Forms
         private TabPage tabMutations;
         private TabPage tabFasta;
         private TextArea txtFASTA;
-        private System.ComponentModel.IContainer components = null;
         private System.ComponentModel.BackgroundWorker bwNewKitAutosomalJob;
         private System.ComponentModel.BackgroundWorker bwSave;
         private System.ComponentModel.BackgroundWorker bwPopulate;
@@ -201,7 +200,7 @@ namespace GKGenetix.UI.Forms
             e.Effects = e.Data.ContainsUris ? DragEffects.Copy : DragEffects.None;
         }
 
-        private bool TryGetFilesDrop(DragEventArgs e, out string[] filePaths)
+        private static bool TryGetFilesDrop(DragEventArgs e, out string[] filePaths)
         {
             if (e.Data.ContainsUris) {
                 filePaths = e.Data.Uris.Select((x) => x.AbsolutePath).ToArray();
@@ -610,7 +609,7 @@ namespace GKGenetix.UI.Forms
 
             // kit - ystr
             var ystrList = GKSqlFuncs.GetYSTR(kit);
-            Dictionary<string, string> ystr_dict = new Dictionary<string, string>();
+            var ystr_dict = new Dictionary<string, string>();
             foreach (var str in ystrList) {
                 ystr_dict.Add(str.Marker, str.Repeats);
             }

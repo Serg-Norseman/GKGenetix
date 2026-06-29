@@ -10,6 +10,7 @@
 
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
+        <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
 
         <NoWarn>$(NoWarn);NU1902;NU1903;NU1904;IDE0017</NoWarn>
     </PropertyGroup>
