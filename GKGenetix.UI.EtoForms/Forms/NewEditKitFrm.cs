@@ -74,13 +74,11 @@ namespace GKGenetix.UI.Forms
         #endregion
 
 
-        private bool saveSuccess = false;
         private string ysnps = null;
         private string mtdna = null;
         private readonly string kit;
         private readonly bool kitDisabled = false;
         private readonly Control[] editableCtrls = null;
-
 
         public NewEditKitFrm(IKitHost host, string kit, bool disabled) : base(host)
         {
@@ -369,13 +367,15 @@ namespace GKGenetix.UI.Forms
             }
         }
 
+        private static readonly char[] separator = new char[] { '\t' };
+
         private void btnPasteY_Click(object sender, EventArgs e)
         {
             if (Clipboard.Instance.ContainsText) {
                 string stab = "";
                 for (int i = 0; i < 111; i++)
                     stab += "\t";
-                string[] ystr = (Clipboard.Instance.Text + stab).TrimStart().Split(new char[] { '\t' });
+                string[] ystr = (Clipboard.Instance.Text + stab).TrimStart().Split(separator);
 
                 //YDNA12
                 /*for (int i = 0; i < RefData.ydna12.Length; i++)
@@ -411,7 +411,7 @@ namespace GKGenetix.UI.Forms
             dgvYMisc.Rows.Clear();*/
         }
 
-        private void SetupYGrid(GridView dgv, string[] markers)
+        private static void SetupYGrid(GridView dgv, string[] markers)
         {
             //dgv.AllowUserToAddRows = false;
             //dgv.AllowUserToDeleteRows = false;
@@ -503,7 +503,6 @@ namespace GKGenetix.UI.Forms
 
         private void bwSave_DoWork(object sender, DoWorkEventArgs e)
         {
-            saveSuccess = false;
             object[] args = (object[])e.Argument;
 
             string kit_no = args[0].ToString();
@@ -542,7 +541,6 @@ namespace GKGenetix.UI.Forms
                 }
 
                 bwSave.ReportProgress(100, "Saved");
-                saveSuccess = true;
             } catch (Exception err) {
                 bwSave.ReportProgress(-1, "Not Saved. Tech Details: " + err.Message);
                 MessageBox.Show("Not Saved. Techical Details: " + err.Message, "Error", MessageBoxButtons.OK, MessageBoxType.Error);
@@ -643,10 +641,8 @@ namespace GKGenetix.UI.Forms
         {
             for (int i = 0; i < ydna.Length; i++) {
                 string marker = ydna[i];
-                if (ystr_dict.ContainsKey(marker)) {
-                    //dgv.Rows[i].Cells[1].Value = ystr_dict[marker];
-                    ystr_dict.Remove(marker);
-                }
+                //dgv.Rows[i].Cells[1].Value = ystr_dict[marker];
+                ystr_dict.Remove(marker);
             }
         }
 
