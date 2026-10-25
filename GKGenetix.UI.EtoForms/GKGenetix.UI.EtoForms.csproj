@@ -31,8 +31,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Eto.Forms" Version="2.13.0" />
-        <PackageReference Include="Eto.Serialization.Xaml" Version="2.13.0" />
+        <PackageReference Include="Eto.Forms" Version="2.12.0" />
+        <PackageReference Include="Eto.Serialization.Xaml" Version="2.12.0" />
         <PackageReference Include="OxyPlot.Eto" Version="1.1.0" />
     </ItemGroup>
 
